@@ -1,0 +1,28 @@
+{
+  "name": "@interviewpilot/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck",
+    "test": "tsx --test src/app.test.ts src/ai/aiService.test.ts src/services/interviewService.test.ts",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.30.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "groq-sdk": "^0.37.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
