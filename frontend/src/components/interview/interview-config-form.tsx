@@ -4,10 +4,12 @@ import { useState, type FormEvent } from 'react'
 import { OptionGroup } from '@/components/interview/option-group'
 import { Button } from '@/components/ui/button'
 import {
+  INTERVIEW_TYPES,
   LEVELS,
   QUESTION_COUNTS,
   ROLES,
   type InterviewConfig,
+  type InterviewType,
   type Level,
   type QuestionCount,
   type Role,
@@ -24,11 +26,12 @@ export function InterviewConfigForm({
 }: InterviewConfigFormProps) {
   const [role, setRole] = useState<Role>('Frontend Developer')
   const [level, setLevel] = useState<Level>('Mid-Level')
+  const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
   const [questionCount, setQuestionCount] = useState<QuestionCount>(5)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onSubmit({ role, level, questionCount })
+    onSubmit({ role, level, interviewType, questionCount })
   }
 
   return (
@@ -61,6 +64,16 @@ export function InterviewConfigForm({
         options={LEVELS}
         title="Level"
         value={level}
+      />
+
+      <OptionGroup
+        description="Choose the style of questions for this interview."
+        disabled={isLoading}
+        name="interviewType"
+        onChange={setInterviewType}
+        options={INTERVIEW_TYPES}
+        title="Interview type"
+        value={interviewType}
       />
 
       <OptionGroup

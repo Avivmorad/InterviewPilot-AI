@@ -30,7 +30,7 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
-  - Why not implemented: The interview type, answer flow, evaluation, final report, and deployment are still unfinished.
+  - Why not implemented: The answer flow, evaluation, final report, and deployment are still unfinished.
 - [ ] Phase 2 - User Accounts + History
   - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
 - [ ] Phase 3 - Resume Upload + Personalization
@@ -42,41 +42,26 @@ Phase 1 - MVP
 
 ## Current Sprint
 
-Interview Configuration UI
+AI Question Generation
 
-- [ ] ****Phase 5 Tasks****
-  - Why not implemented: Interview type selection is not part of the frontend configuration model.
+- [ ] ****Phase 6 Tasks****
+  - Why not implemented: Question generation does not accept or use the selected interview type.
 
 ## Next Task
 
-- [ ] TODO: Add Technical option
-  - Why not implemented: The configuration form currently supports only role, level, and question count.
+- [ ] TODO: Add interview type to the request model and question prompt
+  - Why not implemented: The frontend stores interview type, but the backend request model and prompt do not use it yet.
 
 ---
 
 ## ****Phase 1 Tasks****
-
-- [ ] ****Phase 5 - Interview Configuration UI****
-
-#### 5.4 Create Interview Type Selection
-
-- [ ] TODO: Add Technical option
-- [ ] TODO: Add Behavioral option
-- [ ] TODO: Add Mixed option
-  - Why not implemented: The configuration form currently supports only role, level, and question count.
-
-Explanation:
-
-The interview type controls the style of the interview.
-
----
 
 - [ ] ****Phase 6 - AI Question Generation****
 
 #### 6.2 Create Question Prompt Builder
 
 - [ ] TODO: Add interview type to the request model and question prompt
-  - Why not implemented: Frontend and backend request types currently contain only role, level, and question count.
+  - Why not implemented: The frontend sends interview type, but the backend request type and prompt currently ignore it.
 
 Explanation:
 
@@ -444,6 +429,8 @@ The frontend receives `status: ok` and displays `API connected`.
 
 ---
 
+- [x] ****Phase 5 - Interview Configuration UI****
+
 #### 5.1 Create Homepage
 
 - [x] DONE: Create homepage
@@ -479,6 +466,18 @@ The role tells the AI what type of interview questions to generate.
 Explanation:
 
 The experience level controls the difficulty of the questions.
+
+---
+
+#### 5.4 Create Interview Type Selection
+
+- [x] DONE: Add Technical option
+- [x] DONE: Add Behavioral option
+- [x] DONE: Add Mixed option
+
+Explanation:
+
+The selected interview type is stored in the frontend configuration and displayed in the current setup summary.
 
 ---
 
@@ -520,7 +519,7 @@ Expected input:
 }
 ```
 
-`interviewType` will be added by the unfinished task above.
+The backend will use `interviewType` after the unfinished Phase 6 task is complete.
 
 Expected output:
 
@@ -605,8 +604,7 @@ This makes the project feel more production-ready.
 - [x] DONE: User can open homepage
 - [x] DONE: User can select role
 - [x] DONE: User can select experience level
-- [ ] TODO: User can select interview type
-  - Why not implemented: Interview type is not present in the frontend or backend configuration types.
+- [x] DONE: User can select interview type
 - [x] DONE: AI generates questions
 - [ ] TODO: User can answer questions
   - Why not implemented: The interview session has no answer textarea or submit action.
