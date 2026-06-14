@@ -1,10 +1,12 @@
-# Phase 1 — סדר פעולות מלא
+# InterviewPilot AI — Phases Full Plan
 
-## 0. הכנות לפני שמתחילים
+# Phase 1 — Full Execution Plan
 
-### מה עושים
+## 0. Preparation Before Starting
 
-מתקינים/בודקים שיש:
+### What to do
+
+Install or verify that you have:
 
 ```txt
 Node.js
@@ -15,115 +17,115 @@ Codex
 Gemini API Key
 ```
 
-### מה זה
+### What this means
 
-- **Node.js** — מאפשר להריץ JavaScript במחשב.
-- **VS Code** — המקום שבו כותבים קוד.
-- **Git** — שומר גרסאות של הקוד.
-- **GitHub** — מעלה את הפרויקט לאינטרנט ולפורטפוליו.
-- **Codex** — עוזר לבנות ולתקן קוד.
-- **Gemini API Key** — המפתח שמאפשר לאפליקציה לדבר עם AI.
+- **Node.js** — allows you to run JavaScript on your computer.
+- **VS Code** — the code editor where you write and manage the project.
+- **Git** — saves versions of your code.
+- **GitHub** — uploads your project online for your portfolio.
+- **Codex** — helps you build, edit, and fix code.
+- **Gemini API Key** — the key that allows your app to communicate with AI.
 
 ---
 
-# 1. יצירת תיקיית פרויקט
+## 1. Create the Project Folder
 
-### מה עושים
+### What to do
 
-יוצרים תיקייה בשם:
+Create a folder named:
 
 ```txt
 InterviewPilot-AI
 ```
 
-### מה זה
+### What this means
 
-זו התיקייה הראשית של כל הפרויקט.
+This is the main folder for the entire project.
 
-בתוכה יהיו:
+Inside it, you will have:
 
 ```txt
-client  = האתר
-server  = השרת
+frontend = the website
+backend  = the API server
 ```
 
 ---
 
-# 2. יצירת Frontend
+## 2. Create the Frontend
 
-### מה עושים
+### What to do
 
-יוצרים React app עם Vite.
+Create a React app using Vite.
 
 ```txt
-client/
+frontend/
 ```
 
-### מה זה
+### What this means
 
-ה־Frontend הוא כל מה שהמשתמש רואה:
+The frontend is everything the user sees:
 
-- מסכים
-- כפתורים
-- טפסים
-- שאלות
-- דוח סופי
+- screens
+- buttons
+- forms
+- interview questions
+- final report
 
 ---
 
-# 3. התקנת TypeScript
+## 3. Install TypeScript
 
-### מה עושים
+### What to do
 
-בונים את הפרויקט מראש עם TypeScript.
+Build the project with TypeScript from the beginning.
 
-### מה זה
+### What this means
 
-TypeScript עוזר למנוע טעויות בקוד.
+TypeScript helps prevent coding mistakes.
 
-לדוגמה:
+Example:
 
 ```txt
-אם צריך מספר וכתבת טקסט — הוא מזהיר אותך
+If a number is expected and you write text, TypeScript warns you.
 ```
 
-זה נראה יותר מקצועי לקורות חיים.
+This also looks more professional for your resume.
 
 ---
 
-# 4. התקנת Tailwind CSS
+## 4. Install Tailwind CSS
 
-### מה עושים
+### What to do
 
-מוסיפים Tailwind ל־client.
+Add Tailwind CSS to the frontend.
 
-### מה זה
+### What this means
 
-Tailwind עוזר לעצב את האתר מהר.
+Tailwind helps you design the website quickly.
 
-לדוגמה:
+For example:
 
 ```txt
-כפתור יפה
-ריווחים
-צבעים
-כרטיסים
-מסכים נקיים
+nice buttons
+spacing
+colors
+cards
+clean screens
 ```
 
-בלי לכתוב הרבה CSS ידני.
+Without writing a lot of manual CSS.
 
 ---
 
-# 5. התקנת shadcn/ui
+## 5. Install shadcn/ui
 
-### מה עושים
+### What to do
 
-מוסיפים ספריית קומפוננטות מוכנות.
+Add a ready-made component library.
 
-### מה זה
+### What this means
 
-זה נותן רכיבים מוכנים כמו:
+shadcn/ui gives you ready components such as:
 
 ```txt
 Button
@@ -134,58 +136,58 @@ Select
 Dialog
 ```
 
-במקום לבנות הכל מאפס.
+This prevents you from building everything from scratch.
 
 ---
 
-# 6. יצירת Backend
+## 6. Create the Backend
 
-### מה עושים
+### What to do
 
-יוצרים תיקייה:
+Create a folder:
 
 ```txt
-server/
+backend/
 ```
 
-ומקימים שרת Express.
+Then create an Express server.
 
-### מה זה
+### What this means
 
-ה־Backend הוא החלק שהמשתמש לא רואה.
+The backend is the part the user does not see.
 
-הוא אחראי על:
+It is responsible for:
 
 ```txt
-קבלת בקשות מהאתר
-שליחת בקשות ל-Gemini
-החזרת תשובות לאתר
+receiving requests from the website
+sending requests to Gemini
+returning AI responses to the website
 ```
 
 ---
 
-# 7. חיבור Frontend ל־Backend
+## 7. Connect Frontend to Backend
 
-### מה עושים
+### What to do
 
-יוצרים בדיקה פשוטה:
+Create a simple test:
 
 ```txt
-האתר שולח בקשה לשרת
-השרת מחזיר "OK"
+The website sends a request to the server.
+The server returns "OK".
 ```
 
-### מה זה
+### What this means
 
-זה מוכיח ששני החלקים של הפרויקט מדברים אחד עם השני.
+This proves that both parts of the project can communicate with each other.
 
 ---
 
-# 8. יצירת דף בית
+## 8. Create the Home Page
 
-### מה עושים
+### What to do
 
-בונים עמוד ראשון:
+Build the first page:
 
 ```txt
 InterviewPilot AI
@@ -193,23 +195,23 @@ Practice realistic AI-powered technical interviews
 Start Interview
 ```
 
-### מה זה
+### What this means
 
-זה המסך הראשון שהמשתמש רואה.
+This is the first screen the user sees.
 
-המטרה:
+The goal:
 
 ```txt
-להרגיש כמו מוצר אמיתי
+Make it feel like a real product.
 ```
 
 ---
 
-# 9. יצירת מסך בחירת תפקיד
+## 9. Create the Role Selection Screen
 
-### מה עושים
+### What to do
 
-מוסיפים כרטיסים:
+Add cards for:
 
 ```txt
 Frontend Developer
@@ -218,19 +220,19 @@ Full Stack Developer
 AI Engineer
 ```
 
-### מה זה
+### What this means
 
-המשתמש בוחר לאיזה תפקיד הוא רוצה להתאמן.
+The user chooses which role they want to practice for.
 
-הבחירה תשפיע על השאלות שה־AI ייצור.
+This choice affects the questions the AI will generate.
 
 ---
 
-# 10. יצירת מסך בחירת רמה
+## 10. Create the Experience Level Screen
 
-### מה עושים
+### What to do
 
-מוסיפים אפשרויות:
+Add options:
 
 ```txt
 Junior
@@ -238,24 +240,24 @@ Mid-Level
 Senior
 ```
 
-### מה זה
+### What this means
 
-הרמה קובעת את קושי השאלות.
+The level controls the difficulty of the questions.
 
-דוגמה:
+Example:
 
 ```txt
-Junior = שאלות בסיסיות
-Senior = שאלות עומק וארכיטקטורה
+Junior = basic questions
+Senior = deep architecture and advanced questions
 ```
 
 ---
 
-# 11. יצירת מסך בחירת סוג ראיון
+## 11. Create the Interview Type Screen
 
-### מה עושים
+### What to do
 
-מוסיפים:
+Add:
 
 ```txt
 Technical
@@ -263,21 +265,21 @@ Behavioral
 Mixed
 ```
 
-### מה זה
+### What this means
 
-זה קובע איזה סוג שאלות יהיו:
+This controls the type of questions:
 
-- **Technical** — שאלות טכניות.
-- **Behavioral** — שאלות אישיות/עבודה בצוות.
-- **Mixed** — שילוב.
+- **Technical** — technical questions.
+- **Behavioral** — teamwork, communication, and personal experience questions.
+- **Mixed** — a combination of both.
 
 ---
 
-# 12. שמירת בחירות המשתמש
+## 12. Save the User Selections
 
-### מה עושים
+### What to do
 
-שומרים את הבחירות באובייקט:
+Save the choices in an object:
 
 ```txt
 role
@@ -285,120 +287,120 @@ experienceLevel
 interviewType
 ```
 
-### מה זה
+### What this means
 
-זה המידע שהמערכת תשלח ל־AI.
+This is the information the system sends to the AI.
 
-לדוגמה:
+Example:
 
 ```txt
 AI Engineer + Junior + Technical
 ```
 
-ה־AI יידע ליצור ראיון מתאים לזה.
+The AI will use this to create a relevant interview.
 
 ---
 
-# 13. יצירת API ליצירת ראיון
+## 13. Create the Interview Generation API
 
-### מה עושים
+### What to do
 
-בשרת יוצרים:
+In the server, create:
 
 ```txt
-POST /api/interview/generate
+POST /api/interview/create
 ```
 
-### מה זה
+### What this means
 
-זה נתיב שהאתר קורא לו כדי לבקש שאלות.
+This is the route the website calls to request interview questions.
 
-האתר שולח:
+The website sends:
 
 ```txt
-תפקיד + רמה + סוג ראיון
+role + experience level + interview type
 ```
 
-השרת מחזיר:
+The server returns:
 
 ```txt
-רשימת שאלות
-```
-
----
-
-# 14. חיבור Gemini
-
-### מה עושים
-
-יוצרים שירות:
-
-```txt
-geminiService
-```
-
-### מה זה
-
-זה הקובץ שמדבר עם Gemini.
-
-הוא אחראי על:
-
-```txt
-לקבל prompt
-לשלוח אותו ל-Gemini
-לקבל תשובה
-להחזיר אותה לשרת
+a list of questions
 ```
 
 ---
 
-# 15. יצירת Prompt Builder לשאלות
+## 14. Connect Gemini
 
-### מה עושים
+### What to do
 
-יוצרים קובץ שבונה הוראות ל־AI.
-
-### מה זה
-
-במקום לכתוב prompt מבולגן, יש קובץ מסודר שאומר ל־AI:
+Create a service:
 
 ```txt
-צור 5 שאלות ראיון
-לפי תפקיד
-לפי רמה
-לפי סוג ראיון
-תחזיר JSON מסודר
+AI service with a Gemini provider
+```
+
+### What this means
+
+This is the file that communicates with Gemini.
+
+It is responsible for:
+
+```txt
+receiving a prompt
+sending it to Gemini
+getting a response
+returning it to the server
 ```
 
 ---
 
-# 16. החזרת שאלות בפורמט קבוע
+## 15. Create a Prompt Builder for Questions
 
-### מה עושים
+### What to do
 
-דואגים שה־AI מחזיר JSON כזה:
+Create a file that builds instructions for the AI.
+
+### What this means
+
+Instead of writing messy prompts, you create a clean file that tells the AI:
+
+```txt
+Create 5 interview questions.
+Use the selected role.
+Use the selected experience level.
+Use the selected interview type.
+Return structured JSON.
+```
+
+---
+
+## 16. Return Questions in a Fixed Format
+
+### What to do
+
+Make sure the AI returns JSON like this:
 
 ```txt
 id
 question
 topic
 difficulty
-expectedAnswerPoints
+expectedConcepts
 ```
 
-### מה זה
+### What this means
 
-זה חשוב כי האתר צריך לדעת איך להציג את הנתונים.
+This is important because the website needs to know how to display the data.
 
-לא רוצים תשובה חופשית ומבולגנת.
+You do not want random, unstructured AI text.
 
 ---
 
-# 17. הצגת שאלות באתר
+## 17. Display Questions on the Website
 
-### מה עושים
+### What to do
 
-יוצרים מסך:
+Create an interview screen:
 
 ```txt
 Question 1 of 5
@@ -407,80 +409,80 @@ Question 1 of 5
 [Submit Answer]
 ```
 
-### מה זה
+### What this means
 
-זה מסך הראיון עצמו.
+This is the actual interview screen.
 
-המשתמש רואה שאלה אחת בכל פעם ועונה.
-
----
-
-# 18. יצירת תיבת תשובה
-
-### מה עושים
-
-מוסיפים Textarea.
-
-### מה זה
-
-זה המקום שבו המשתמש כותב את התשובה שלו.
+The user sees one question at a time and writes an answer.
 
 ---
 
-# 19. יצירת API להערכת תשובה
+## 18. Create the Answer Box
 
-### מה עושים
+### What to do
 
-בשרת יוצרים:
+Add a Textarea.
+
+### What this means
+
+This is where the user writes their answer.
+
+---
+
+## 19. Create the Answer Evaluation API
+
+### What to do
+
+In the server, create:
 
 ```txt
 POST /api/interview/evaluate
 ```
 
-### מה זה
+### What this means
 
-האתר שולח לשרת:
+The website sends the server:
 
 ```txt
-השאלה
-התשובה של המשתמש
-התפקיד
-הרמה
+the question
+the user's answer
+the role
+the experience level
 ```
 
-השרת מחזיר:
+The server returns:
 
 ```txt
-ציון ופידבק
-```
-
----
-
-# 20. יצירת Prompt Builder להערכה
-
-### מה עושים
-
-יוצרים prompt שאומר ל־AI איך לבדוק תשובה.
-
-### מה זה
-
-ה־AI מקבל הוראות ברורות:
-
-```txt
-תן ציון 1-10
-כתוב חוזקות
-כתוב חולשות
-כתוב מושגים חסרים
-כתוב תשובה משופרת
+a score and feedback
 ```
 
 ---
 
-# 21. החזרת הערכה בפורמט קבוע
+## 20. Create a Prompt Builder for Evaluation
 
-### מה עושים
+### What to do
 
-ה־AI מחזיר:
+Create a prompt that tells the AI how to evaluate an answer.
+
+### What this means
+
+The AI receives clear instructions:
+
+```txt
+Give a score from 1-10.
+Write strengths.
+Write weaknesses.
+Write missing concepts.
+Write an improved answer.
+```
+
+---
+
+## 21. Return Evaluation in a Fixed Format
+
+### What to do
+
+The AI returns:
 
 ```txt
 score
@@ -491,19 +493,19 @@ improvedAnswer
 confidenceLevel
 ```
 
-### מה זה
+### What this means
 
-זה הופך את הפידבק למבנה קבוע וברור.
+This makes the feedback structured and clear.
 
-זה חשוב מאוד לפרויקט AI רציני.
+This is very important for a serious AI project.
 
 ---
 
-# 22. הצגת פידבק באתר
+## 22. Display Feedback on the Website
 
-### מה עושים
+### What to do
 
-אחרי שליחת תשובה מציגים:
+After the user submits an answer, display:
 
 ```txt
 Score: 8/10
@@ -513,54 +515,54 @@ Missing Concepts
 Improved Answer
 ```
 
-### מה זה
+### What this means
 
-המשתמש מבין בדיוק מה טוב ומה צריך לשפר.
+The user understands exactly what was good and what needs improvement.
 
 ---
 
-# 23. מעבר לשאלה הבאה
+## 23. Move to the Next Question
 
-### מה עושים
+### What to do
 
-מוסיפים כפתור:
+Add a button:
 
 ```txt
 Next Question
 ```
 
-### מה זה
+### What this means
 
-אחרי פידבק, המשתמש עובר לשאלה הבאה.
+After receiving feedback, the user moves to the next question.
 
 ---
 
-# 24. שמירת כל התשובות והציונים
+## 24. Save All Answers and Scores
 
-### מה עושים
+### What to do
 
-שומרים בזיכרון של האתר:
+Store in the frontend memory:
 
 ```txt
-כל שאלה
-כל תשובה
-כל ציון
-כל פידבק
+each question
+each user answer
+each score
+each feedback result
 ```
 
-### מה זה
+### What this means
 
-צריך את זה בשביל הדוח הסופי.
+You need this data for the final report.
 
 ---
 
-# 25. יצירת Final Report
+## 25. Create the Final Report
 
-### מה עושים
+### What to do
 
-בסוף הראיון יוצרים מסך סיכום.
+At the end of the interview, create a summary screen.
 
-### מה זה כולל
+### What it includes
 
 ```txt
 Overall Score
@@ -576,21 +578,21 @@ Recommended Topics
 
 ---
 
-# 26. חישוב ציון כללי
+## 26. Calculate the Overall Score
 
-### מה עושים
+### What to do
 
-לוקחים את כל הציונים ומחשבים ממוצע.
+Take all scores and calculate the average.
 
-### מה זה
+### What this means
 
-אם היו ציונים:
+If the scores are:
 
 ```txt
 8, 7, 9, 6, 8
 ```
 
-הציון הכללי יהיה:
+The overall score will be:
 
 ```txt
 7.6/10
@@ -598,15 +600,15 @@ Recommended Topics
 
 ---
 
-# 27. יצירת Learning Roadmap
+## 27. Create a Learning Roadmap
 
-### מה עושים
+### What to do
 
-ה־AI או הקוד יוצרים רשימת נושאים לשיפור.
+The AI or the code creates a list of topics for improvement.
 
-### מה זה
+### What this means
 
-לדוגמה:
+Example:
 
 ```txt
 1. Learn REST API basics
@@ -614,15 +616,15 @@ Recommended Topics
 3. Review authentication flow
 ```
 
-זה נותן למשתמש תוכנית למידה אחרי הראיון.
+This gives the user a learning plan after the interview.
 
 ---
 
-# 28. הוספת Loading States
+## 28. Add Loading States
 
-### מה עושים
+### What to do
 
-מוסיפים הודעות טעינה:
+Add loading messages:
 
 ```txt
 Generating questions...
@@ -630,110 +632,110 @@ Evaluating answer...
 Creating report...
 ```
 
-### מה זה
+### What this means
 
-כשה־AI עובד, המשתמש לא יחשוב שהאתר נתקע.
+When the AI is working, the user will not think the website is stuck.
 
 ---
 
-# 29. הוספת Error States
+## 29. Add Error States
 
-### מה עושים
+### What to do
 
-מוסיפים הודעות שגיאה:
+Add error messages:
 
 ```txt
 Something went wrong. Please try again.
 ```
 
-### מה זה
+### What this means
 
-אם Gemini נכשל או האינטרנט נופל, האתר לא קורס.
+If Gemini fails or the internet connection has a problem, the website does not crash.
 
 ---
 
-# 30. בדיקות ידניות
+## 30. Manual Testing
 
-### מה עושים
+### What to do
 
-בודקים:
+Test:
 
 ```txt
-בחירת תפקיד עובדת
-יצירת שאלות עובדת
-שליחת תשובה עובדת
-פידבק מוצג
-דוח סופי נוצר
+role selection works
+question generation works
+answer submission works
+feedback appears
+final report is created
 ```
 
-### מה זה
+### What this means
 
-מוודאים שה־MVP באמת עובד מהתחלה עד סוף.
+You verify that the MVP works from start to finish.
 
 ---
 
-# 31. העלאה ל־GitHub
+## 31. Push to GitHub
 
-### מה עושים
+### What to do
 
-שומרים את הקוד ב־GitHub.
+Save the code on GitHub.
 
-### מה זה
+### What this means
 
-זה חשוב כי מגייסים יכולים לראות:
+This is important because recruiters can see:
 
 ```txt
-קוד
-מבנה פרויקט
+code
+project structure
 commits
 README
 ```
 
 ---
 
-# 32. כתיבת README
+## 32. Write the README
 
-### מה עושים
+### What to do
 
-כותבים קובץ הסבר לפרויקט.
+Write a project explanation file.
 
-### מה צריך להיות בו
+### What it should include
 
 ```txt
-מה הפרויקט עושה
-באיזה טכנולוגיות השתמשת
-איך מריצים אותו
-מה ה-AI עושה
-מה למדת
-תמונות מסך
+what the project does
+which technologies you used
+how to run it
+what the AI does
+what you learned
+screenshots
 ```
 
-### למה זה חשוב
+### Why this is important
 
-הרבה מגייסים קוראים README לפני שהם מסתכלים בקוד.
+Many recruiters read the README before looking at the code.
 
 ---
 
-# 33. Deployment
+## 33. Deployment
 
-### מה עושים
+### What to do
 
-מעלים לאינטרנט:
+Deploy the project online:
 
 ```txt
 Frontend → Vercel
 Backend → Render
 ```
 
-### מה זה
+### What this means
 
-ככה אפשר לשלוח לינק חי למגייסים.
+This allows you to send a live link to recruiters.
 
 ---
 
-# 34. מה לא עושים עדיין
+## 34. What Not to Build Yet
 
-ב־Phase 1 לא מוסיפים:
+In Phase 1, do not add:
 
 ```txt
 Login
@@ -746,15 +748,15 @@ Payment
 Admin Panel
 ```
 
-### למה
+### Why
 
-כי זה יאט את הבנייה.
+Because it will slow down the build.
 
-קודם בונים מוצר עובד.
+First, build a working product.
 
 ---
 
-# סדר הביצוע הכי נכון
+# Best Execution Order
 
 ```txt
 1. Setup project
@@ -784,4 +786,4 @@ Admin Panel
 25. Deploy
 ```
 
-זה הסדר הכי נכון ל־Phase 1.
+This is the best order for Phase 1.

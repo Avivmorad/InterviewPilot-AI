@@ -14,6 +14,7 @@ Rules:
 6. Keep explanations short but clear.
 7. Do not delete completed tasks.
 8. Update the progress section after every completed task.
+9. Use each `Phase N Tasks` checkbox as the completion status for that numbered task group.
 
 ---
 
@@ -33,11 +34,12 @@ Phase 1 - MVP
 
 ## Current Sprint
 
-Project Setup
+Frontend Backend Connection
+- [ ] ****Phase 4 Tasks****
 
 ## Next Task
 
-- [ ] TODO: Create project folder structure
+- [ ] TODO: Call `/api/health` from the frontend
 
 ---
 
@@ -49,11 +51,13 @@ Build a working AI interview simulator where the user can choose a role, experie
 
 ---
 
+- [ ] ****Phase 1 Tasks****
+
 ## 1. Project Setup
 
 ### 1.1 Create Main Project Folder
 
-- [ ] TODO: Create main folder named `InterviewPilot-AI`
+- [x] DONE: Create main folder named `InterviewPilot-AI`
 
 Explanation:
 
@@ -69,22 +73,22 @@ InterviewPilot-AI/
 
 ### 1.2 Create Main Subfolders
 
-- [ ] TODO: Create `client` folder
-- [ ] TODO: Create `server` folder
-- [ ] TODO: Create `docs` folder
+- [x] DONE: Create `frontend` folder
+- [x] DONE: Create `backend` folder
+- [x] DONE: Create `docs` folder
 
 Explanation:
 
-`client` is the website users see.
-`server` is the backend that talks to the AI.
+`frontend` is the website users see.
+`backend` is the server that talks to the AI.
 `docs` contains project documentation and planning.
 
 Expected result:
 
 ```txt
 InterviewPilot-AI/
-├── client/
-├── server/
+├── frontend/
+├── backend/
 └── docs/
 ```
 
@@ -92,12 +96,13 @@ InterviewPilot-AI/
 
 ### 1.3 Create Documentation Files
 
-- [ ] TODO: Create `README.md`
-- [ ] TODO: Create `docs/MASTER_TASKS.md`
-- [ ] TODO: Create `docs/PROJECT_OVERVIEW.md`
-- [ ] TODO: Create `docs/ARCHITECTURE.md`
-- [ ] TODO: Create `docs/API_DESIGN.md`
-- [ ] TODO: Create `docs/PROMPTS.md`
+- [x] DONE: Create `README.md`
+- [x] DONE: Create `docs/MASTER_TASKS.md`
+- [x] DONE: Create `docs/PROJECT_PLAN.md`
+- [x] DONE: Create `docs/MVP_SCOPE.md`
+- [x] DONE: Create `docs/ARCHITECTURE.md`
+- [x] DONE: Create `docs/API_DESIGN.md`
+- [x] DONE: Create `docs/AI_PROMPT_DESIGN.md`
 
 Explanation:
 
@@ -105,11 +110,13 @@ These files make the project easier to understand for the developer, Codex, and 
 
 ---
 
+- [x] ****Phase 2 Tasks****
+
 ## 2. Frontend Setup
 
 ### 2.1 Create React App
 
-- [ ] TODO: Create React + Vite + TypeScript app inside `client`
+- [x] DONE: Create React + Vite + TypeScript app inside `frontend`
 
 Explanation:
 
@@ -125,7 +132,7 @@ The app runs locally in the browser.
 
 ### 2.2 Install Tailwind CSS
 
-- [ ] TODO: Install and configure Tailwind CSS
+- [x] DONE: Install and configure Tailwind CSS
 
 Explanation:
 
@@ -139,7 +146,7 @@ The frontend can use Tailwind classes for layout, colors, spacing, and buttons.
 
 ### 2.3 Install shadcn/ui
 
-- [ ] TODO: Install and configure shadcn/ui
+- [x] DONE: Install and configure shadcn/ui
 
 Explanation:
 
@@ -151,11 +158,13 @@ The project can use reusable UI components instead of building everything from z
 
 ---
 
+- [x] ****Phase 3 Tasks****
+
 ## 3. Backend Setup
 
 ### 3.1 Create Express Server
 
-- [ ] TODO: Create Express + TypeScript backend inside `server`
+- [x] DONE: Create Express + TypeScript backend inside `backend`
 
 Explanation:
 
@@ -170,7 +179,7 @@ The backend runs locally.
 
 ### 3.2 Create Health Check Endpoint
 
-- [ ] TODO: Create `GET /api/health`
+- [x] DONE: Create `GET /api/health`
 
 Explanation:
 
@@ -186,11 +195,13 @@ Expected response:
 
 ---
 
+- [ ] ****Phase 4 Tasks****
+
 ## 4. Frontend Backend Connection
 
 ### 4.1 Create API Client
 
-- [ ] TODO: Create frontend API service file
+- [x] DONE: Create frontend API service file
 
 Explanation:
 
@@ -216,14 +227,16 @@ The frontend receives `status: ok`.
 
 ---
 
+- [ ] ****Phase 5 Tasks****
+
 ## 5. Interview Configuration UI
 
 ### 5.1 Create Homepage
 
-- [ ] TODO: Create homepage
-- [ ] TODO: Add project title
-- [ ] TODO: Add short product description
-- [ ] TODO: Add Start Interview button
+- [x] DONE: Create homepage
+- [x] DONE: Add project title
+- [x] DONE: Add short product description
+- [x] DONE: Add Start Interview button
 
 Explanation:
 
@@ -233,10 +246,10 @@ This is the first page the user sees.
 
 ### 5.2 Create Role Selection
 
-- [ ] TODO: Add Frontend Developer option
-- [ ] TODO: Add Backend Developer option
-- [ ] TODO: Add Full Stack Developer option
-- [ ] TODO: Add AI Engineer option
+- [x] DONE: Add Frontend Developer option
+- [x] DONE: Add Backend Developer option
+- [x] DONE: Add Full Stack Developer option
+- [x] DONE: Add AI Engineer option
 
 Explanation:
 
@@ -246,9 +259,9 @@ The role tells the AI what type of interview questions to generate.
 
 ### 5.3 Create Experience Level Selection
 
-- [ ] TODO: Add Junior option
-- [ ] TODO: Add Mid-Level option
-- [ ] TODO: Add Senior option
+- [x] DONE: Add Junior option
+- [x] DONE: Add Mid-Level option
+- [x] DONE: Add Senior option
 
 Explanation:
 
@@ -268,11 +281,13 @@ The interview type controls the style of the interview.
 
 ---
 
+- [ ] ****Phase 6 Tasks****
+
 ## 6. AI Question Generation
 
 ### 6.1 Create Gemini Service
 
-- [ ] TODO: Create Gemini AI service in backend
+- [x] DONE: Create Gemini AI service in backend
 
 Explanation:
 
@@ -282,7 +297,8 @@ This service is responsible for sending prompts to Gemini and receiving AI respo
 
 ### 6.2 Create Question Prompt Builder
 
-- [ ] TODO: Create prompt builder for interview questions
+- [x] DONE: Create prompt builder for interview questions
+- [ ] TODO: Add interview type to the request model and question prompt
 
 Explanation:
 
@@ -298,9 +314,9 @@ It should include:
 
 ---
 
-### 6.3 Create Generate Interview Endpoint
+### 6.3 Create Interview Endpoint
 
-- [ ] TODO: Create `POST /api/interview/generate`
+- [x] DONE: Create `POST /api/interview/create`
 
 Explanation:
 
@@ -326,14 +342,16 @@ Expected output:
 
 ---
 
+- [ ] ****Phase 7 Tasks****
+
 ## 7. Interview Session UI
 
 ### 7.1 Display Questions
 
 - [ ] TODO: Show one question at a time
-- [ ] TODO: Show question number
-- [ ] TODO: Show topic
-- [ ] TODO: Show difficulty
+- [x] DONE: Show question number
+- [x] DONE: Show topic
+- [x] DONE: Show difficulty
 
 Explanation:
 
@@ -351,6 +369,8 @@ Explanation:
 The user writes their answer here.
 
 ---
+
+- [ ] ****Phase 8 Tasks****
 
 ## 8. Answer Evaluation
 
@@ -397,6 +417,8 @@ This is one of the most important AI features in the project.
 
 ---
 
+- [ ] ****Phase 9 Tasks****
+
 ## 9. Final Report
 
 ### 9.1 Store Interview Results
@@ -426,11 +448,13 @@ This gives the user a useful summary after finishing the interview.
 
 ---
 
+- [ ] ****Phase 10 Tasks****
+
 ## 10. MVP Quality Improvements
 
 ### 10.1 Loading States
 
-- [ ] TODO: Add loading state while generating questions
+- [x] DONE: Add loading state while generating questions
 - [ ] TODO: Add loading state while evaluating answers
 - [ ] TODO: Add loading state while generating final report
 
@@ -442,10 +466,10 @@ Loading states prevent the app from feeling broken while AI is working.
 
 ### 10.2 Error Handling
 
-- [ ] TODO: Handle Gemini API errors
-- [ ] TODO: Handle backend errors
+- [x] DONE: Handle Gemini API errors
+- [x] DONE: Handle backend errors
 - [ ] TODO: Handle empty answers
-- [ ] TODO: Handle invalid selections
+- [x] DONE: Handle invalid selections
 
 Explanation:
 
@@ -453,34 +477,38 @@ This makes the project feel more production-ready.
 
 ---
 
+- [ ] ****Phase 11 Tasks****
+
 ## 11. Documentation
 
 ### 11.1 Update README
 
-- [ ] TODO: Explain what the project does
-- [ ] TODO: List technologies used
-- [ ] TODO: Explain how to run locally
+- [x] DONE: Explain what the project does
+- [x] DONE: List technologies used
+- [x] DONE: Explain how to run locally
 - [ ] TODO: Add screenshots later
-- [ ] TODO: Explain AI features
+- [x] DONE: Explain AI features
 
 ---
 
 ### 11.2 Update Architecture Document
 
-- [ ] TODO: Explain frontend
-- [ ] TODO: Explain backend
-- [ ] TODO: Explain AI flow
-- [ ] TODO: Explain API structure
+- [x] DONE: Explain frontend
+- [x] DONE: Explain backend
+- [x] DONE: Explain AI flow
+- [x] DONE: Explain API structure
 
 ---
 
 ### 11.3 Update Prompts Document
 
-- [ ] TODO: Document question generation prompt
+- [x] DONE: Document question generation prompt
 - [ ] TODO: Document answer evaluation prompt
 - [ ] TODO: Document final report prompt
 
 ---
+
+- [ ] ****Phase 12 Tasks****
 
 ## 12. Deployment
 
@@ -518,11 +546,11 @@ This confirms the project is ready to share.
 
 # Phase 1 Completion Checklist
 
-- [ ] TODO: User can open homepage
-- [ ] TODO: User can select role
-- [ ] TODO: User can select experience level
+- [x] DONE: User can open homepage
+- [x] DONE: User can select role
+- [x] DONE: User can select experience level
 - [ ] TODO: User can select interview type
-- [ ] TODO: AI generates questions
+- [x] DONE: AI generates questions
 - [ ] TODO: User can answer questions
 - [ ] TODO: AI evaluates answers
 - [ ] TODO: User can move between questions
