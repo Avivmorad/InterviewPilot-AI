@@ -5,6 +5,11 @@ import type {
   InterviewQuestion,
 } from '@/types/interview'
 
+export type ApiHealth = {
+  status: 'ok'
+  message: string
+}
+
 const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(
   /\/+$/,
   '',
@@ -32,6 +37,40 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isDifficulty(value: unknown): value is Difficulty {
   return value === 'junior' || value === 'mid-level' || value === 'senior'
+}
+
+export async function getApiHealth(): Promise<ApiHealth> {
+  let response: Response
+
+  try {
+    response = await fetch(`${apiUrl}/api/health`)
+  } catch {
+    throw new InterviewApiError(
+      'Unable to reach the InterviewPilot API. Make sure the backend is running.',
+      'NETWORK_ERROR',
+      0,
+    )
+  }
+
+  const data: unknown = await response.json().catch(() => null)
+
+  if (
+    !response.ok ||
+    !isRecord(data) ||
+    data.status !== 'ok' ||
+    typeof data.message !== 'string'
+  ) {
+    throw new InterviewApiError(
+      'The backend health check returned an invalid response.',
+      'INVALID_HEALTH_RESPONSE',
+      response.status,
+    )
+  }
+
+  return {
+    status: data.status,
+    message: data.message,
+  }
 }
 
 function parseQuestion(value: unknown): InterviewQuestion {

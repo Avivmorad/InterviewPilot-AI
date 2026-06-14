@@ -29,58 +29,34 @@ Phase 1 - MVP
 
 ## Phase Status
 
-Phase 1 - MVP
-   Why not implemented: The interview type, answer flow, evaluation, final report, and deployment are still unfinished.
-Phase 2 - User Accounts + History
-   Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
-Phase 3 - Resume Upload + Personalization
-   Why not implemented: Phase 3 is locked until the earlier phases are complete.
-Phase 4 - Voice Interviews
-   Why not implemented: Phase 4 is locked until the earlier phases are complete.
-Phase 5 - AI Career Coach
+- [ ] Phase 1 - MVP
+  - Why not implemented: The interview type, answer flow, evaluation, final report, and deployment are still unfinished.
+- [ ] Phase 2 - User Accounts + History
+  - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
+- [ ] Phase 3 - Resume Upload + Personalization
+  - Why not implemented: Phase 3 is locked until the earlier phases are complete.
+- [ ] Phase 4 - Voice Interviews
+  - Why not implemented: Phase 4 is locked until the earlier phases are complete.
+- [ ] Phase 5 - AI Career Coach
+  - Why not implemented: Phase 5 is locked until the earlier phases are complete.
 
 ## Current Sprint
 
-Frontend Backend Connection
+Interview Configuration UI
 
-- [ ] ****Phase 4 Tasks****
-  - Why not implemented: The frontend API client creates interviews but does not call the health endpoint.
+- [ ] ****Phase 5 Tasks****
+  - Why not implemented: Interview type selection is not part of the frontend configuration model.
 
 ## Next Task
 
-- [ ] TODO: Call `/api/health` from the frontend
-  - Why not implemented: No frontend health-check function or UI status exists yet.
-
----
-
-# Phase 1 - MVP
-
-Goal:
-
-Build a working AI interview simulator where the user can choose a role, experience level, and interview type, answer AI-generated questions, receive feedback, and get a final report.
+- [ ] TODO: Add Technical option
+  - Why not implemented: The configuration form currently supports only role, level, and question count.
 
 ---
 
 ## ****Phase 1 Tasks****
 
-### 4. Frontend Backend Connection
-
-#### 4.2 Test Connection
-
-- [ ] TODO: Call `/api/health` from the frontend
-  - Why not implemented: The frontend API service only implements `POST /api/interview/create`.
-
-Explanation:
-
-This proves the frontend and backend can communicate.
-
-Expected result:
-
-The frontend receives `status: ok`.
-
----
-
-### 5. Interview Configuration UI
+- [ ] ****Phase 5 - Interview Configuration UI****
 
 #### 5.4 Create Interview Type Selection
 
@@ -95,7 +71,7 @@ The interview type controls the style of the interview.
 
 ---
 
-### 6. AI Question Generation
+- [ ] ****Phase 6 - AI Question Generation****
 
 #### 6.2 Create Question Prompt Builder
 
@@ -116,7 +92,7 @@ It should include:
 
 ---
 
-### 7. Interview Session UI
+- [ ] ****Phase 7 - Interview Session UI****
 
 #### 7.1 Display Questions
 
@@ -141,7 +117,7 @@ The user writes their answer here.
 
 ---
 
-### 8. Answer Evaluation
+- [ ] ****Phase 8 - Answer Evaluation****
 
 #### 8.1 Create Evaluation Prompt Builder
 
@@ -189,7 +165,7 @@ This is one of the most important AI features in the project.
 
 ---
 
-### 9. Final Report
+- [ ] ****Phase 9 - Final Report****
 
 #### 9.1 Store Interview Results
 
@@ -219,7 +195,7 @@ This gives the user a useful summary after finishing the interview.
 
 ---
 
-### 10. MVP Quality Improvements
+- [ ] ****Phase 10 - MVP Quality Improvements****
 
 #### 10.1 Loading States
 
@@ -244,7 +220,7 @@ This makes the project feel more production-ready.
 
 ---
 
-### 11. Documentation
+- [ ] ****Phase 11 - Documentation****
 
 #### 11.1 Update README
 
@@ -261,7 +237,7 @@ This makes the project feel more production-ready.
 
 ---
 
-### 12. Deployment
+- [ ] ****Phase 12 - Deployment****
 
 #### 12.1 Deploy Frontend
 
@@ -300,7 +276,7 @@ This confirms the project is ready to share.
 
 ## ****Phase 1 Done Tasks****
 
-### 1. Project Setup
+- [x] ****Phase 1 - Project Setup****
 
 ##### 1.1 Create Main Project Folder
 
@@ -357,7 +333,7 @@ These files make the project easier to understand for the developer, Codex, and 
 
 ---
 
-### 2. Frontend Setup
+- [x] ****Phase 2 - Frontend Setup****
 
 #### 2.1 Create React App
 
@@ -403,7 +379,7 @@ The project can use reusable UI components instead of building everything from z
 
 ---
 
-### 3. Backend Setup
+- [x] ****Phase 3 - Backend Setup****
 
 #### 3.1 Create Express Server
 
@@ -438,6 +414,8 @@ Expected response:
 
 ---
 
+- [x] ****Phase 4 - Frontend Backend Connection****
+
 #### 4.1 Create API Client
 
 - [x] DONE: Create frontend API service file
@@ -449,6 +427,20 @@ This file will contain functions that call the backend.
 Expected result:
 
 The frontend can send requests to the backend in an organized way.
+
+---
+
+#### 4.2 Test Connection
+
+- [x] DONE: Call `/api/health` from the frontend
+
+Explanation:
+
+The frontend calls the backend health endpoint when the app loads and shows whether the API is connected.
+
+Expected result:
+
+The frontend receives `status: ok` and displays `API connected`.
 
 ---
 
@@ -645,6 +637,9 @@ Phase 2 will include:
 Do not start Phase 2 before Phase 1 is fully completed.
 
 ---
+
+- [ ] ****Phase 2 Tasks****
+  - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
 
 # Codex Rule
 

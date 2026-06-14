@@ -1,18 +1,45 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { AppLayout } from '@/components/layout/app-layout'
 import { HomePage } from '@/pages/home-page'
 import {
   createInterview,
+  getApiHealth,
   InterviewApiError,
 } from '@/services/interview-api'
-import type { CreateInterviewResponse, InterviewConfig } from '@/types/interview'
+import type {
+  ApiConnectionStatus,
+  CreateInterviewResponse,
+  InterviewConfig,
+} from '@/types/interview'
 
 function App() {
   const [savedConfig, setSavedConfig] = useState<InterviewConfig | null>(null)
   const [interview, setInterview] = useState<CreateInterviewResponse | null>(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [apiConnectionStatus, setApiConnectionStatus] =
+    useState<ApiConnectionStatus>('checking')
+
+  useEffect(() => {
+    let isActive = true
+
+    getApiHealth()
+      .then(() => {
+        if (isActive) {
+          setApiConnectionStatus('connected')
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          setApiConnectionStatus('unavailable')
+        }
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   async function handleStartInterview(config: InterviewConfig) {
     setSavedConfig(config)
@@ -34,7 +61,7 @@ function App() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout apiConnectionStatus={apiConnectionStatus}>
       <HomePage
         error={error}
         interview={interview}
