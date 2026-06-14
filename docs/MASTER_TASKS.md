@@ -15,6 +15,7 @@ Rules:
 7. Do not delete completed tasks.
 8. Update the progress section after every completed task.
 9. Use each `Phase N Tasks` checkbox as the completion status for that numbered task group.
+10. Add a short `Why not implemented:` note below each unfinished TODO or task group.
 
 ---
 
@@ -27,19 +28,26 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
+  - Why not implemented: The interview type, answer flow, evaluation, final report, and deployment are still unfinished.
 - [ ] Phase 2 - User Accounts + History
+  - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
 - [ ] Phase 3 - Resume Upload + Personalization
+  - Why not implemented: Phase 3 is locked until the earlier phases are complete.
 - [ ] Phase 4 - Voice Interviews
+  - Why not implemented: Phase 4 is locked until the earlier phases are complete.
 - [ ] Phase 5 - AI Career Coach
+  - Why not implemented: Phase 5 is locked until the earlier phases are complete.
 
 ## Current Sprint
 
 Frontend Backend Connection
 - [ ] ****Phase 4 Tasks****
+  - Why not implemented: The frontend API client creates interviews but does not call the health endpoint.
 
 ## Next Task
 
 - [ ] TODO: Call `/api/health` from the frontend
+  - Why not implemented: No frontend health-check function or UI status exists yet.
 
 ---
 
@@ -51,7 +59,7 @@ Build a working AI interview simulator where the user can choose a role, experie
 
 ---
 
-- [ ] ****Phase 1 Tasks****
+- [x] ****Phase 1 Tasks****
 
 ## 1. Project Setup
 
@@ -196,6 +204,7 @@ Expected response:
 ---
 
 - [ ] ****Phase 4 Tasks****
+  - Why not implemented: The frontend has not called `/api/health` yet.
 
 ## 4. Frontend Backend Connection
 
@@ -216,6 +225,7 @@ The frontend can send requests to the backend in an organized way.
 ### 4.2 Test Connection
 
 - [ ] TODO: Call `/api/health` from the frontend
+  - Why not implemented: The frontend API service only implements `POST /api/interview/create`.
 
 Explanation:
 
@@ -228,6 +238,7 @@ The frontend receives `status: ok`.
 ---
 
 - [ ] ****Phase 5 Tasks****
+  - Why not implemented: Interview type selection is not part of the frontend configuration model.
 
 ## 5. Interview Configuration UI
 
@@ -274,6 +285,7 @@ The experience level controls the difficulty of the questions.
 - [ ] TODO: Add Technical option
 - [ ] TODO: Add Behavioral option
 - [ ] TODO: Add Mixed option
+  - Why not implemented: The configuration form currently supports only role, level, and question count.
 
 Explanation:
 
@@ -282,6 +294,7 @@ The interview type controls the style of the interview.
 ---
 
 - [ ] ****Phase 6 Tasks****
+  - Why not implemented: Question generation does not accept or use an interview type.
 
 ## 6. AI Question Generation
 
@@ -299,6 +312,7 @@ This service is responsible for sending prompts to Gemini and receiving AI respo
 
 - [x] DONE: Create prompt builder for interview questions
 - [ ] TODO: Add interview type to the request model and question prompt
+  - Why not implemented: Frontend and backend request types currently contain only role, level, and question count.
 
 Explanation:
 
@@ -327,10 +341,12 @@ Expected input:
 ```json
 {
   "role": "AI Engineer",
-  "experienceLevel": "Junior",
-  "interviewType": "Technical"
+  "level": "Junior",
+  "questionCount": 5
 }
 ```
+
+`interviewType` will be added by the unfinished task above.
 
 Expected output:
 
@@ -343,12 +359,14 @@ Expected output:
 ---
 
 - [ ] ****Phase 7 Tasks****
+  - Why not implemented: Generated questions are displayed together and there is no answer-entry workflow.
 
 ## 7. Interview Session UI
 
 ### 7.1 Display Questions
 
 - [ ] TODO: Show one question at a time
+  - Why not implemented: The current questions component maps and renders the full question list.
 - [x] DONE: Show question number
 - [x] DONE: Show topic
 - [x] DONE: Show difficulty
@@ -363,6 +381,7 @@ This creates the actual interview experience.
 
 - [ ] TODO: Add textarea for user answer
 - [ ] TODO: Add Submit Answer button
+  - Why not implemented: No answer state or answer-submission handler exists in the frontend.
 
 Explanation:
 
@@ -371,12 +390,14 @@ The user writes their answer here.
 ---
 
 - [ ] ****Phase 8 Tasks****
+  - Why not implemented: Answer evaluation has not been implemented in the backend or frontend.
 
 ## 8. Answer Evaluation
 
 ### 8.1 Create Evaluation Prompt Builder
 
 - [ ] TODO: Create prompt builder for answer evaluation
+  - Why not implemented: The backend currently has only the interview question-generation prompt.
 
 Explanation:
 
@@ -396,6 +417,7 @@ It should return:
 ### 8.2 Create Evaluation Endpoint
 
 - [ ] TODO: Create `POST /api/interview/evaluate`
+  - Why not implemented: The interview router currently exposes only `POST /api/interview/create`.
 
 Explanation:
 
@@ -410,6 +432,7 @@ This endpoint receives the question and user answer, sends them to Gemini, and r
 - [ ] TODO: Display weaknesses
 - [ ] TODO: Display missing concepts
 - [ ] TODO: Display improved answer
+  - Why not implemented: There is no evaluation API response or frontend feedback state to display.
 
 Explanation:
 
@@ -418,14 +441,16 @@ This is one of the most important AI features in the project.
 ---
 
 - [ ] ****Phase 9 Tasks****
+  - Why not implemented: The answer and evaluation flow required for a final report is missing.
 
 ## 9. Final Report
 
 ### 9.1 Store Interview Results
 
-- [ ] TODO: Store all questions
+- [x] DONE: Store all questions
 - [ ] TODO: Store all user answers
 - [ ] TODO: Store all AI evaluations
+  - Why not implemented: Questions are stored in React state, but user answers and evaluations do not exist yet.
 
 Explanation:
 
@@ -441,6 +466,7 @@ This data is needed to generate the final report.
 - [ ] TODO: Show knowledge gaps
 - [ ] TODO: Show learning roadmap
 - [ ] TODO: Show recommended topics
+  - Why not implemented: No completed interview results or report-generation logic exists yet.
 
 Explanation:
 
@@ -449,6 +475,7 @@ This gives the user a useful summary after finishing the interview.
 ---
 
 - [ ] ****Phase 10 Tasks****
+  - Why not implemented: Evaluation and final-report states do not exist yet, so their quality states cannot be added.
 
 ## 10. MVP Quality Improvements
 
@@ -457,6 +484,7 @@ This gives the user a useful summary after finishing the interview.
 - [x] DONE: Add loading state while generating questions
 - [ ] TODO: Add loading state while evaluating answers
 - [ ] TODO: Add loading state while generating final report
+  - Why not implemented: Evaluation and final-report requests have not been implemented.
 
 Explanation:
 
@@ -469,6 +497,7 @@ Loading states prevent the app from feeling broken while AI is working.
 - [x] DONE: Handle Gemini API errors
 - [x] DONE: Handle backend errors
 - [ ] TODO: Handle empty answers
+  - Why not implemented: The application does not have an answer textarea or submit action yet.
 - [x] DONE: Handle invalid selections
 
 Explanation:
@@ -478,6 +507,7 @@ This makes the project feel more production-ready.
 ---
 
 - [ ] ****Phase 11 Tasks****
+  - Why not implemented: Screenshots and documentation for unimplemented evaluation and report prompts are still missing.
 
 ## 11. Documentation
 
@@ -487,6 +517,7 @@ This makes the project feel more production-ready.
 - [x] DONE: List technologies used
 - [x] DONE: Explain how to run locally
 - [ ] TODO: Add screenshots later
+  - Why not implemented: Final screenshots should be captured after the complete MVP flow and visual states are finished.
 - [x] DONE: Explain AI features
 
 ---
@@ -505,16 +536,19 @@ This makes the project feel more production-ready.
 - [x] DONE: Document question generation prompt
 - [ ] TODO: Document answer evaluation prompt
 - [ ] TODO: Document final report prompt
+  - Why not implemented: These prompts have not been designed or implemented yet.
 
 ---
 
 - [ ] ****Phase 12 Tasks****
+  - Why not implemented: Deployment should happen after the complete MVP interview flow is finished.
 
 ## 12. Deployment
 
 ### 12.1 Deploy Frontend
 
 - [ ] TODO: Deploy frontend to Vercel
+  - Why not implemented: The frontend has not been prepared or deployed to a production environment.
 
 Explanation:
 
@@ -525,6 +559,7 @@ Vercel hosts the website.
 ### 12.2 Deploy Backend
 
 - [ ] TODO: Deploy backend to Render
+  - Why not implemented: The backend has not been prepared or deployed to a production environment.
 
 Explanation:
 
@@ -537,6 +572,7 @@ Render hosts the backend server.
 - [ ] TODO: Test full interview flow online
 - [ ] TODO: Verify AI works in production
 - [ ] TODO: Verify no API keys are exposed in frontend
+  - Why not implemented: There is no production deployment to test, and the full interview flow is incomplete.
 
 Explanation:
 
@@ -550,14 +586,21 @@ This confirms the project is ready to share.
 - [x] DONE: User can select role
 - [x] DONE: User can select experience level
 - [ ] TODO: User can select interview type
+  - Why not implemented: Interview type is not present in the frontend or backend configuration types.
 - [x] DONE: AI generates questions
 - [ ] TODO: User can answer questions
+  - Why not implemented: The interview session has no answer textarea or submit action.
 - [ ] TODO: AI evaluates answers
+  - Why not implemented: No evaluation prompt or API endpoint exists.
 - [ ] TODO: User can move between questions
+  - Why not implemented: Questions are currently rendered as a complete list without session navigation.
 - [ ] TODO: Final report is generated
+  - Why not implemented: Answers and evaluations are not available to build a report.
 - [ ] TODO: App works online
+  - Why not implemented: The frontend and backend have not been deployed.
 - [ ] TODO: README is complete
-- [ ] TODO: GitHub repository is updated
+  - Why not implemented: README screenshots and the complete MVP feature description are still missing.
+- [x] DONE: GitHub repository is updated
 
 ---
 
