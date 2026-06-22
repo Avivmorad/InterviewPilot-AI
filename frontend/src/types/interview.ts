@@ -49,3 +49,9 @@ export type AnswerEvaluation = {
   improvedAnswer: string
   confidenceLevel: EvaluationConfidenceLevel
 }
+
+export type InterviewQuestionResult = {
+  question: InterviewQuestion
+  answer: string
+  evaluation: AnswerEvaluation
+}

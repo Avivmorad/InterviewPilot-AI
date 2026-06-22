@@ -8,15 +8,15 @@ Rules:
 
 1. Work only on the current active phase.
 2. Do not start the next phase until the current phase is fully completed.
-3. When a task is completed, change `[ ]` to `[x]` and move it to the `****Phase N Done Tasks****` section.
+3. When a task is completed, change `[ ]` to `[x]` and move it to the `****Stage N Done Tasks****` section.
 4. Replace `TODO:` with `DONE:`.
 5. If new tasks are discovered, add them under the correct section.
 6. Keep explanations short but clear.
 7. Do not delete completed tasks.
 8. Update the progress section after every completed task.
 9. Each phase has two sections:
-   - `****Phase N Tasks****` - for incomplete, unchecked tasks (at the top for easy access)
-   - `****Phase N Done Tasks****` - for completed, checked tasks (at the bottom for reference)
+   - `****Stage N Tasks****` - for incomplete, unchecked tasks (at the top for easy access)
+   - `****Stage N Done Tasks****` - for completed, checked tasks (at the bottom for reference)
 10. Add a short `Why not implemented:` note below each unfinished TODO or task group.
 
 ---
@@ -30,93 +30,25 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
-  - Why not implemented: Final report and deployment are still unfinished.
-- [ ] Phase 2 - User Accounts + History
-  - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
-- [ ] Phase 3 - Resume Upload + Personalization
-  - Why not implemented: Phase 3 is locked until the earlier phases are complete.
-- [ ] Phase 4 - Voice Interviews
-  - Why not implemented: Phase 4 is locked until the earlier phases are complete.
-- [ ] Phase 5 - AI Career Coach
-  - Why not implemented: Phase 5 is locked until the earlier phases are complete.
+  - Why not implemented: Deployment is still unfinished.
 
 ## Current Sprint
 
-Final Report
+Deployment
 
-- [ ] ****Phase 9 Tasks****
-  - Why not implemented: Completed answers and evaluations are not yet stored as report-ready interview results.
+- [ ] \***\*Stage 12 Tasks\*\***
+  - Why not implemented: The frontend and backend have not been deployed.
 
 ## Next Task
 
-- [ ] TODO: Make submitted answers available to the final report flow
-  - Why not implemented: Answers and evaluations are currently shown in the interview UI but are not yet collected into a final report flow.
+- [ ] TODO: Deploy frontend to Vercel
+  - Why not implemented: The frontend has not been prepared or deployed to a production environment.
 
 ---
 
-## ****Phase 1 Tasks****
+## \***\*Stage 1 Tasks\*\***
 
-- [ ] ****Phase 9 - Final Report****
-
-#### 9.1 Store Interview Results
-
-- [ ] TODO: Make submitted answers available to the final report flow
-- [ ] TODO: Store all user answers
-- [ ] TODO: Store all AI evaluations
-  - Why not implemented: Questions are stored in React state and answers are saved locally in the interview UI, but completed answers and evaluations are not yet stored as report-ready interview results.
-
-Explanation:
-
-This data is needed to generate the final report.
-
----
-
-#### 9.2 Create Final Report Screen
-
-- [ ] TODO: Show overall score
-- [ ] TODO: Show strengths summary
-- [ ] TODO: Show weaknesses summary
-- [ ] TODO: Show knowledge gaps
-- [ ] TODO: Show learning roadmap
-- [ ] TODO: Show recommended topics
-  - Why not implemented: No completed interview results or report-generation logic exists yet.
-
-Explanation:
-
-This gives the user a useful summary after finishing the interview.
-
----
-
-- [ ] ****Phase 10 - MVP Quality Improvements****
-
-#### 10.1 Loading States
-
-- [ ] TODO: Add loading state while generating final report
-  - Why not implemented: Final-report requests have not been implemented.
-
-Explanation:
-
-Loading states prevent the app from feeling broken while AI is working.
-
----
-
-- [ ] ****Phase 11 - Documentation****
-
-#### 11.1 Update README
-
-- [ ] TODO: Add screenshots later
-  - Why not implemented: Final screenshots should be captured after the complete MVP flow and visual states are finished.
-
----
-
-#### 11.3 Update Prompts Document
-
-- [ ] TODO: Document final report prompt
-  - Why not implemented: The final report prompt has not been designed or implemented yet.
-
----
-
-- [ ] ****Phase 12 - Deployment****
+- [ ] \***\*Stage 12 - Deployment\*\***
 
 #### 12.1 Deploy Frontend
 
@@ -145,7 +77,7 @@ Render hosts the backend server.
 - [ ] TODO: Test full interview flow online
 - [ ] TODO: Verify AI works in production
 - [ ] TODO: Verify no API keys are exposed in frontend
-  - Why not implemented: There is no production deployment to test, and the full interview flow is incomplete.
+  - Why not implemented: There is no production deployment to test.
 
 Explanation:
 
@@ -153,9 +85,9 @@ This confirms the project is ready to share.
 
 ---
 
-## ****Phase 1 Done Tasks****
+## \***\*Stage 1 Done Tasks\*\***
 
-- [x] ****Phase 1 - Project Setup****
+- [x] \***\*Stage 1 - Project Setup\*\***
 
 ##### 1.1 Create Main Project Folder
 
@@ -212,7 +144,7 @@ These files make the project easier to understand for the developer, Codex, and 
 
 ---
 
-- [x] ****Phase 2 - Frontend Setup****
+- [x] \***\*Stage 2 - Frontend Setup\*\***
 
 #### 2.1 Create React App
 
@@ -258,7 +190,7 @@ The project can use reusable UI components instead of building everything from z
 
 ---
 
-- [x] ****Phase 3 - Backend Setup****
+- [x] \***\*Stage 3 - Backend Setup\*\***
 
 #### 3.1 Create Express Server
 
@@ -293,7 +225,7 @@ Expected response:
 
 ---
 
-- [x] ****Phase 4 - Frontend Backend Connection****
+- [x] \***\*Stage 4 - Frontend Backend Connection\*\***
 
 #### 4.1 Create API Client
 
@@ -323,7 +255,7 @@ The frontend receives `status: ok` and displays `API connected`.
 
 ---
 
-- [x] ****Phase 5 - Interview Configuration UI****
+- [x] \***\*Stage 5 - Interview Configuration UI\*\***
 
 #### 5.1 Create Homepage
 
@@ -427,7 +359,7 @@ Expected output:
 
 ---
 
-- [x] ****Phase 7 - Interview Session UI****
+- [x] \***\*Stage 7 - Interview Session UI\*\***
 
 #### 7.1 Display Questions (Completed Items)
 
@@ -453,7 +385,7 @@ The user can write and locally submit an answer for each generated question.
 
 ---
 
-- [x] ****Phase 8 - Answer Evaluation****
+- [x] \***\*Stage 8 - Answer Evaluation\*\***
 
 #### 8.1 Create Evaluation Prompt Builder
 
@@ -503,6 +435,9 @@ the current question.
 #### 9.1 Store Interview Results
 
 - [x] DONE: Store all questions
+- [x] DONE: Make submitted answers available to the final report flow
+- [x] DONE: Store all user answers
+- [x] DONE: Store all AI evaluations
 
 Explanation:
 
@@ -510,10 +445,29 @@ This data is needed to generate the final report.
 
 ---
 
+- [x] \***\*Stage 9 - Final Report\*\***
+
+#### 9.2 Create Final Report Screen
+
+- [x] DONE: Show overall score
+- [x] DONE: Show strengths summary
+- [x] DONE: Show weaknesses summary
+- [x] DONE: Show knowledge gaps
+- [x] DONE: Show learning roadmap
+- [x] DONE: Show recommended topics
+
+Explanation:
+
+The frontend now stores evaluated answers in parent state and shows a final
+report after every question has feedback.
+
+---
+
 #### 10.1 Loading States (Completed Items)
 
 - [x] DONE: Add loading state while generating questions
 - [x] DONE: Add loading state while evaluating answers
+- [x] DONE: Add loading state while generating final report
 
 Explanation:
 
@@ -540,6 +494,8 @@ This makes the project feel more production-ready.
 - [x] DONE: List technologies used
 - [x] DONE: Explain how to run locally
 - [x] DONE: Explain AI features
+- [x] DONE: Update complete MVP feature description
+- [x] DONE: Add screenshots
 
 ---
 
@@ -556,6 +512,7 @@ This makes the project feel more production-ready.
 
 - [x] DONE: Document question generation prompt
 - [x] DONE: Document answer evaluation prompt
+- [x] DONE: Document final report prompt
 
 ---
 
@@ -569,12 +526,10 @@ This makes the project feel more production-ready.
 - [x] DONE: User can answer questions
 - [x] DONE: AI evaluates answers
 - [x] DONE: User can move between questions
-- [ ] TODO: Final report is generated
-  - Why not implemented: Answers and evaluations are not available to build a report.
+- [x] DONE: Final report is generated
 - [ ] TODO: App works online
   - Why not implemented: The frontend and backend have not been deployed.
-- [ ] TODO: README is complete
-  - Why not implemented: README screenshots and the complete MVP feature description are still missing.
+- [x] DONE: README is complete
 - [ ] TODO: GitHub repository is updated
   - Why not implemented: Current local changes have not been committed and pushed yet.
 
@@ -594,7 +549,16 @@ Do not start Phase 2 before Phase 1 is fully completed.
 
 ---
 
-- [ ] ****Phase 2 Tasks****
+- [ ] Phase 2 - User Accounts + History
+  - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
+- [ ] Phase 3 - Resume Upload + Personalization
+  - Why not implemented: Phase 3 is locked until the earlier phases are complete.
+- [ ] Phase 4 - Voice Interviews
+  - Why not implemented: Phase 4 is locked until the earlier phases are complete.
+- [ ] Phase 5 - AI Career Coach
+  - Why not implemented: Phase 5 is locked until the earlier phases are complete.
+
+- [ ] \***\*Stage 2 Tasks\*\***
   - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
 
 # Codex Rule
@@ -602,9 +566,9 @@ Do not start Phase 2 before Phase 1 is fully completed.
 Before making code changes, Codex must:
 
 1. Read this file.
-2. Find the next unchecked TODO in the `****Phase N Tasks****` section of the active phase.
+2. Find the next unchecked TODO in the `****Stage N Tasks****` section of the active phase.
 3. Complete only that task or a small related group of tasks.
 4. Update this file after completion.
-5. Move completed tasks from `****Phase N Tasks****` to `****Phase N Done Tasks****` and change `[ ]` to `[x]`.
+5. Move completed tasks from `****Stage N Tasks****` to `****Stage N Done Tasks****` and change `[ ]` to `[x]`.
 6. Keep all completed tasks visible (do not delete them).
 7. Do not start locked phases.

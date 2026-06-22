@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { AppLayout } from '@/components/layout/app-layout'
 import { HomePage } from '@/pages/home-page'
@@ -11,11 +11,16 @@ import type {
   ApiConnectionStatus,
   CreateInterviewResponse,
   InterviewConfig,
+  InterviewQuestionResult,
 } from '@/types/interview'
 
 function App() {
   const [savedConfig, setSavedConfig] = useState<InterviewConfig | null>(null)
   const [interview, setInterview] = useState<CreateInterviewResponse | null>(null)
+  const [interviewResults, setInterviewResults] = useState<Record<string, InterviewQuestionResult>>({})
+  const reportLoadingTimerRef = useRef<number | undefined>(undefined)
+  const [isReportLoading, setIsReportLoading] = useState(false)
+  const [isReportVisible, setIsReportVisible] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [apiConnectionStatus, setApiConnectionStatus] =
@@ -38,12 +43,34 @@ function App() {
 
     return () => {
       isActive = false
+      clearReportLoadingTimer()
     }
   }, [])
 
+  function clearReportLoadingTimer() {
+    window.clearTimeout(reportLoadingTimerRef.current)
+    reportLoadingTimerRef.current = undefined
+  }
+
+  function handleCompleteInterview() {
+    clearReportLoadingTimer()
+    setIsReportVisible(false)
+    setIsReportLoading(true)
+
+    reportLoadingTimerRef.current = window.setTimeout(() => {
+      reportLoadingTimerRef.current = undefined
+      setIsReportLoading(false)
+      setIsReportVisible(true)
+    }, 500)
+  }
+
   async function handleStartInterview(config: InterviewConfig) {
+    clearReportLoadingTimer()
     setSavedConfig(config)
     setInterview(null)
+    setInterviewResults({})
+    setIsReportLoading(false)
+    setIsReportVisible(false)
     setError('')
     setIsLoading(true)
 
@@ -65,7 +92,27 @@ function App() {
       <HomePage
         error={error}
         interview={interview}
+        interviewResults={interviewResults}
+        isReportLoading={isReportLoading}
+        isReportVisible={isReportVisible}
         isLoading={isLoading}
+        onCompleteInterview={handleCompleteInterview}
+        onResultChange={(result) =>
+          setInterviewResults((currentResults) => ({
+            ...currentResults,
+            [result.question.id]: result,
+          }))
+        }
+        onResultRemove={(questionId) => {
+          clearReportLoadingTimer()
+          setInterviewResults((currentResults) => {
+            const nextResults = { ...currentResults }
+            delete nextResults[questionId]
+            return nextResults
+          })
+          setIsReportLoading(false)
+          setIsReportVisible(false)
+        }}
         onStartInterview={handleStartInterview}
         savedConfig={savedConfig}
       />

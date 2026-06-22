@@ -1,15 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AlertCircle, CheckCircle2, LoaderCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { evaluateAnswer } from '@/services/interview-api'
-import type { AnswerEvaluation, CreateInterviewResponse } from '@/types/interview'
+import type {
+  AnswerEvaluation,
+  CreateInterviewResponse,
+  InterviewQuestionResult,
+} from '@/types/interview'
 
 type InterviewQuestionsProps = {
   interview: CreateInterviewResponse
+  isReportLoading: boolean
+  onCompleteInterview: () => void
+  onResultChange: (result: InterviewQuestionResult) => void
+  onResultRemove: (questionId: string) => void
+  results: Record<string, InterviewQuestionResult>
 }
 
-export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
+export function InterviewQuestions({
+  interview,
+  isReportLoading,
+  onCompleteInterview,
+  onResultChange,
+  onResultRemove,
+  results,
+}: InterviewQuestionsProps) {
+  const isMountedRef = useRef(true)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({})
   const [evaluationErrors, setEvaluationErrors] = useState<Record<string, string>>({})
@@ -22,6 +39,11 @@ export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
   const totalQuestions = interview.questions.length
   const isFirstQuestion = activeQuestionIndex === 0
   const isLastQuestion = activeQuestionIndex === totalQuestions - 1
+  const evaluatedQuestionCount = interview.questions.filter(
+    (interviewQuestion) => results[interviewQuestion.id],
+  ).length
+  const canCompleteInterview =
+    totalQuestions > 0 && evaluatedQuestionCount === totalQuestions
   const currentAnswer = question ? (answerDrafts[question.id] ?? '') : ''
   const trimmedCurrentAnswer = currentAnswer.trim()
   const submittedAnswer = question ? submittedAnswers[question.id] : undefined
@@ -37,11 +59,40 @@ export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
     (!isSavedAnswerCurrent || Boolean(currentEvaluationError)) &&
     !isEvaluatingCurrentQuestion
 
+  useEffect(() => {
+    isMountedRef.current = true
+
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   if (!question) {
     return null
   }
 
   function updateCurrentAnswer(answer: string) {
+    const savedAnswer = submittedAnswers[question.id]
+
+    if (typeof savedAnswer === 'string' && answer.trim() !== savedAnswer) {
+      setSubmittedAnswers((answers) => {
+        const nextAnswers = { ...answers }
+        delete nextAnswers[question.id]
+        return nextAnswers
+      })
+      setEvaluations((currentEvaluations) => {
+        const nextEvaluations = { ...currentEvaluations }
+        delete nextEvaluations[question.id]
+        return nextEvaluations
+      })
+      setEvaluationErrors((errors) => {
+        const nextErrors = { ...errors }
+        delete nextErrors[question.id]
+        return nextErrors
+      })
+      onResultRemove(question.id)
+    }
+
     setAnswerDrafts((drafts) => ({
       ...drafts,
       [question.id]: answer,
@@ -77,25 +128,40 @@ export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
     try {
       const evaluation = await evaluateAnswer(submittedQuestion, submittedText)
 
+      if (!isMountedRef.current) {
+        return
+      }
+
       setEvaluations((currentEvaluations) => ({
         ...currentEvaluations,
         [submittedQuestion.id]: evaluation,
       }))
+      onResultChange({
+        question: submittedQuestion,
+        answer: submittedText,
+        evaluation,
+      })
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : 'Answer evaluation failed. Please try again.'
 
+      if (!isMountedRef.current) {
+        return
+      }
+
       setEvaluationErrors((errors) => ({
         ...errors,
         [submittedQuestion.id]: message,
       }))
     } finally {
-      setEvaluatingQuestionIds((questionIds) => ({
-        ...questionIds,
-        [submittedQuestion.id]: false,
-      }))
+      if (isMountedRef.current) {
+        setEvaluatingQuestionIds((questionIds) => ({
+          ...questionIds,
+          [submittedQuestion.id]: false,
+        }))
+      }
     }
   }
 
@@ -165,6 +231,7 @@ export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
               onChange={(event) => updateCurrentAnswer(event.target.value)}
               placeholder="Type your answer here..."
               value={currentAnswer}
+              disabled={isEvaluatingCurrentQuestion}
             />
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-muted-foreground">
@@ -285,6 +352,27 @@ export function InterviewQuestions({ interview }: InterviewQuestionsProps) {
             Next question
           </Button>
         </div>
+
+        <section className="mt-6 rounded-lg border bg-card p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold">Interview progress</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {evaluatedQuestionCount} of {totalQuestions} answers have feedback.
+              </p>
+            </div>
+            <Button
+              disabled={!canCompleteInterview || isReportLoading}
+              onClick={onCompleteInterview}
+              type="button"
+            >
+              {isReportLoading ? (
+                <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+              ) : null}
+              {isReportLoading ? 'Generating report' : 'Complete interview'}
+            </Button>
+          </div>
+        </section>
       </div>
     </section>
   )

@@ -55,6 +55,26 @@ The backend validates this contract before returning feedback:
 }
 ```
 
+## Final Report Generation
+
+The MVP final report does not call Gemini with a separate final-report prompt.
+It is generated in the frontend from already validated answer-evaluation JSON.
+This keeps the report deterministic and avoids sending the full interview back
+to an AI provider.
+
+The report derives:
+
+- overall score from the average evaluation score
+- strengths summary from unique evaluation strengths
+- weaknesses summary from unique evaluation weaknesses
+- knowledge gaps from unique missing concepts
+- recommended topics from knowledge gaps or question topics
+- learning roadmap from the recommended topics and weaknesses
+
+If a future phase adds an AI-generated narrative report, that prompt should
+request strict JSON, avoid markdown-wrapped output, validate required fields,
+and fall back to the deterministic report when provider output is invalid.
+
 ## Safety and Reliability
 
 - Validate all user-controlled fields before prompt construction.
