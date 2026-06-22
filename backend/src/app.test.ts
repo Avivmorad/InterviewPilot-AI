@@ -4,12 +4,15 @@ import test from 'node:test'
 
 import { createApp } from './app.js'
 import { AIProviderError, AIServiceError } from './ai/types.js'
-import { createCreateInterviewController } from './controllers/interviewController.js'
+import {
+  createCreateInterviewController,
+  createEvaluateAnswerController,
+} from './controllers/interviewController.js'
 import { createInterviewRoutes } from './routes/interviewRoutes.js'
 
 const app = createApp()
 
-test('health and interview routes enforce the step 1-5 API contract', async (context) => {
+test('health and interview routes enforce the current create API contract', async (context) => {
   const server = app.listen(0)
   await new Promise<void>((resolve) => server.once('listening', resolve))
   context.after(() => server.close())
@@ -44,7 +47,12 @@ test('health and interview routes enforce the step 1-5 API contract', async (con
   const invalidCreateResponse = await fetch(`${baseUrl}/api/interview/create`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ role: 'Unknown', level: 'Junior', questionCount: 3 }),
+    body: JSON.stringify({
+      role: 'Unknown',
+      level: 'Junior',
+      interviewType: 'Technical',
+      questionCount: 3,
+    }),
   })
   assert.equal(invalidCreateResponse.status, 400)
   assert.deepEqual(await invalidCreateResponse.json(), {
@@ -63,14 +71,23 @@ test('health and interview routes enforce the step 1-5 API contract', async (con
     code: 'INVALID_REQUEST',
   })
 
-  for (const route of ['evaluate', 'summary']) {
-    const response = await fetch(`${baseUrl}/api/interview/${route}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: '{}',
-    })
-    assert.equal(response.status, 404)
-  }
+  const invalidEvaluateResponse = await fetch(`${baseUrl}/api/interview/evaluate`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: '{}',
+  })
+  assert.equal(invalidEvaluateResponse.status, 400)
+  assert.deepEqual(await invalidEvaluateResponse.json(), {
+    error: 'Question must be a valid interview question.',
+    code: 'INVALID_REQUEST',
+  })
+
+  const summaryResponse = await fetch(`${baseUrl}/api/interview/summary`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: '{}',
+  })
+  assert.equal(summaryResponse.status, 404)
 })
 
 test('malformed JSON returns a readable JSON error', async (context) => {
@@ -122,6 +139,7 @@ test('create route returns the required interview response shape', async (contex
       body: JSON.stringify({
         role: 'Frontend Developer',
         level: 'Junior',
+        interviewType: 'Technical',
         questionCount: 3,
       }),
     },
@@ -139,6 +157,54 @@ test('create route returns the required interview response shape', async (contex
         expectedConcepts: ['State', 'Rendering'],
       },
     ],
+  })
+})
+
+test('evaluate route returns the required feedback response shape', async (context) => {
+  const createController = createCreateInterviewController(async () => ({
+    interviewId: 'interview-test',
+    questions: [],
+  }))
+  const evaluateController = createEvaluateAnswerController(async () => ({
+    score: 4,
+    strengths: ['Clear explanation.'],
+    weaknesses: ['Needs more detail on tradeoffs.'],
+    missingConcepts: ['Testing'],
+    improvedAnswer: 'A stronger answer would cover state, rendering, and testing.',
+    confidenceLevel: 'high',
+  }))
+  const testApp = createApp(createInterviewRoutes(createController, evaluateController))
+  const server = testApp.listen(0)
+  await new Promise<void>((resolve) => server.once('listening', resolve))
+  context.after(() => server.close())
+
+  const { port } = server.address() as AddressInfo
+  const response = await fetch(
+    `http://127.0.0.1:${port}/api/interview/evaluate`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        question: {
+          id: 'q1',
+          topic: 'React',
+          difficulty: 'junior',
+          question: 'What problem does React state solve?',
+          expectedConcepts: ['State', 'Rendering'],
+        },
+        answer: 'State stores values that affect rendering.',
+      }),
+    },
+  )
+
+  assert.equal(response.status, 200)
+  assert.deepEqual(await response.json(), {
+    score: 4,
+    strengths: ['Clear explanation.'],
+    weaknesses: ['Needs more detail on tradeoffs.'],
+    missingConcepts: ['Testing'],
+    improvedAnswer: 'A stronger answer would cover state, rendering, and testing.',
+    confidenceLevel: 'high',
   })
 })
 
@@ -171,6 +237,7 @@ test('create route returns a clear AI configuration error', async (context) => {
       body: JSON.stringify({
         role: 'Frontend Developer',
         level: 'Junior',
+        interviewType: 'Technical',
         questionCount: 3,
       }),
     },

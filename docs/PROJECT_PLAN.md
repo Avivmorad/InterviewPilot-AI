@@ -13,7 +13,7 @@ Build a focused technical interview simulator that demonstrates practical full-s
 
 ## Phase 2: Core Interview Flow
 
-- Interview setup form: role, level, focus, and question count
+- Interview setup form: role, level, interview type, and question count
 - Gemini adapter with Groq fallback
 - One-question-at-a-time interview session
 - Structured answer feedback and final summary

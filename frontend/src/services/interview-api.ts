@@ -1,4 +1,5 @@
 import type {
+  AnswerEvaluation,
   CreateInterviewResponse,
   Difficulty,
   InterviewConfig,
@@ -37,6 +38,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isDifficulty(value: unknown): value is Difficulty {
   return value === 'junior' || value === 'mid-level' || value === 'senior'
+}
+
+function isConfidenceLevel(value: unknown): value is AnswerEvaluation['confidenceLevel'] {
+  return value === 'low' || value === 'medium' || value === 'high'
+}
+
+function isStringList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
 export async function getApiHealth(): Promise<ApiHealth> {
@@ -153,4 +162,72 @@ export async function createInterview(
   }
 
   return parseInterviewResponse(data)
+}
+
+function parseAnswerEvaluation(value: unknown): AnswerEvaluation {
+  if (
+    !isRecord(value) ||
+    typeof value.score !== 'number' ||
+    !Number.isInteger(value.score) ||
+    value.score < 1 ||
+    value.score > 5 ||
+    !isStringList(value.strengths) ||
+    !isStringList(value.weaknesses) ||
+    !isStringList(value.missingConcepts) ||
+    typeof value.improvedAnswer !== 'string' ||
+    !isConfidenceLevel(value.confidenceLevel)
+  ) {
+    throw new InterviewApiError(
+      'The backend returned an invalid evaluation response.',
+      'INVALID_RESPONSE',
+      502,
+    )
+  }
+
+  return {
+    score: value.score,
+    strengths: value.strengths,
+    weaknesses: value.weaknesses,
+    missingConcepts: value.missingConcepts,
+    improvedAnswer: value.improvedAnswer,
+    confidenceLevel: value.confidenceLevel,
+  }
+}
+
+export async function evaluateAnswer(
+  question: InterviewQuestion,
+  answer: string,
+): Promise<AnswerEvaluation> {
+  let response: Response
+
+  try {
+    response = await fetch(`${apiUrl}/api/interview/evaluate`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ question, answer }),
+    })
+  } catch {
+    throw new InterviewApiError(
+      'Unable to reach the InterviewPilot API. Make sure the backend is running.',
+      'NETWORK_ERROR',
+      0,
+    )
+  }
+
+  const data: unknown = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    const message =
+      isRecord(data) && typeof data.error === 'string'
+        ? data.error
+        : 'Answer evaluation failed. Please try again.'
+    const code =
+      isRecord(data) && typeof data.code === 'string'
+        ? data.code
+        : 'REQUEST_FAILED'
+
+    throw new InterviewApiError(message, code, response.status)
+  }
+
+  return parseAnswerEvaluation(data)
 }

@@ -34,7 +34,18 @@ export type InterviewQuestion = {
   expectedConcepts: string[]
 }
 
+export type EvaluationConfidenceLevel = 'low' | 'medium' | 'high'
+
 export type CreateInterviewResponse = {
   interviewId: string
   questions: InterviewQuestion[]
+}
+
+export type AnswerEvaluation = {
+  score: number
+  strengths: string[]
+  weaknesses: string[]
+  missingConcepts: string[]
+  improvedAnswer: string
+  confidenceLevel: EvaluationConfidenceLevel
 }

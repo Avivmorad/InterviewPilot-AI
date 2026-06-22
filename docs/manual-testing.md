@@ -1,10 +1,11 @@
 # Manual Testing Guide
 
-This guide covers manual testing for InterviewPilot AI steps 1-5:
+This guide covers manual testing for the current local InterviewPilot AI MVP flow:
 
 - Start the frontend and backend.
 - Check that the backend is healthy.
-- Generate interview questions.
+- Generate interview questions with role, level, interview type, and count.
+- Move through questions and locally save user answers.
 - Understand common development errors.
 
 Run commands from PowerShell. Keep the frontend and backend running in separate
@@ -52,7 +53,7 @@ Local: http://localhost:5173/
 ```
 
 Open `http://localhost:5173` in a browser. The interview configuration form
-should display role, level, and question-count options.
+should display role, level, interview-type, and question-count options.
 
 ## 2. Start the Backend
 
@@ -98,6 +99,7 @@ With the backend running and at least one API key configured, run:
 $body = @{
   role = "Frontend Developer"
   level = "Junior"
+  interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
 
@@ -122,6 +124,12 @@ Valid levels:
 - `Junior`
 - `Mid-Level`
 - `Senior`
+
+Valid interview types:
+
+- `Technical`
+- `Behavioral`
+- `Mixed`
 
 Valid question counts are `3`, `5`, and `10`.
 
@@ -154,7 +162,10 @@ The generated wording will vary. Verify that:
 - The number of questions matches `questionCount`.
 - Every question has `id`, `topic`, `difficulty`, `question`, and
   `expectedConcepts`.
-- The frontend displays a loading state and then shows the generated questions.
+- The frontend displays a loading state and then shows one generated question at
+  a time.
+- The answer textarea accepts text, blocks empty submissions, and shows
+  `Answer saved` after the current answer is submitted.
 
 ## Common Errors
 
@@ -206,7 +217,8 @@ writing the JSON string manually.
 
 Valid JSON can still be rejected when its values are unsupported. For example,
 `questionCount = 4` returns an `INVALID_REQUEST` error because only `3`, `5`,
-and `10` are allowed.
+and `10` are allowed. An unsupported `interviewType` also returns an
+`INVALID_REQUEST` error.
 
 ### CORS Error
 

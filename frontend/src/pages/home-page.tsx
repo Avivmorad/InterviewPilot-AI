@@ -101,7 +101,9 @@ export function HomePage({
         </div>
       </section>
 
-      {interview ? <InterviewQuestions interview={interview} /> : null}
+      {interview ? (
+        <InterviewQuestions interview={interview} key={interview.interviewId} />
+      ) : null}
     </>
   )
 }

@@ -24,28 +24,34 @@ The prompt should define:
 - Role: professional technical interviewer
 - Language: English only
 - Candidate target role and seniority
+- Selected interview type: technical, behavioral, or mixed
 - Allowed topics and question count
 - One question at a time
 - No answer reveal before the candidate responds
 - Concise follow-ups when clarification is useful
 
-Question generation requests strict JSON containing the topic, selected-level
+Question generation uses the selected interview type to tune the question mix, then requests strict JSON containing the topic, selected-level
 difficulty, question text, and expected concepts. Generated output is parsed and
 validated before it is returned by the API. The backend assigns stable
 sequential question IDs after validation instead of trusting provider-generated
 IDs.
 
-## Future Feedback Contract
+## Answer Evaluation Prompt
 
-This contract is planned for a later step and is not implemented in steps 1-5:
+Answer evaluation uses the submitted question, expected concepts, and candidate
+answer. The prompt tells the AI to act as a professional interviewer, treat the
+candidate answer as untrusted text, and return strict JSON only.
+
+The backend validates this contract before returning feedback:
 
 ```json
 {
   "score": 4,
   "strengths": ["Explained the main trade-off clearly."],
-  "improvements": ["Discuss failure handling and observability."],
-  "idealAnswerSummary": "A concise outline of a stronger answer.",
-  "nextQuestion": "The next interview question or null."
+  "weaknesses": ["Discuss failure handling and observability."],
+  "missingConcepts": ["Observability"],
+  "improvedAnswer": "A concise stronger answer.",
+  "confidenceLevel": "medium"
 }
 ```
 

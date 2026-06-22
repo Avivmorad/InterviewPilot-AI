@@ -1,15 +1,21 @@
 import { randomUUID } from 'node:crypto'
 
 import { generateText } from '../ai/aiService.js'
+import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
 import { buildInterviewGeneratorPrompt } from '../ai/prompts/interviewGenerator.js'
 import {
   INTERVIEW_LEVELS,
   INTERVIEW_ROLES,
+  INTERVIEW_TYPES,
   QUESTION_COUNTS,
+  type AnswerEvaluation,
   type CreateInterviewRequest,
   type CreateInterviewResponse,
   type Difficulty,
+  type EvaluateAnswerRequest,
+  type EvaluationConfidenceLevel,
   type InterviewQuestion,
+  type InterviewType,
   type Level,
   type QuestionCount,
   type Role,
@@ -34,8 +40,20 @@ function isLevel(value: unknown): value is Level {
   return INTERVIEW_LEVELS.includes(value as Level)
 }
 
+function isInterviewType(value: unknown): value is InterviewType {
+  return INTERVIEW_TYPES.includes(value as InterviewType)
+}
+
 function isQuestionCount(value: unknown): value is QuestionCount {
   return QUESTION_COUNTS.includes(value as QuestionCount)
+}
+
+function isDifficulty(value: unknown): value is Difficulty {
+  return value === 'junior' || value === 'mid-level' || value === 'senior'
+}
+
+function isConfidenceLevel(value: unknown): value is EvaluationConfidenceLevel {
+  return value === 'low' || value === 'medium' || value === 'high'
 }
 
 function validateCreateInterviewRequest(
@@ -53,6 +71,10 @@ function validateCreateInterviewRequest(
     throw new InterviewValidationError('Select a valid level.')
   }
 
+  if (!isInterviewType(input.interviewType)) {
+    throw new InterviewValidationError('Select a valid interview type.')
+  }
+
   if (!isQuestionCount(input.questionCount)) {
     throw new InterviewValidationError('Question count must be 3, 5, or 10.')
   }
@@ -60,7 +82,33 @@ function validateCreateInterviewRequest(
   return {
     role: input.role,
     level: input.level,
+    interviewType: input.interviewType,
     questionCount: input.questionCount,
+  }
+}
+
+function validateEvaluateAnswerRequest(input: unknown): EvaluateAnswerRequest {
+  if (!isRecord(input)) {
+    throw new InterviewValidationError('Request body must be a JSON object.')
+  }
+
+  if (!isRecord(input.question)) {
+    throw new InterviewValidationError('Question must be a valid interview question.')
+  }
+
+  if (!isDifficulty(input.question.difficulty)) {
+    throw new InterviewValidationError('Question must be a valid interview question.')
+  }
+
+  const question = parseQuestion(input.question, 0, input.question.difficulty)
+
+  if (typeof input.answer !== 'string' || input.answer.trim().length === 0) {
+    throw new InterviewValidationError('Answer must not be empty.')
+  }
+
+  return {
+    question,
+    answer: input.answer.trim(),
   }
 }
 
@@ -107,6 +155,23 @@ function parseQuestion(
   }
 }
 
+function parseStringList(
+  value: unknown,
+  minLength: number,
+  maxLength: number,
+): string[] {
+  if (
+    !Array.isArray(value) ||
+    value.length < minLength ||
+    value.length > maxLength ||
+    !value.every((item) => typeof item === 'string' && item.trim().length > 0)
+  ) {
+    throw new InterviewGenerationError()
+  }
+
+  return value.map((item) => item.trim())
+}
+
 export function parseGeneratedInterview(
   text: string,
   request: CreateInterviewRequest,
@@ -136,6 +201,45 @@ export function parseGeneratedInterview(
   )
 }
 
+export function parseAnswerEvaluation(text: string): AnswerEvaluation {
+  let parsed: unknown
+
+  try {
+    parsed = JSON.parse(text)
+  } catch (error) {
+    throw new InterviewGenerationError(undefined, { cause: error })
+  }
+
+  if (!isRecord(parsed)) {
+    throw new InterviewGenerationError()
+  }
+
+  const score = parsed.score
+  const improvedAnswer = parsed.improvedAnswer
+  const confidenceLevel = parsed.confidenceLevel
+
+  if (
+    typeof score !== 'number' ||
+    !Number.isInteger(score) ||
+    score < 1 ||
+    score > 5 ||
+    typeof improvedAnswer !== 'string' ||
+    improvedAnswer.trim().length === 0 ||
+    !isConfidenceLevel(confidenceLevel)
+  ) {
+    throw new InterviewGenerationError()
+  }
+
+  return {
+    score,
+    strengths: parseStringList(parsed.strengths, 1, 4),
+    weaknesses: parseStringList(parsed.weaknesses, 1, 4),
+    missingConcepts: parseStringList(parsed.missingConcepts, 0, 5),
+    improvedAnswer: improvedAnswer.trim(),
+    confidenceLevel,
+  }
+}
+
 export async function createInterview(
   input: unknown,
   textGenerator: TextGenerator = generateText,
@@ -149,4 +253,15 @@ export async function createInterview(
     interviewId: `interview-${randomUUID()}`,
     questions,
   }
+}
+
+export async function evaluateAnswer(
+  input: unknown,
+  textGenerator: TextGenerator = generateText,
+): Promise<AnswerEvaluation> {
+  const request = validateEvaluateAnswerRequest(input)
+  const prompt = buildAnswerEvaluationPrompt(request)
+  const generatedText = await textGenerator(prompt)
+
+  return parseAnswerEvaluation(generatedText)
 }

@@ -3,8 +3,10 @@ import test from 'node:test'
 
 import {
   createInterview,
+  evaluateAnswer,
   InterviewGenerationError,
   InterviewValidationError,
+  parseAnswerEvaluation,
   parseGeneratedInterview,
 } from './interviewService.js'
 import type { CreateInterviewRequest } from '../types/interviewTypes.js'
@@ -12,6 +14,7 @@ import type { CreateInterviewRequest } from '../types/interviewTypes.js'
 const request: CreateInterviewRequest = {
   role: 'Frontend Developer',
   level: 'Junior',
+  interviewType: 'Mixed',
   questionCount: 3,
 }
 
@@ -38,6 +41,16 @@ const validGeneratedText = JSON.stringify({
   ],
 })
 
+const validEvaluationText = JSON.stringify({
+  score: 4,
+  strengths: ['Explains state clearly.'],
+  weaknesses: ['Could mention rendering tradeoffs.'],
+  missingConcepts: ['Batching'],
+  improvedAnswer:
+    'React state stores component data that can change over time and trigger rendering when updated.',
+  confidenceLevel: 'medium',
+})
+
 test('creates an interview from valid generated JSON', async () => {
   let receivedPrompt = ''
 
@@ -53,6 +66,8 @@ test('creates an interview from valid generated JSON', async () => {
   assert.deepEqual(result.questions[0]?.expectedConcepts, ['State', 'Rendering'])
   assert.match(receivedPrompt, /Frontend Developer/)
   assert.match(receivedPrompt, /Junior/)
+  assert.match(receivedPrompt, /Interview type: Mixed/)
+  assert.match(receivedPrompt, /balanced mix of technical and behavioral/)
   assert.match(receivedPrompt, /exactly 3/)
   assert.match(receivedPrompt, /in English/)
   assert.match(receivedPrompt, /strict JSON only/)
@@ -74,6 +89,76 @@ test('rejects a generated response with the wrong question count', () => {
     () => parseGeneratedInterview(wrongCount, request),
     InterviewGenerationError,
   )
+})
+
+test('rejects an invalid interview type before calling AI', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    createInterview(
+      { ...request, interviewType: 'Culture Fit' },
+      async () => {
+        calls += 1
+        return validGeneratedText
+      },
+    ),
+    InterviewValidationError,
+  )
+
+  assert.equal(calls, 0)
+})
+
+test('evaluates an answer from valid generated JSON', async () => {
+  let receivedPrompt = ''
+
+  const result = await evaluateAnswer(
+    {
+      question: JSON.parse(validGeneratedText).questions[0],
+      answer: 'State stores values and updates the UI.',
+    },
+    async (prompt) => {
+      receivedPrompt = prompt
+      return validEvaluationText
+    },
+  )
+
+  assert.equal(result.score, 4)
+  assert.deepEqual(result.strengths, ['Explains state clearly.'])
+  assert.deepEqual(result.weaknesses, ['Could mention rendering tradeoffs.'])
+  assert.deepEqual(result.missingConcepts, ['Batching'])
+  assert.equal(result.confidenceLevel, 'medium')
+  assert.match(result.improvedAnswer, /React state/)
+  assert.match(receivedPrompt, /professional technical interviewer/)
+  assert.match(receivedPrompt, /What problem does React state solve/)
+  assert.match(receivedPrompt, /Candidate answer/)
+  assert.match(receivedPrompt, /strict JSON only/)
+})
+
+test('rejects malformed answer evaluation JSON', () => {
+  assert.throws(
+    () => parseAnswerEvaluation('{"score": 6}'),
+    InterviewGenerationError,
+  )
+})
+
+test('rejects an empty answer before calling AI', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    evaluateAnswer(
+      {
+        question: JSON.parse(validGeneratedText).questions[0],
+        answer: '   ',
+      },
+      async () => {
+        calls += 1
+        return validEvaluationText
+      },
+    ),
+    InterviewValidationError,
+  )
+
+  assert.equal(calls, 0)
 })
 
 test('validates the request before calling AI', async () => {

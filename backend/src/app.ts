@@ -65,7 +65,7 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
 
     if (error instanceof InterviewGenerationError) {
       response.status(502).json({
-        error: 'The AI returned an invalid interview response. Please try again.',
+        error: 'The AI returned an invalid response. Please try again.',
         code: 'INVALID_AI_RESPONSE',
       })
       return

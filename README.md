@@ -1,9 +1,9 @@
 # InterviewPilot AI
 
 InterviewPilot AI is a technical interview simulator. The current implementation
-covers steps 1-5: project setup, the frontend shell, the backend API skeleton,
-the Gemini-first AI provider layer with Groq fallback, and interview question
-generation.
+covers the Phase 1 flow through interview setup, AI question generation,
+question-by-question navigation, and local answer capture. Answer evaluation,
+the final report, deployment, authentication, and persistence are still pending.
 
 ## Project Structure
 
@@ -18,13 +18,15 @@ interviewpilot-ai/
 
 ## How It Works
 
-1. The React frontend sends the selected role, level, and question count to
+1. The React frontend sends the selected role, level, interview type, and question count to
    `POST /api/interview/create`.
 2. The Express route delegates to a thin controller and interview service.
 3. The service validates the request and builds a focused generation prompt.
 4. The AI service tries Gemini first and Groq as a fallback.
 5. The service validates the generated JSON, assigns question IDs, and returns a
    predictable response to the frontend.
+6. The frontend shows one question at a time and lets the user save a local
+   answer for each generated question.
 
 Provider SDKs and API keys remain in the backend. The frontend only knows the
 JSON API contract.
@@ -107,6 +109,7 @@ used as the fallback.
 $body = @{
   role = "Frontend Developer"
   level = "Junior"
+  interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
 

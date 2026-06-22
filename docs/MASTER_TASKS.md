@@ -30,7 +30,7 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
-  - Why not implemented: The answer flow, evaluation, final report, and deployment are still unfinished.
+  - Why not implemented: Final report and deployment are still unfinished.
 - [ ] Phase 2 - User Accounts + History
   - Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
 - [ ] Phase 3 - Resume Upload + Personalization
@@ -42,121 +42,28 @@ Phase 1 - MVP
 
 ## Current Sprint
 
-AI Question Generation
+Final Report
 
-- [ ] ****Phase 6 Tasks****
-  - Why not implemented: Question generation does not accept or use the selected interview type.
+- [ ] ****Phase 9 Tasks****
+  - Why not implemented: Completed answers and evaluations are not yet stored as report-ready interview results.
 
 ## Next Task
 
-- [ ] TODO: Add interview type to the request model and question prompt
-  - Why not implemented: The frontend stores interview type, but the backend request model and prompt do not use it yet.
+- [ ] TODO: Make submitted answers available to the final report flow
+  - Why not implemented: Answers and evaluations are currently shown in the interview UI but are not yet collected into a final report flow.
 
 ---
 
 ## ****Phase 1 Tasks****
 
-- [ ] ****Phase 6 - AI Question Generation****
-
-#### 6.2 Create Question Prompt Builder
-
-- [ ] TODO: Add interview type to the request model and question prompt
-  - Why not implemented: The frontend sends interview type, but the backend request type and prompt currently ignore it.
-
-Explanation:
-
-The prompt builder creates clear instructions for Gemini.
-
-It should include:
-
-- role
-- experience level
-- interview type
-- number of questions
-- JSON output format
-
----
-
-- [ ] ****Phase 7 - Interview Session UI****
-
-#### 7.1 Display Questions
-
-- [ ] TODO: Show one question at a time
-  - Why not implemented: The current questions component maps and renders the full question list.
-
-Explanation:
-
-This creates the actual interview experience.
-
----
-
-#### 7.2 Add Answer Box
-
-- [ ] TODO: Add textarea for user answer
-- [ ] TODO: Add Submit Answer button
-  - Why not implemented: No answer state or answer-submission handler exists in the frontend.
-
-Explanation:
-
-The user writes their answer here.
-
----
-
-- [ ] ****Phase 8 - Answer Evaluation****
-
-#### 8.1 Create Evaluation Prompt Builder
-
-- [ ] TODO: Create prompt builder for answer evaluation
-  - Why not implemented: The backend currently has only the interview question-generation prompt.
-
-Explanation:
-
-This prompt tells Gemini how to grade the answer.
-
-It should return:
-
-- score
-- strengths
-- weaknesses
-- missing concepts
-- improved answer
-- confidence level
-
----
-
-#### 8.2 Create Evaluation Endpoint
-
-- [ ] TODO: Create `POST /api/interview/evaluate`
-  - Why not implemented: The interview router currently exposes only `POST /api/interview/create`.
-
-Explanation:
-
-This endpoint receives the question and user answer, sends them to Gemini, and returns feedback.
-
----
-
-#### 8.3 Display Feedback
-
-- [ ] TODO: Display score
-- [ ] TODO: Display strengths
-- [ ] TODO: Display weaknesses
-- [ ] TODO: Display missing concepts
-- [ ] TODO: Display improved answer
-  - Why not implemented: There is no evaluation API response or frontend feedback state to display.
-
-Explanation:
-
-This is one of the most important AI features in the project.
-
----
-
 - [ ] ****Phase 9 - Final Report****
 
 #### 9.1 Store Interview Results
 
+- [ ] TODO: Make submitted answers available to the final report flow
 - [ ] TODO: Store all user answers
 - [ ] TODO: Store all AI evaluations
-  - Why not implemented: Questions are stored in React state, but user answers and evaluations do not exist yet.
+  - Why not implemented: Questions are stored in React state and answers are saved locally in the interview UI, but completed answers and evaluations are not yet stored as report-ready interview results.
 
 Explanation:
 
@@ -184,24 +91,12 @@ This gives the user a useful summary after finishing the interview.
 
 #### 10.1 Loading States
 
-- [ ] TODO: Add loading state while evaluating answers
 - [ ] TODO: Add loading state while generating final report
-  - Why not implemented: Evaluation and final-report requests have not been implemented.
+  - Why not implemented: Final-report requests have not been implemented.
 
 Explanation:
 
 Loading states prevent the app from feeling broken while AI is working.
-
----
-
-#### 10.2 Error Handling
-
-- [ ] TODO: Handle empty answers
-  - Why not implemented: The application does not have an answer textarea or submit action yet.
-
-Explanation:
-
-This makes the project feel more production-ready.
 
 ---
 
@@ -216,9 +111,8 @@ This makes the project feel more production-ready.
 
 #### 11.3 Update Prompts Document
 
-- [ ] TODO: Document answer evaluation prompt
 - [ ] TODO: Document final report prompt
-  - Why not implemented: These prompts have not been designed or implemented yet.
+  - Why not implemented: The final report prompt has not been designed or implemented yet.
 
 ---
 
@@ -494,10 +388,12 @@ This service is responsible for sending prompts to Gemini and receiving AI respo
 #### 6.2 Create Question Prompt Builder
 
 - [x] DONE: Create prompt builder for interview questions
+- [x] DONE: Add interview type to the request model and question prompt
 
 Explanation:
 
-The prompt builder creates clear instructions for Gemini.
+The backend validates `interviewType` and includes it in the Gemini prompt so
+Technical, Behavioral, and Mixed interviews generate different question styles.
 
 ---
 
@@ -515,31 +411,92 @@ Expected input:
 {
   "role": "AI Engineer",
   "level": "Junior",
+  "interviewType": "Mixed",
   "questionCount": 5
 }
 ```
-
-The backend will use `interviewType` after the unfinished Phase 6 task is complete.
 
 Expected output:
 
 ```json
 {
+  "interviewId": "interview-...",
   "questions": []
 }
 ```
 
 ---
 
+- [x] ****Phase 7 - Interview Session UI****
+
 #### 7.1 Display Questions (Completed Items)
 
 - [x] DONE: Show question number
 - [x] DONE: Show topic
 - [x] DONE: Show difficulty
+- [x] DONE: Show one question at a time
 
 Explanation:
 
 This creates the actual interview experience.
+
+---
+
+#### 7.2 Add Answer Box
+
+- [x] DONE: Add textarea for user answer
+- [x] DONE: Add Submit Answer button
+
+Explanation:
+
+The user can write and locally submit an answer for each generated question.
+
+---
+
+- [x] ****Phase 8 - Answer Evaluation****
+
+#### 8.1 Create Evaluation Prompt Builder
+
+- [x] DONE: Create prompt builder for answer evaluation
+
+Explanation:
+
+The backend now builds a strict JSON prompt for grading one submitted answer.
+
+It asks the AI to return:
+
+- score
+- strengths
+- weaknesses
+- missing concepts
+- improved answer
+- confidence level
+
+---
+
+#### 8.2 Create Evaluation Endpoint
+
+- [x] DONE: Create `POST /api/interview/evaluate`
+
+Explanation:
+
+The endpoint receives a question and user answer, sends a strict prompt to the
+AI provider layer, validates the returned JSON, and returns safe feedback.
+
+---
+
+#### 8.3 Display Feedback
+
+- [x] DONE: Display score
+- [x] DONE: Display strengths
+- [x] DONE: Display weaknesses
+- [x] DONE: Display missing concepts
+- [x] DONE: Display improved answer
+
+Explanation:
+
+The frontend now evaluates submitted answers and shows structured feedback below
+the current question.
 
 ---
 
@@ -556,6 +513,7 @@ This data is needed to generate the final report.
 #### 10.1 Loading States (Completed Items)
 
 - [x] DONE: Add loading state while generating questions
+- [x] DONE: Add loading state while evaluating answers
 
 Explanation:
 
@@ -568,6 +526,7 @@ Loading states prevent the app from feeling broken while AI is working.
 - [x] DONE: Handle Gemini API errors
 - [x] DONE: Handle backend errors
 - [x] DONE: Handle invalid selections
+- [x] DONE: Handle empty answers
 
 Explanation:
 
@@ -596,6 +555,7 @@ This makes the project feel more production-ready.
 #### 11.3 Update Prompts Document (Completed Items)
 
 - [x] DONE: Document question generation prompt
+- [x] DONE: Document answer evaluation prompt
 
 ---
 
@@ -606,19 +566,17 @@ This makes the project feel more production-ready.
 - [x] DONE: User can select experience level
 - [x] DONE: User can select interview type
 - [x] DONE: AI generates questions
-- [ ] TODO: User can answer questions
-  - Why not implemented: The interview session has no answer textarea or submit action.
-- [ ] TODO: AI evaluates answers
-  - Why not implemented: No evaluation prompt or API endpoint exists.
-- [ ] TODO: User can move between questions
-  - Why not implemented: Questions are currently rendered as a complete list without session navigation.
+- [x] DONE: User can answer questions
+- [x] DONE: AI evaluates answers
+- [x] DONE: User can move between questions
 - [ ] TODO: Final report is generated
   - Why not implemented: Answers and evaluations are not available to build a report.
 - [ ] TODO: App works online
   - Why not implemented: The frontend and backend have not been deployed.
 - [ ] TODO: README is complete
   - Why not implemented: README screenshots and the complete MVP feature description are still missing.
-- [x] DONE: GitHub repository is updated
+- [ ] TODO: GitHub repository is updated
+  - Why not implemented: Current local changes have not been committed and pushed yet.
 
 ---
 
