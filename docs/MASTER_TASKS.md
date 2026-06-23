@@ -50,7 +50,7 @@ From-scratch project audit, MVP verification, and production deployment
 
 - [x] DONE: Re-run current local automated checks on the current worktree.
 - [x] DONE: Review current uncommitted files before commit or deployment.
-- [x] DONE: Verify local server health and real API create/evaluate smoke flow.
+- [x] DONE: Verify local server health and safe AI-unavailable create response.
 - [x] DONE: Verify the local client loads in the browser without console errors.
 
 Explanation:
@@ -150,9 +150,9 @@ This is the required Phase 1 product flow.
 
 #### 12.7 Local Manual MVP Smoke Test
 
-- [ ] TODO: Start the backend locally.
-- [ ] TODO: Start the frontend locally.
-- [ ] TODO: Verify `/api/health` in the browser or PowerShell.
+- [x] DONE: Start the backend locally.
+- [x] DONE: Start the frontend locally.
+- [x] DONE: Verify `/api/health` in the browser or PowerShell.
 - [ ] TODO: Generate a 3-question interview with real AI credentials.
 - [ ] TODO: Submit answers for all questions.
 - [ ] TODO: Confirm feedback appears for each answer.
