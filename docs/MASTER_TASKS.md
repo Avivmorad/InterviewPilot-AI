@@ -30,60 +30,67 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
-  - Why not implemented: The local MVP flow is complete and checks pass, but
-    Phase 1 is not fully complete until the app is deployed, configured with
-    production secrets, verified online, and pushed to GitHub.
+  - Why not implemented: The local MVP flow appears implemented, but Phase 1 is
+    not fully complete until the project is audited from scratch, documentation
+    matches the code, checks pass on the current worktree, the app is deployed,
+    production secrets are configured, the online MVP flow is verified, and the
+    repository is pushed to GitHub.
 
 ## Current Sprint
 
-Production deployment and verification
+From-scratch project audit, MVP verification, and production deployment
 
 - [ ] \***\*Stage 12 Tasks\*\***
-  - Why not implemented: The frontend and backend are configured for deployment,
-    but live Vercel and Render services still need account access, production
-    environment variables, and production URL verification.
+  - Why not implemented: The project needs a clean audit pass before deployment.
+    The repo currently uses `frontend/` and `backend/`, while the latest project
+    rules mention `client/` and `server/`. Documentation also needs to be checked
+    against the real code before committing, deploying, or calling Phase 1 done.
 
-## Latest Local Deployment Readiness Check
+## Latest Known State
 
-- [x] DONE: `npm run check` passed locally on the current branch
-  `final-report-mvp-flow`.
+- [ ] TODO: Re-run all current checks after the audit tasks below are completed.
+  - Why not implemented: A previous `npm run check` passed, but the worktree has
+    changed since then and the result should not be treated as current.
+- [ ] TODO: Review current uncommitted files before commit or deployment.
+  - Why not implemented: `git status` currently shows modified frontend/backend
+    files and untracked Playwright audit output that must be reviewed before
+    publishing.
 
 Explanation:
 
-The local project is ready to publish to GitHub before importing into Vercel and
-Render. The remaining Stage 12 work requires GitHub, Vercel, Render, and secret
-management actions.
+Do not push, deploy, rename folders, or remove generated files until the audit
+confirms what should be kept.
 
 ## Action Needed From Daniel
 
-1. Decide whether Codex should commit and push the current deployment-ready
-   changes, or do it manually.
-2. If doing it manually, push the current branch to GitHub:
-
-```powershell
-git status
-git add README.md `
-  backend/src/app.ts backend/src/config.ts `
-  docs/API_DESIGN.md docs/DEPLOYMENT.md docs/DevQ&A.md `
-  docs/MASTER_TASKS.md docs/MVP_SCOPE.md docs/manual-testing.md `
-  frontend/src/components/interview/interview-config-form.tsx `
-  frontend/src/components/interview/option-group.tsx `
-  frontend/src/components/layout/header.tsx `
-  frontend/src/components/ui/button.tsx `
-  frontend/src/index.css frontend/src/pages/home-page.tsx `
-  render.yaml vercel.json
-git commit -m "Prepare MVP deployment"
-git push -u origin final-report-mvp-flow
-```
-
-3. Open a pull request on GitHub and merge it to `main` if Vercel and Render
-   should deploy from `main`.
-4. Deploy the backend on Render first, because Vercel needs the live backend URL.
-5. Deploy the frontend on Vercel after the Render backend URL is available.
+1. Confirm whether the project should keep `frontend/` and `backend/`, or be
+   renamed to `client/` and `server/` in a later task.
+2. Provide or configure backend AI provider secrets only in backend/server
+   environments when real AI testing or deployment is needed.
+3. Explicitly ask Codex before any commit, push, branch change, GitHub action, or
+   production deployment.
+4. Deploy the backend before the frontend because Vercel needs the live backend
+   URL for `VITE_API_URL`.
 
 ## What Is Needed To Finish Phase 1
 
-- [ ] Push the current repository changes to GitHub.
+- [ ] Complete the from-scratch repository and architecture audit.
+  - Why not implemented: The audit tasks below have not been completed yet.
+- [ ] Decide and document the final folder structure.
+  - Why not implemented: Current code uses `frontend/` and `backend/`, while the
+    latest project rules mention `client/` and `server/`.
+- [ ] Fix documentation drift found during the audit.
+  - Why not implemented: `docs/ARCHITECTURE.md` still says answer evaluation and
+    final reports are not included, while the current MVP includes both.
+- [ ] Verify the local MVP flow from start to finish.
+  - Why not implemented: The flow must be manually retested on the current
+    worktree after the audit.
+- [ ] Re-run all existing local checks.
+  - Why not implemented: Checks need to run after the latest local changes.
+- [ ] Review and resolve uncommitted files before publishing.
+  - Why not implemented: Codex must preserve user changes and cannot assume all
+    dirty files should be committed.
+- [ ] Push the reviewed repository changes to GitHub.
   - Why not implemented: Codex was not explicitly asked to commit or push.
 - [ ] Create the backend service on Render from `render.yaml`.
   - Why not implemented: Requires Render account access and production secrets.
@@ -103,68 +110,284 @@ git push -u origin final-report-mvp-flow
 
 ## Next Task
 
-- [ ] TODO: Push repository changes to GitHub
-  - Why not implemented: Vercel and Render deployment should import the latest
-    project state from GitHub. Local checks pass, but Codex still needs an
-    explicit commit and push request before changing Git history or publishing
-    the branch.
+- [ ] TODO: Complete the from-scratch project audit
+  - Why not implemented: The project should be checked from files to
+    architecture to MVP behavior before deployment or GitHub publishing.
 
 ---
 
 ## \***\*Stage 12 Tasks\*\***
 
-- [ ] \***\*Stage 12 - Deployment\*\***
+- [ ] \***\*Stage 12 - From-Scratch Audit, Stabilization, and Deployment\*\***
 
-#### 12.0 Update GitHub Repository
+#### 12.0 Review Current Worktree
 
-- [ ] TODO: Commit and push deployment-ready changes to GitHub
-  - Why not implemented: Codex must not commit or push unless explicitly asked.
-
-Explanation:
-
-Vercel and Render should deploy from the latest GitHub repository state.
-
-#### 12.1 Deploy Frontend
-
-- [ ] TODO: Deploy frontend to Vercel
-- [ ] TODO: Set `VITE_API_URL` in Vercel to the live Render backend URL
-  - Why not implemented: `vercel.json` is ready, but Vercel account login,
-    GitHub project import, environment variable setup, and production URL
-    verification still need to happen outside the local workspace.
+- [ ] TODO: Inspect `git status --short` before making any audit fixes.
+- [ ] TODO: Identify every modified tracked file and why it changed.
+- [ ] TODO: Identify every untracked file or folder and whether it should be
+  kept, ignored, documented, or removed.
+- [ ] TODO: Preserve user changes and avoid reverting unrelated work.
+  - Why not implemented: The worktree is currently dirty and must be reviewed
+    before committing, deploying, or deleting generated output.
 
 Explanation:
 
-Vercel hosts the website.
+This prevents accidental loss of work and prevents publishing unrelated files.
 
 ---
 
-#### 12.2 Deploy Backend
+#### 12.1 Project Structure And Architecture Audit
 
-- [ ] TODO: Deploy backend to Render
-- [ ] TODO: Set `CLIENT_ORIGIN` in Render to the live Vercel frontend URL
-- [ ] TODO: Set `GEMINI_API_KEY` in Render
-- [ ] TODO: Optionally set `GROQ_API_KEY` in Render for fallback AI generation
-  - Why not implemented: `render.yaml` is ready, but Render account access,
-    secret setup, service creation, and production URL verification still need
-    to happen outside the local workspace.
+- [ ] TODO: Decide whether to keep `frontend/` and `backend/` or rename them to
+  `client/` and `server/`.
+- [ ] TODO: If renaming is chosen, update workspace names, package lock entries,
+  scripts, deployment configs, docs, screenshots paths, and local command
+  examples in the same task.
+- [ ] TODO: Verify frontend code stays inside the frontend/client folder.
+- [ ] TODO: Verify backend code stays inside the backend/server folder.
+- [ ] TODO: Verify provider SDKs and AI API calls exist only in the backend.
+- [ ] TODO: Verify frontend code has no Gemini or Groq API keys, provider SDK
+  imports, or direct provider requests.
+- [ ] TODO: Verify root `package.json`, workspace config, `vercel.json`, and
+  `render.yaml` match the final folder structure.
+  - Why not implemented: The current repo structure and latest project rules do
+    not use the same folder names.
 
 Explanation:
 
-Render hosts the backend server.
+This confirms the full-stack architecture is clean and recruiter-friendly.
 
 ---
 
-#### 12.3 Test Production App
+#### 12.2 Documentation Audit
 
-- [ ] TODO: Verify Render health endpoint returns `status: ok`
-- [ ] TODO: Test full interview flow online
-- [ ] TODO: Verify AI works in production
-- [ ] TODO: Verify no API keys are exposed in frontend
-  - Why not implemented: There is no production deployment URL to test yet.
+- [ ] TODO: Update `README.md` if setup, scripts, screenshots, structure, or
+  MVP behavior no longer match the app.
+- [ ] TODO: Update `docs/MVP_SCOPE.md` if implemented or excluded features have
+  changed.
+- [ ] TODO: Update `docs/ARCHITECTURE.md` so it includes answer evaluation and
+  frontend-generated final reports.
+- [ ] TODO: Update `docs/API_DESIGN.md` if request fields, response shapes,
+  status codes, or error shapes changed.
+- [ ] TODO: Update `docs/AI_PROMPT_DESIGN.md` if prompts, provider fallback, JSON
+  validation, retries, or final-report behavior changed.
+- [ ] TODO: Update `docs/manual-testing.md` with the current manual MVP smoke
+  test.
+- [ ] TODO: Update `docs/DEPLOYMENT.md` if deployment commands, env vars, or
+  hosted service order changed.
+- [ ] TODO: Update `docs/DevQ&A.md` if earlier decisions are now outdated.
+- [ ] TODO: Update screenshots if the visible UI changed meaningfully.
+  - Why not implemented: At least one known doc drift exists in
+    `docs/ARCHITECTURE.md`, and the rest of the docs need a full consistency
+    pass.
 
 Explanation:
 
-This confirms the project is ready to share.
+Docs should describe the real app, not an older phase.
+
+---
+
+#### 12.3 Frontend MVP Flow Audit
+
+- [ ] TODO: Verify the user can select role.
+- [ ] TODO: Verify the user can select level.
+- [ ] TODO: Verify the user can select interview type.
+- [ ] TODO: Verify the user can select question count.
+- [ ] TODO: Verify invalid or missing selections are handled safely.
+- [ ] TODO: Verify question generation shows loading, success, and safe error
+  states.
+- [ ] TODO: Verify generated questions render one at a time.
+- [ ] TODO: Verify question navigation works without losing answers or feedback.
+- [ ] TODO: Verify empty answers are blocked before API submission.
+- [ ] TODO: Verify submitted answers show evaluation loading, success, and safe
+  error states.
+- [ ] TODO: Verify feedback displays score, strengths, weaknesses, missing
+  concepts, improved answer, and confidence level.
+- [ ] TODO: Verify the interview cannot be completed until all questions have
+  feedback.
+- [ ] TODO: Verify completing the interview shows final-report loading and then
+  the final report.
+- [ ] TODO: Verify the final report shows overall score, summaries, knowledge
+  gaps, recommended topics, roadmap, and per-question detail.
+- [ ] TODO: Verify starting a new interview clears the previous session state.
+- [ ] TODO: Verify desktop and mobile layouts do not overlap, clip content, or
+  hide required controls.
+- [ ] TODO: Verify basic accessibility: labels, focus movement, alert regions,
+  button disabled states, and keyboard navigation.
+  - Why not implemented: The MVP must be tested against the current code, not
+    assumed from previous screenshots.
+
+Explanation:
+
+This is the required Phase 1 product flow.
+
+---
+
+#### 12.4 Backend And API Contract Audit
+
+- [ ] TODO: Verify `GET /api/health` response shape and status.
+- [ ] TODO: Verify `POST /api/interview/create` validates request body before
+  calling AI.
+- [ ] TODO: Verify `POST /api/interview/create` returns `interviewId` and the
+  exact requested number of validated questions.
+- [ ] TODO: Verify `POST /api/interview/evaluate` validates the question and
+  answer before calling AI.
+- [ ] TODO: Verify `POST /api/interview/evaluate` returns the documented
+  feedback shape.
+- [ ] TODO: Verify frontend response parsers match backend response contracts.
+- [ ] TODO: Verify invalid JSON requests return safe JSON errors.
+- [ ] TODO: Verify unknown routes return safe JSON errors.
+- [ ] TODO: Verify unexpected backend errors do not expose stack traces or raw AI
+  provider errors.
+- [ ] TODO: Verify CORS uses `CLIENT_ORIGIN` and supports the needed local and
+  production origins.
+  - Why not implemented: API behavior must be checked end to end before
+    deployment.
+
+Explanation:
+
+The backend must be predictable because the frontend depends on structured JSON.
+
+---
+
+#### 12.5 AI JSON Reliability And Security Audit
+
+- [ ] TODO: Verify question-generation prompt requests strict JSON only.
+- [ ] TODO: Verify answer-evaluation prompt requests strict JSON only.
+- [ ] TODO: Verify prompts avoid markdown-wrapped JSON.
+- [ ] TODO: Verify generated interview parsing rejects malformed JSON.
+- [ ] TODO: Verify generated interview parsing rejects wrong question counts.
+- [ ] TODO: Verify generated interview parsing rejects missing or invalid
+  `topic`, `difficulty`, `question`, and `expectedConcepts`.
+- [ ] TODO: Verify answer evaluation parsing rejects invalid score, lists,
+  improved answer, and confidence level.
+- [ ] TODO: Verify invalid answer-evaluation JSON gets one strict retry before
+  failing safely.
+- [ ] TODO: Verify malformed AI output cannot crash the backend or frontend.
+- [ ] TODO: Verify Gemini is primary and Groq is fallback only when configured.
+- [ ] TODO: Verify missing provider keys produce a safe user-facing error.
+- [ ] TODO: Verify full API keys are never logged or returned.
+- [ ] TODO: Verify candidate answers are treated as untrusted prompt input.
+  - Why not implemented: AI output is untrusted and must be validated before
+    the MVP is considered stable.
+
+Explanation:
+
+This protects the app from malformed AI responses and accidental secret leaks.
+
+---
+
+#### 12.6 Local Automated Checks
+
+- [ ] TODO: Confirm available scripts in root, frontend, and backend
+  `package.json` files before running them.
+- [ ] TODO: Run frontend `npm run typecheck`.
+- [ ] TODO: Run frontend `npm run lint`.
+- [ ] TODO: Run frontend `npm run build`.
+- [ ] TODO: Note that frontend has no `npm run check` unless one is added.
+- [ ] TODO: Run backend `npm run check`.
+- [ ] TODO: Run backend `npm run typecheck`.
+- [ ] TODO: Run backend `npm run test`.
+- [ ] TODO: Run backend `npm run build`.
+- [ ] TODO: Note that backend has no `npm run lint` unless one is added.
+- [ ] TODO: Run root `npm run check`.
+- [ ] TODO: Run root `npm run build`.
+- [ ] TODO: Record any failures with the command, error summary, and file path.
+  - Why not implemented: Current pass/fail status is unknown after the latest
+    worktree changes.
+
+Explanation:
+
+Only existing scripts should be run. Do not invent missing commands.
+
+---
+
+#### 12.7 Local Manual MVP Smoke Test
+
+- [ ] TODO: Start the backend locally.
+- [ ] TODO: Start the frontend locally.
+- [ ] TODO: Verify `/api/health` in the browser or PowerShell.
+- [ ] TODO: Generate a 3-question interview with real AI credentials.
+- [ ] TODO: Submit answers for all questions.
+- [ ] TODO: Confirm feedback appears for each answer.
+- [ ] TODO: Complete the interview.
+- [ ] TODO: Confirm the final report renders correctly.
+- [ ] TODO: Test backend-down behavior from the frontend.
+- [ ] TODO: Test missing-provider-key behavior from the backend.
+- [ ] TODO: Check browser developer tools for exposed API keys.
+- [ ] TODO: Capture or update screenshots only if the UI changed.
+  - Why not implemented: Local end-to-end behavior needs to be verified on the
+    current worktree.
+
+Explanation:
+
+This confirms the app works as a user-facing MVP, not just as isolated code.
+
+---
+
+#### 12.8 GitHub Readiness
+
+- [ ] TODO: Review the final `git diff` before staging.
+- [ ] TODO: Stage only files that belong to the completed task.
+- [ ] TODO: Commit only after Daniel explicitly asks for a commit.
+- [ ] TODO: Push only after Daniel explicitly asks for a push.
+- [ ] TODO: Open or update a pull request only if Daniel asks for GitHub PR work.
+  - Why not implemented: Codex must not commit, push, or change Git history
+    without an explicit request.
+
+Explanation:
+
+GitHub should receive only reviewed, intentional changes.
+
+---
+
+#### 12.9 Deploy Backend
+
+- [ ] TODO: Create the backend service on Render from `render.yaml`.
+- [ ] TODO: Set `CLIENT_ORIGIN` in Render to the live Vercel frontend URL.
+- [ ] TODO: Set `GEMINI_API_KEY` in Render.
+- [ ] TODO: Optionally set `GROQ_API_KEY` in Render for fallback AI generation.
+- [ ] TODO: Verify Render health endpoint returns `status: ok`.
+  - Why not implemented: Requires Render account access, production secrets, and
+    a live Render service URL.
+
+Explanation:
+
+The backend must be live before configuring the frontend production API URL.
+
+---
+
+#### 12.10 Deploy Frontend
+
+- [ ] TODO: Create the frontend project on Vercel from `vercel.json`.
+- [ ] TODO: Set `VITE_API_URL` in Vercel to the live Render backend URL.
+- [ ] TODO: Deploy the frontend.
+- [ ] TODO: Verify the deployed frontend loads without console errors.
+  - Why not implemented: Requires Vercel account access, GitHub import,
+    environment variable setup, and the live Render backend URL.
+
+Explanation:
+
+Vercel hosts the user-facing app.
+
+---
+
+#### 12.11 Production Verification
+
+- [ ] TODO: Verify the deployed Vercel URL can reach the Render backend.
+- [ ] TODO: Test the full MVP flow online.
+- [ ] TODO: Verify AI question generation works in production.
+- [ ] TODO: Verify AI answer evaluation works in production.
+- [ ] TODO: Verify final report generation works in production.
+- [ ] TODO: Verify production user-facing errors stay simple and safe.
+- [ ] TODO: Verify browser network requests do not expose Gemini or Groq keys.
+- [ ] TODO: Update docs with final production URLs only if they are intended to
+  be public project documentation.
+  - Why not implemented: There is no verified production deployment URL yet.
+
+Explanation:
+
+This confirms Phase 1 is ready to share.
 
 ---
 
