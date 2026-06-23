@@ -7,3 +7,5 @@ dist/
 .vite/
 coverage/
 .vscode/
+
+.vercel
