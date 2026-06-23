@@ -58,7 +58,7 @@ backend  = the API server
 Create a React app using Vite.
 
 ```txt
-frontend/
+client/
 ```
 
 ### What this means
@@ -147,7 +147,7 @@ This prevents you from building everything from scratch.
 Create a folder:
 
 ```txt
-backend/
+server/
 ```
 
 Then create an Express server.
@@ -762,7 +762,7 @@ First, build a working product.
 1. Setup project
 2. Setup frontend
 3. Setup backend
-4. Connect frontend/backend
+4. Connect client/backend
 5. Build homepage
 6. Build role selection
 7. Build level selection

@@ -1,4 +1,4 @@
-# InterviewPilot AI Frontend
+# InterviewPilot AI Client
 
 React, Vite, and TypeScript frontend for configuring an interview and displaying
 generated questions.

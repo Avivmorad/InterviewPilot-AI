@@ -21,14 +21,14 @@ cd C:\Users\Daniel\Desktop\InterviewPilot-AI
 npm install
 ```
 
-Create the backend environment file:
+Create the server environment file:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 Copy-Item .env.example .env
 ```
 
-Open `backend/.env` and set at least one API key:
+Open `server/.env` and set at least one API key:
 
 ```dotenv
 GEMINI_API_KEY=your_gemini_api_key
@@ -36,14 +36,14 @@ GROQ_API_KEY=
 ```
 
 Gemini is the primary provider. Groq is used as a fallback when it is
-configured. Never put an API key in frontend files.
+configured. Never put an API key in client files.
 
 ## 1. Start the Frontend
 
 In the first PowerShell window:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run dev
 ```
 
@@ -61,7 +61,7 @@ should display role, level, interview-type, and question-count options.
 In a second PowerShell window:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run dev
 ```
 
@@ -227,8 +227,8 @@ Typical response:
 
 Meaning: the backend is running, but neither AI provider has an API key.
 
-Fix: add `GEMINI_API_KEY` or `GROQ_API_KEY` to `backend/.env`, then restart the
-backend. Do not place API keys in `frontend/.env` or frontend source files.
+Fix: add `GEMINI_API_KEY` or `GROQ_API_KEY` to `server/.env`, then restart the
+backend. Do not place API keys in `client/.env` or client source files.
 
 ### Invalid JSON
 
@@ -266,7 +266,7 @@ allow. By default, the backend allows `http://localhost:5173`.
 Fix:
 
 1. Check the frontend URL printed by Vite.
-2. Set `CLIENT_ORIGIN` in `backend/.env` to that exact URL without a trailing
+2. Set `CLIENT_ORIGIN` in `server/.env` to that exact URL without a trailing
    slash. Use comma-separated values when you need to allow both local and
    production frontend origins.
 3. Restart the backend.
@@ -301,19 +301,19 @@ First, check whether InterviewPilot is already running in another terminal. If
 it is, use that existing server or stop it with `Ctrl+C`.
 
 If the frontend starts on a different port, update `CLIENT_ORIGIN` in
-`backend/.env` to match it. If the backend port must change, update both
-`PORT` in `backend/.env` and `VITE_API_URL` in `frontend/.env`, then restart
+`server/.env` to match it. If the backend port must change, update both
+`PORT` in `server/.env` and `VITE_API_URL` in `client/.env`, then restart
 both servers.
 
 Example alternate-port configuration:
 
 ```dotenv
-# backend/.env
+# server/.env
 PORT=3002
 CLIENT_ORIGIN=http://localhost:5174
 ```
 
 ```dotenv
-# frontend/.env
+# client/.env
 VITE_API_URL=http://localhost:3002
 ```

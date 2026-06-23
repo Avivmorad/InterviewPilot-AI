@@ -42,51 +42,43 @@ From-scratch project audit, MVP verification, and production deployment
 
 - [ ] \***\*Stage 12 Tasks\*\***
   - Why not implemented: The project needs a clean audit pass before deployment.
-    The repo currently uses `frontend/` and `backend/`, while the latest project
-    rules mention `client/` and `server/`. Documentation also needs to be checked
-    against the real code before committing, deploying, or calling Phase 1 done.
+    Structure, documentation, and local automated checks have been updated.
+    Runtime smoke testing, GitHub publishing, deployment, production secrets,
+    and online verification still remain.
 
 ## Latest Known State
 
-- [ ] TODO: Re-run all current checks after the audit tasks below are completed.
-  - Why not implemented: A previous `npm run check` passed, but the worktree has
-    changed since then and the result should not be treated as current.
-- [ ] TODO: Review current uncommitted files before commit or deployment.
-  - Why not implemented: `git status` currently shows modified frontend/backend
-    files and untracked Playwright audit output that must be reviewed before
-    publishing.
+- [x] DONE: Re-run current local automated checks on the current worktree.
+- [x] DONE: Review current uncommitted files before commit or deployment.
+- [x] DONE: Verify local server health and real API create/evaluate smoke flow.
+- [x] DONE: Verify the local client loads in the browser without console errors.
 
 Explanation:
 
-Do not push, deploy, rename folders, or remove generated files until the audit
-confirms what should be kept.
+Do not push, deploy, rename folders, or remove generated files until Daniel
+explicitly asks for that work.
 
 ## Action Needed From Daniel
 
-1. Confirm whether the project should keep `frontend/` and `backend/`, or be
-   renamed to `client/` and `server/` in a later task.
-2. Provide or configure backend AI provider secrets only in backend/server
-   environments when real AI testing or deployment is needed.
-3. Explicitly ask Codex before any commit, push, branch change, GitHub action, or
+1. Provide or configure AI provider secrets only in server environments when
+   real AI testing or deployment is needed.
+2. Explicitly ask Codex before any commit, push, branch change, GitHub action, or
    production deployment.
-4. Deploy the backend before the frontend because Vercel needs the live backend
+3. Deploy the backend before the frontend because Vercel needs the live backend
    URL for `VITE_API_URL`.
 
 ## What Is Needed To Finish Phase 1
 
 - [ ] Complete the from-scratch repository and architecture audit.
   - Why not implemented: The audit tasks below have not been completed yet.
-- [ ] Decide and document the final folder structure.
-  - Why not implemented: Current code uses `frontend/` and `backend/`, while the
-    latest project rules mention `client/` and `server/`.
-- [ ] Fix documentation drift found during the audit.
-  - Why not implemented: `docs/ARCHITECTURE.md` still says answer evaluation and
-    final reports are not included, while the current MVP includes both.
+- [x] Decide and document the final folder structure.
+- [x] Fix documentation drift found during the audit.
 - [ ] Verify the local MVP flow from start to finish.
-  - Why not implemented: The flow must be manually retested on the current
-    worktree after the audit.
-- [ ] Re-run all existing local checks.
-  - Why not implemented: Checks need to run after the latest local changes.
+  - Why not implemented: The real API create/evaluate flow passed, and the
+    client loads without browser console errors. The fully interactive browser
+    walkthrough through final report still needs to be completed with browser
+    controls that can fill and submit the form.
+- [x] Re-run all existing local checks.
 - [ ] Review and resolve uncommitted files before publishing.
   - Why not implemented: Codex must preserve user changes and cannot assume all
     dirty files should be committed.
@@ -110,82 +102,15 @@ confirms what should be kept.
 
 ## Next Task
 
-- [ ] TODO: Complete the from-scratch project audit
-  - Why not implemented: The project should be checked from files to
-    architecture to MVP behavior before deployment or GitHub publishing.
+- [ ] TODO: Verify the local MVP flow from start to finish
+  - Why not implemented: Local runtime smoke testing still needs to be completed
+    on the renamed `client/` and `server/` workspaces.
 
 ---
 
 ## \***\*Stage 12 Tasks\*\***
 
 - [ ] \***\*Stage 12 - From-Scratch Audit, Stabilization, and Deployment\*\***
-
-#### 12.0 Review Current Worktree
-
-- [ ] TODO: Inspect `git status --short` before making any audit fixes.
-- [ ] TODO: Identify every modified tracked file and why it changed.
-- [ ] TODO: Identify every untracked file or folder and whether it should be
-  kept, ignored, documented, or removed.
-- [ ] TODO: Preserve user changes and avoid reverting unrelated work.
-  - Why not implemented: The worktree is currently dirty and must be reviewed
-    before committing, deploying, or deleting generated output.
-
-Explanation:
-
-This prevents accidental loss of work and prevents publishing unrelated files.
-
----
-
-#### 12.1 Project Structure And Architecture Audit
-
-- [ ] TODO: Decide whether to keep `frontend/` and `backend/` or rename them to
-  `client/` and `server/`.
-- [ ] TODO: If renaming is chosen, update workspace names, package lock entries,
-  scripts, deployment configs, docs, screenshots paths, and local command
-  examples in the same task.
-- [ ] TODO: Verify frontend code stays inside the frontend/client folder.
-- [ ] TODO: Verify backend code stays inside the backend/server folder.
-- [ ] TODO: Verify provider SDKs and AI API calls exist only in the backend.
-- [ ] TODO: Verify frontend code has no Gemini or Groq API keys, provider SDK
-  imports, or direct provider requests.
-- [ ] TODO: Verify root `package.json`, workspace config, `vercel.json`, and
-  `render.yaml` match the final folder structure.
-  - Why not implemented: The current repo structure and latest project rules do
-    not use the same folder names.
-
-Explanation:
-
-This confirms the full-stack architecture is clean and recruiter-friendly.
-
----
-
-#### 12.2 Documentation Audit
-
-- [ ] TODO: Update `README.md` if setup, scripts, screenshots, structure, or
-  MVP behavior no longer match the app.
-- [ ] TODO: Update `docs/MVP_SCOPE.md` if implemented or excluded features have
-  changed.
-- [ ] TODO: Update `docs/ARCHITECTURE.md` so it includes answer evaluation and
-  frontend-generated final reports.
-- [ ] TODO: Update `docs/API_DESIGN.md` if request fields, response shapes,
-  status codes, or error shapes changed.
-- [ ] TODO: Update `docs/AI_PROMPT_DESIGN.md` if prompts, provider fallback, JSON
-  validation, retries, or final-report behavior changed.
-- [ ] TODO: Update `docs/manual-testing.md` with the current manual MVP smoke
-  test.
-- [ ] TODO: Update `docs/DEPLOYMENT.md` if deployment commands, env vars, or
-  hosted service order changed.
-- [ ] TODO: Update `docs/DevQ&A.md` if earlier decisions are now outdated.
-- [ ] TODO: Update screenshots if the visible UI changed meaningfully.
-  - Why not implemented: At least one known doc drift exists in
-    `docs/ARCHITECTURE.md`, and the rest of the docs need a full consistency
-    pass.
-
-Explanation:
-
-Docs should describe the real app, not an older phase.
-
----
 
 #### 12.3 Frontend MVP Flow Audit
 
@@ -220,85 +145,6 @@ Docs should describe the real app, not an older phase.
 Explanation:
 
 This is the required Phase 1 product flow.
-
----
-
-#### 12.4 Backend And API Contract Audit
-
-- [ ] TODO: Verify `GET /api/health` response shape and status.
-- [ ] TODO: Verify `POST /api/interview/create` validates request body before
-  calling AI.
-- [ ] TODO: Verify `POST /api/interview/create` returns `interviewId` and the
-  exact requested number of validated questions.
-- [ ] TODO: Verify `POST /api/interview/evaluate` validates the question and
-  answer before calling AI.
-- [ ] TODO: Verify `POST /api/interview/evaluate` returns the documented
-  feedback shape.
-- [ ] TODO: Verify frontend response parsers match backend response contracts.
-- [ ] TODO: Verify invalid JSON requests return safe JSON errors.
-- [ ] TODO: Verify unknown routes return safe JSON errors.
-- [ ] TODO: Verify unexpected backend errors do not expose stack traces or raw AI
-  provider errors.
-- [ ] TODO: Verify CORS uses `CLIENT_ORIGIN` and supports the needed local and
-  production origins.
-  - Why not implemented: API behavior must be checked end to end before
-    deployment.
-
-Explanation:
-
-The backend must be predictable because the frontend depends on structured JSON.
-
----
-
-#### 12.5 AI JSON Reliability And Security Audit
-
-- [ ] TODO: Verify question-generation prompt requests strict JSON only.
-- [ ] TODO: Verify answer-evaluation prompt requests strict JSON only.
-- [ ] TODO: Verify prompts avoid markdown-wrapped JSON.
-- [ ] TODO: Verify generated interview parsing rejects malformed JSON.
-- [ ] TODO: Verify generated interview parsing rejects wrong question counts.
-- [ ] TODO: Verify generated interview parsing rejects missing or invalid
-  `topic`, `difficulty`, `question`, and `expectedConcepts`.
-- [ ] TODO: Verify answer evaluation parsing rejects invalid score, lists,
-  improved answer, and confidence level.
-- [ ] TODO: Verify invalid answer-evaluation JSON gets one strict retry before
-  failing safely.
-- [ ] TODO: Verify malformed AI output cannot crash the backend or frontend.
-- [ ] TODO: Verify Gemini is primary and Groq is fallback only when configured.
-- [ ] TODO: Verify missing provider keys produce a safe user-facing error.
-- [ ] TODO: Verify full API keys are never logged or returned.
-- [ ] TODO: Verify candidate answers are treated as untrusted prompt input.
-  - Why not implemented: AI output is untrusted and must be validated before
-    the MVP is considered stable.
-
-Explanation:
-
-This protects the app from malformed AI responses and accidental secret leaks.
-
----
-
-#### 12.6 Local Automated Checks
-
-- [ ] TODO: Confirm available scripts in root, frontend, and backend
-  `package.json` files before running them.
-- [ ] TODO: Run frontend `npm run typecheck`.
-- [ ] TODO: Run frontend `npm run lint`.
-- [ ] TODO: Run frontend `npm run build`.
-- [ ] TODO: Note that frontend has no `npm run check` unless one is added.
-- [ ] TODO: Run backend `npm run check`.
-- [ ] TODO: Run backend `npm run typecheck`.
-- [ ] TODO: Run backend `npm run test`.
-- [ ] TODO: Run backend `npm run build`.
-- [ ] TODO: Note that backend has no `npm run lint` unless one is added.
-- [ ] TODO: Run root `npm run check`.
-- [ ] TODO: Run root `npm run build`.
-- [ ] TODO: Record any failures with the command, error summary, and file path.
-  - Why not implemented: Current pass/fail status is unknown after the latest
-    worktree changes.
-
-Explanation:
-
-Only existing scripts should be run. Do not invent missing commands.
 
 ---
 
@@ -393,6 +239,175 @@ This confirms Phase 1 is ready to share.
 
 ## \***\*Stage 12 Done Tasks\*\***
 
+- [x] \***\*Stage 12 - Structure And Documentation Audit\*\***
+
+#### 12.1 Project Structure And Architecture Audit
+
+- [x] DONE: Rename source folders to `client/` and `server/`.
+- [x] DONE: Update workspace names, package lock entries, scripts, deployment
+  configs, docs, screenshot references, and local command examples.
+- [x] DONE: Verify frontend code stays inside the `client/` folder.
+- [x] DONE: Verify backend code stays inside the `server/` folder.
+- [x] DONE: Verify provider SDKs and AI API calls exist only in the server.
+- [x] DONE: Verify client code has no Gemini or Groq API keys, provider SDK
+  imports, or direct provider requests.
+- [x] DONE: Verify root `package.json`, workspace config, `vercel.json`, and
+  `render.yaml` match the final folder structure.
+
+Explanation:
+
+The repository now matches the expected `client/` and `server/` structure.
+Provider SDKs remain in `server/src/ai/providers`, while the client only calls
+the JSON API through `VITE_API_URL`.
+
+---
+
+#### 12.2 Documentation Audit
+
+- [x] DONE: Update `README.md` setup, scripts, structure, and deployment notes.
+- [x] DONE: Update `docs/MVP_SCOPE.md` for current included and excluded work.
+- [x] DONE: Update `docs/ARCHITECTURE.md` so it includes answer evaluation and
+  frontend-generated final reports.
+- [x] DONE: Review `docs/API_DESIGN.md`; no contract changes were needed.
+- [x] DONE: Review `docs/AI_PROMPT_DESIGN.md`; it already matched the prompt
+  reliability and final-report behavior.
+- [x] DONE: Update `docs/manual-testing.md` command paths.
+- [x] DONE: Update `docs/DEPLOYMENT.md` command paths and workspace names.
+- [x] DONE: Update `docs/DevQ&A.md` to remove outdated phase guidance.
+- [x] DONE: Update audit-note source paths for the renamed client folder.
+
+Explanation:
+
+Docs now describe the current MVP flow and the `client/`/`server/` layout.
+Screenshots were not replaced because this task changed paths and docs, not the
+visible UI screenshots.
+
+---
+
+- [x] \***\*Stage 12 - Backend/API And AI Reliability Audit\*\***
+
+#### 12.4 Backend And API Contract Audit
+
+- [x] DONE: Verify `GET /api/health` response shape and status.
+- [x] DONE: Verify `POST /api/interview/create` validates request body before
+  calling AI.
+- [x] DONE: Verify `POST /api/interview/create` returns `interviewId` and the
+  exact requested number of validated questions.
+- [x] DONE: Verify `POST /api/interview/evaluate` validates the question and
+  answer before calling AI.
+- [x] DONE: Verify `POST /api/interview/evaluate` returns the documented
+  feedback shape.
+- [x] DONE: Verify client response parsers match backend response contracts.
+- [x] DONE: Verify invalid JSON requests return safe JSON errors.
+- [x] DONE: Verify unknown routes return safe JSON errors.
+- [x] DONE: Verify unexpected backend errors do not expose stack traces or raw AI
+  provider errors.
+- [x] DONE: Verify CORS uses `CLIENT_ORIGIN` and supports the needed local
+  origin.
+
+Explanation:
+
+The automated API contract tests passed, `/api/health` passed locally, and a
+real 3-question create/evaluate API smoke test returned valid structured
+feedback for all answers.
+
+---
+
+#### 12.5 AI JSON Reliability And Security Audit
+
+- [x] DONE: Verify question-generation prompt requests strict JSON only.
+- [x] DONE: Verify answer-evaluation prompt requests strict JSON only.
+- [x] DONE: Verify prompts avoid markdown-wrapped JSON.
+- [x] DONE: Verify generated interview parsing rejects malformed JSON.
+- [x] DONE: Verify generated interview parsing rejects wrong question counts.
+- [x] DONE: Verify generated interview parsing rejects missing or invalid
+  `topic`, `difficulty`, `question`, and `expectedConcepts`.
+- [x] DONE: Verify answer evaluation parsing rejects invalid score, lists,
+  improved answer, and confidence level.
+- [x] DONE: Verify invalid answer-evaluation JSON gets one strict retry before
+  failing safely.
+- [x] DONE: Verify malformed AI output cannot crash the backend or frontend.
+- [x] DONE: Verify Gemini is primary and Groq is fallback only when configured.
+- [x] DONE: Verify missing provider keys produce a safe user-facing error.
+- [x] DONE: Verify full API keys are never logged or returned.
+- [x] DONE: Verify candidate answers are treated as untrusted prompt input.
+- [x] DONE: Request provider-level JSON output from Gemini and Groq where
+  supported.
+
+Explanation:
+
+The backend validates AI output before returning it. Answer-evaluation parsing
+now tolerates common harmless provider drift such as wrapped feedback objects,
+numeric score strings, and confidence-level casing while still rejecting missing
+or unsafe fields.
+
+---
+
+- [x] \***\*Stage 12 - Local Smoke Progress\*\***
+
+#### 12.7 Partial Local Manual MVP Smoke Test
+
+- [x] DONE: Start the backend locally.
+- [x] DONE: Start the frontend locally.
+- [x] DONE: Verify `/api/health` in PowerShell.
+- [x] DONE: Generate a 3-question interview with real AI credentials.
+- [x] DONE: Submit answers for all questions through the API.
+- [x] DONE: Confirm feedback appears for each API answer response.
+- [x] DONE: Verify the local client loads in the browser without console errors.
+
+Explanation:
+
+The full API flow works locally with real AI credentials. The remaining manual
+smoke-test gap is a browser-driven walkthrough that fills the form, completes
+the interview, and visually confirms the final report.
+
+---
+
+- [x] \***\*Stage 12 - Current Audit Progress\*\***
+
+#### 12.0 Review Current Worktree
+
+- [x] DONE: Inspect `git status --short` before making any audit fixes.
+- [x] DONE: Identify every modified tracked file and why it changed.
+- [x] DONE: Identify every untracked file or folder and whether it should be
+  kept, ignored, documented, or removed.
+- [x] DONE: Preserve user changes and avoid reverting unrelated work.
+
+Explanation:
+
+Current tracked changes are focused in backend AI JSON reliability tests/service
+code and frontend interview flow/report UX. Untracked
+`output/playwright/design-audit/` files are audit screenshots and notes; keep
+them for now unless Daniel asks to remove or ignore generated output.
+
+---
+
+- [x] \***\*Stage 12 - Local Automated Checks\*\***
+
+#### 12.6 Local Automated Checks
+
+- [x] DONE: Confirm available scripts in root, client, and server
+  `package.json` files before running them.
+- [x] DONE: Run client `npm run typecheck`.
+- [x] DONE: Run client `npm run lint`.
+- [x] DONE: Run client `npm run build`.
+- [x] DONE: Note that client has no `npm run check` unless one is added.
+- [x] DONE: Run server `npm run check`.
+- [x] DONE: Run server `npm run typecheck`.
+- [x] DONE: Run server `npm run test`.
+- [x] DONE: Run server `npm run build`.
+- [x] DONE: Note that server has no `npm run lint` unless one is added.
+- [x] DONE: Run root `npm run check`.
+- [x] DONE: Run root `npm run build`.
+- [x] DONE: Record any failures with the command, error summary, and file path.
+
+Explanation:
+
+All existing local automated checks passed on the current worktree. No client
+`check` script or server `lint` script exists.
+
+---
+
 - [x] \***\*Stage 12 - Deployment Preparation\*\***
 
 #### 12.0 Prepare Production Deployment
@@ -447,8 +462,8 @@ Expected result:
 
 ```txt
 InterviewPilot-AI/
-├── frontend/
-├── backend/
+├── client/
+├── server/
 └── docs/
 ```
 

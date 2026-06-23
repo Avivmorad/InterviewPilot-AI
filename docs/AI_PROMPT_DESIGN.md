@@ -16,6 +16,8 @@ routes do not depend on SDK details.
 The initial provider layer exposes a generic `generateText(prompt)` function. It
 tries Gemini first and then Groq. Missing keys and provider failures are reported
 only when generation is requested, so the backend can start without AI credentials.
+Provider calls request JSON output where the SDK supports it, and the backend
+still parses and validates the returned text before trusting it.
 
 ## Interviewer System Prompt
 

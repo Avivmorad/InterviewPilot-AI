@@ -1,46 +1,57 @@
-import { Code2, LoaderCircle, MessageSquareText, Sparkles, Target } from 'lucide-react'
+import {
+  Code2,
+  LoaderCircle,
+  MessageSquareText,
+  Sparkles,
+  Target,
+} from "lucide-react";
+import type { RefObject } from "react";
 
-import { FinalReport } from '@/components/interview/final-report'
-import { InterviewConfigForm } from '@/components/interview/interview-config-form'
-import { InterviewQuestions } from '@/components/interview/interview-questions'
-import { SavedConfigSummary } from '@/components/interview/saved-config-summary'
+import { FinalReport } from "@/components/interview/final-report";
+import { InterviewConfigForm } from "@/components/interview/interview-config-form";
+import { InterviewQuestions } from "@/components/interview/interview-questions";
+import { SavedConfigSummary } from "@/components/interview/saved-config-summary";
 import type {
   CreateInterviewResponse,
   InterviewConfig,
   InterviewQuestionResult,
-} from '@/types/interview'
+} from "@/types/interview";
 
 type HomePageProps = {
-  error: string
-  interview: CreateInterviewResponse | null
-  interviewResults: Record<string, InterviewQuestionResult>
-  isReportLoading: boolean
-  isReportVisible: boolean
-  isLoading: boolean
-  onCompleteInterview: () => void
-  onResultChange: (result: InterviewQuestionResult) => void
-  onResultRemove: (questionId: string) => void
-  onStartInterview: (config: InterviewConfig) => void | Promise<void>
-  savedConfig: InterviewConfig | null
-}
+  error: string;
+  interview: CreateInterviewResponse | null;
+  interviewResults: Record<string, InterviewQuestionResult>;
+  isReportLoading: boolean;
+  isReportVisible: boolean;
+  isLoading: boolean;
+  onCompleteInterview: () => void;
+  onResultChange: (result: InterviewQuestionResult) => void;
+  onResultRemove: (questionId: string) => void;
+  onStartNewInterview: () => void;
+  onStartInterview: (config: InterviewConfig) => void | Promise<void>;
+  savedConfig: InterviewConfig | null;
+  sessionRef: RefObject<HTMLElement | null>;
+  setupRef: RefObject<HTMLDivElement | null>;
+};
 
 const benefits = [
   {
     icon: Code2,
-    title: 'Role-specific practice',
-    description: 'Questions focused on your target engineering role.',
+    title: "Role-specific practice",
+    description: "Questions focused on your target engineering role.",
   },
   {
     icon: Target,
-    title: 'Right level of difficulty',
-    description: 'Practice calibrated to your current experience.',
+    title: "Right level of difficulty",
+    description: "Practice calibrated to your current experience.",
   },
   {
     icon: MessageSquareText,
-    title: 'Structured question sets',
-    description: 'Review focused questions and the concepts strong answers should cover.',
+    title: "Structured question sets",
+    description:
+      "Review focused questions and the concepts strong answers should cover.",
   },
-]
+];
 
 export function HomePage({
   error,
@@ -52,16 +63,19 @@ export function HomePage({
   onCompleteInterview,
   onResultChange,
   onResultRemove,
+  onStartNewInterview,
   onStartInterview,
   savedConfig,
+  sessionRef,
+  setupRef,
 }: HomePageProps) {
   return (
     <>
       <section
-        className="mx-auto grid max-w-[1468px] gap-12 px-5 py-12 sm:px-8 lg:grid-cols-[minmax(0,1fr)_468px] lg:items-start lg:gap-20 lg:px-0 lg:pb-0 lg:pt-[6.75rem]"
+        className="mx-auto grid max-w-[1468px] gap-12 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_468px] lg:items-start lg:gap-20 lg:px-0 lg:pb-0 lg:pt-[6.75rem]"
         id="home"
       >
-        <div className="flex flex-col justify-center">
+        <div className="order-2 flex flex-col justify-center lg:order-1">
           <div className="mb-7 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm">
             <Sparkles aria-hidden="true" className="size-4 text-primary" />
             AI-powered interview prep
@@ -75,8 +89,8 @@ export function HomePage({
             <span className="text-primary">confidence.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-slate-700 sm:text-xl">
-            Prepare for technical interviews with focused sessions tailored to your
-            role and experience level.
+            Prepare for technical interviews with focused sessions tailored to
+            your role and experience level.
           </p>
 
           <div className="mt-16 flex flex-col gap-10" id="how-it-works">
@@ -96,8 +110,15 @@ export function HomePage({
           </div>
         </div>
 
-        <div className="flex flex-col gap-5">
-          <InterviewConfigForm isLoading={isLoading} onSubmit={onStartInterview} />
+        <div
+          className="order-1 flex flex-col gap-5 lg:order-2"
+          ref={setupRef}
+          tabIndex={-1}
+        >
+          <InterviewConfigForm
+            isLoading={isLoading}
+            onSubmit={onStartInterview}
+          />
           {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
 
           {isLoading ? (
@@ -105,9 +126,14 @@ export function HomePage({
               aria-live="polite"
               className="flex items-center gap-3 rounded-2xl border bg-white p-5 shadow-sm"
             >
-              <LoaderCircle aria-hidden="true" className="size-5 animate-spin text-primary" />
+              <LoaderCircle
+                aria-hidden="true"
+                className="size-5 animate-spin text-primary"
+              />
               <div>
-                <h2 className="font-semibold">Generating interview questions</h2>
+                <h2 className="font-semibold">
+                  Generating interview questions
+                </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   The AI is preparing a focused question set.
                 </p>
@@ -120,7 +146,9 @@ export function HomePage({
               className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm"
               role="alert"
             >
-              <h2 className="font-semibold">Could not generate the interview</h2>
+              <h2 className="font-semibold">
+                Could not generate the interview
+              </h2>
               <p className="mt-1 text-sm leading-6">{error}</p>
             </section>
           ) : null}
@@ -136,6 +164,7 @@ export function HomePage({
           onResultChange={onResultChange}
           onResultRemove={onResultRemove}
           results={interviewResults}
+          sessionRef={sessionRef}
         />
       ) : null}
 
@@ -145,11 +174,15 @@ export function HomePage({
           className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
         >
           <div className="flex items-start gap-3 rounded-lg border bg-card p-5">
-            <LoaderCircle aria-hidden="true" className="mt-0.5 size-5 animate-spin text-primary" />
+            <LoaderCircle
+              aria-hidden="true"
+              className="mt-0.5 size-5 animate-spin text-primary"
+            />
             <div>
               <h2 className="font-semibold">Generating final report</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                The app is summarizing your scores, gaps, and recommended topics.
+                The app is summarizing your scores, gaps, and recommended
+                topics.
               </p>
             </div>
           </div>
@@ -160,9 +193,10 @@ export function HomePage({
         <FinalReport
           config={savedConfig}
           interview={interview}
+          onStartNewInterview={onStartNewInterview}
           results={interviewResults}
         />
       ) : null}
     </>
-  )
+  );
 }

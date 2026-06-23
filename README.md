@@ -10,8 +10,8 @@ persistence are still pending.
 
 ```text
 interviewpilot-ai/
-  frontend/   React + Vite + TypeScript
-  backend/    Node.js + Express + TypeScript
+  client/   React + Vite + TypeScript
+  server/    Node.js + Express + TypeScript
   docs/       Product and technical notes
   README.md
   .gitignore
@@ -46,18 +46,28 @@ cd C:\Users\Daniel\Desktop\InterviewPilot-AI
 npm install
 ```
 
+## Start The Project
+
+From the project root:
+
+```powershell
+.\runproject
+```
+
+This starts the client and server together.
+
 ## Run The Frontend
 
 From the project root:
 
 ```powershell
-npm run dev:frontend
+npm run dev:client
 ```
 
-Or from the frontend folder:
+Or from the client folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run dev
 ```
 
@@ -70,13 +80,13 @@ Open a second terminal:
 From the project root:
 
 ```powershell
-npm run dev:backend
+npm run dev:server
 ```
 
-Or from the backend folder:
+Or from the server folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run dev
 ```
 
@@ -107,8 +117,8 @@ Expected response:
 
 ## Create An Interview
 
-Set at least one backend API key in `backend/.env`, using
-`backend/.env.example` as the template. Gemini is attempted first and Groq is
+Set at least one server API key in `server/.env`, using
+`server/.env.example` as the template. Gemini is attempted first and Groq is
 used as the fallback.
 
 ```powershell
@@ -172,8 +182,8 @@ report. Authentication and persistence are not included yet.
 
 ```powershell
 npm run dev
-npm run dev:frontend
-npm run dev:backend
+npm run dev:client
+npm run dev:server
 npm run typecheck
 npm run build
 npm run check
@@ -187,33 +197,33 @@ npm run check
 To run scripts from an individual workspace:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run typecheck
 npm run lint
 npm run build
 npm run preview
 
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run typecheck
 npm run build
 npm run start
 ```
 
 Run `npm run build` before `npm run start` in the backend because `start` runs
-the compiled `backend/dist/server.js` file.
+the compiled `server/dist/server.js` file.
 
 ## Deployment
 
 Deployment config is included:
 
-- `vercel.json` builds the `frontend` workspace for Vercel.
-- `render.yaml` builds and starts the `backend` service on Render.
+- `vercel.json` builds the `client` workspace for Vercel.
+- `render.yaml` builds and starts the `server` service on Render.
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) lists the required production
   environment variables and verification checklist.
 
 Production deploy still requires your Vercel and Render accounts, a GitHub repo,
-and backend AI provider keys configured as provider secrets. Never put Gemini or
-Groq keys in frontend environment variables.
+and server AI provider keys configured as provider secrets. Never put Gemini or
+Groq keys in client environment variables.
 
 See [docs/manual-testing.md](docs/manual-testing.md) for browser and PowerShell
 testing steps.

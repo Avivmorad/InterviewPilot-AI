@@ -35,6 +35,7 @@ export class GroqProvider implements AIProvider {
       const response = await client.chat.completions.create({
         model: this.model,
         messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
       })
       const text = response.choices[0]?.message.content?.trim()
 

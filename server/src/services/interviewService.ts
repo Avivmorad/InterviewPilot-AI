@@ -172,17 +172,134 @@ function parseStringList(
   return value.map((item) => item.trim())
 }
 
+function parseScore(value: unknown): number {
+  const score =
+    typeof value === 'string' && value.trim().length > 0
+      ? Number(value)
+      : value
+
+  if (
+    typeof score !== 'number' ||
+    !Number.isInteger(score) ||
+    score < 1 ||
+    score > 5
+  ) {
+    throw new InterviewGenerationError()
+  }
+
+  return score
+}
+
+function parseConfidenceLevel(value: unknown): EvaluationConfidenceLevel {
+  if (typeof value !== 'string') {
+    throw new InterviewGenerationError()
+  }
+
+  const normalizedValue = value.trim().toLowerCase()
+
+  if (!isConfidenceLevel(normalizedValue)) {
+    throw new InterviewGenerationError()
+  }
+
+  return normalizedValue
+}
+
+function getEvaluationRecord(value: unknown): Record<string, unknown> {
+  if (!isRecord(value)) {
+    throw new InterviewGenerationError()
+  }
+
+  if ('score' in value) {
+    return value
+  }
+
+  if (isRecord(value.evaluation)) {
+    return value.evaluation
+  }
+
+  if (isRecord(value.feedback)) {
+    return value.feedback
+  }
+
+  throw new InterviewGenerationError()
+}
+
+function parseJsonObjectText(text: string): unknown {
+  try {
+    return JSON.parse(text)
+  } catch (error) {
+    const extractedJson = extractFirstJsonObject(text)
+
+    if (!extractedJson) {
+      throw new InterviewGenerationError(undefined, { cause: error })
+    }
+
+    try {
+      return JSON.parse(extractedJson)
+    } catch (extractedError) {
+      throw new InterviewGenerationError(undefined, { cause: extractedError })
+    }
+  }
+}
+
+function extractFirstJsonObject(text: string): string | null {
+  let startIndex = -1
+  let depth = 0
+  let isInString = false
+  let isEscaped = false
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index]
+
+    if (startIndex === -1) {
+      if (character === '{') {
+        startIndex = index
+        depth = 1
+      }
+      continue
+    }
+
+    if (isEscaped) {
+      isEscaped = false
+      continue
+    }
+
+    if (character === '\\') {
+      isEscaped = isInString
+      continue
+    }
+
+    if (character === '"') {
+      isInString = !isInString
+      continue
+    }
+
+    if (isInString) {
+      continue
+    }
+
+    if (character === '{') {
+      depth += 1
+      continue
+    }
+
+    if (character === '}') {
+      depth -= 1
+
+      if (depth === 0) {
+        return text.slice(startIndex, index + 1)
+      }
+    }
+  }
+
+  return null
+}
+
 export function parseGeneratedInterview(
   text: string,
   request: CreateInterviewRequest,
 ): InterviewQuestion[] {
-  let parsed: unknown
-
-  try {
-    parsed = JSON.parse(text)
-  } catch (error) {
-    throw new InterviewGenerationError(undefined, { cause: error })
-  }
+  const parsed = parseJsonObjectText(text)
 
   if (!isRecord(parsed) || !Array.isArray(parsed.questions)) {
     throw new InterviewGenerationError()
@@ -202,30 +319,15 @@ export function parseGeneratedInterview(
 }
 
 export function parseAnswerEvaluation(text: string): AnswerEvaluation {
-  let parsed: unknown
+  const parsed = getEvaluationRecord(parseJsonObjectText(text))
 
-  try {
-    parsed = JSON.parse(text)
-  } catch (error) {
-    throw new InterviewGenerationError(undefined, { cause: error })
-  }
-
-  if (!isRecord(parsed)) {
-    throw new InterviewGenerationError()
-  }
-
-  const score = parsed.score
+  const score = parseScore(parsed.score)
   const improvedAnswer = parsed.improvedAnswer
-  const confidenceLevel = parsed.confidenceLevel
+  const confidenceLevel = parseConfidenceLevel(parsed.confidenceLevel)
 
   if (
-    typeof score !== 'number' ||
-    !Number.isInteger(score) ||
-    score < 1 ||
-    score > 5 ||
     typeof improvedAnswer !== 'string' ||
-    improvedAnswer.trim().length === 0 ||
-    !isConfidenceLevel(confidenceLevel)
+    improvedAnswer.trim().length === 0
   ) {
     throw new InterviewGenerationError()
   }
@@ -261,7 +363,18 @@ export async function evaluateAnswer(
 ): Promise<AnswerEvaluation> {
   const request = validateEvaluateAnswerRequest(input)
   const prompt = buildAnswerEvaluationPrompt(request)
-  const generatedText = await textGenerator(prompt)
 
-  return parseAnswerEvaluation(generatedText)
+  try {
+    return parseAnswerEvaluation(await textGenerator(prompt))
+  } catch (error) {
+    if (!(error instanceof InterviewGenerationError)) {
+      throw error
+    }
+
+    const retryPrompt = `${prompt}
+
+Your previous response was invalid. Return only the JSON object that matches the requested shape. Do not include markdown, code fences, prose, or extra keys.`
+
+    return parseAnswerEvaluation(await textGenerator(retryPrompt))
+  }
 }

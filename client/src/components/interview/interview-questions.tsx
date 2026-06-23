@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 import { AlertCircle, CheckCircle2, LoaderCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ type InterviewQuestionsProps = {
   onResultChange: (result: InterviewQuestionResult) => void
   onResultRemove: (questionId: string) => void
   results: Record<string, InterviewQuestionResult>
+  sessionRef: RefObject<HTMLElement | null>
 }
 
 export function InterviewQuestions({
@@ -25,6 +27,7 @@ export function InterviewQuestions({
   onResultChange,
   onResultRemove,
   results,
+  sessionRef,
 }: InterviewQuestionsProps) {
   const isMountedRef = useRef(true)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
@@ -32,6 +35,7 @@ export function InterviewQuestions({
   const [evaluationErrors, setEvaluationErrors] = useState<Record<string, string>>({})
   const [evaluations, setEvaluations] = useState<Record<string, AnswerEvaluation>>({})
   const [evaluatingQuestionIds, setEvaluatingQuestionIds] = useState<Record<string, boolean>>({})
+  const [visibleHintQuestionIds, setVisibleHintQuestionIds] = useState<Record<string, boolean>>({})
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, string>>({})
 
   const question = interview.questions[activeQuestionIndex]
@@ -54,6 +58,7 @@ export function InterviewQuestions({
     : false
   const isSavedAnswerCurrent =
     typeof submittedAnswer === 'string' && submittedAnswer === trimmedCurrentAnswer
+  const areHintsVisible = question ? Boolean(visibleHintQuestionIds[question.id]) : false
   const canSubmitAnswer =
     trimmedCurrentAnswer.length > 0 &&
     (!isSavedAnswerCurrent || Boolean(currentEvaluationError)) &&
@@ -165,10 +170,23 @@ export function InterviewQuestions({
     }
   }
 
+  function goToNextQuestion() {
+    setActiveQuestionIndex((index) => Math.min(index + 1, totalQuestions - 1))
+  }
+
+  function toggleCurrentHints() {
+    setVisibleHintQuestionIds((questionIds) => ({
+      ...questionIds,
+      [question.id]: !questionIds[question.id],
+    }))
+  }
+
   return (
     <section
       aria-labelledby="questions-title"
       className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
+      ref={sessionRef}
+      tabIndex={-1}
     >
       <div className="border-t pt-10">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -202,18 +220,36 @@ export function InterviewQuestions({
           <p className="mt-4 text-base font-medium leading-7">{question.question}</p>
 
           <div className="mt-5 border-t pt-4">
-            <h3 className="text-sm font-semibold">Expected concepts</h3>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-              {question.expectedConcepts.map((concept) => (
-                <li className="flex items-start gap-2 text-sm text-muted-foreground" key={concept}>
-                  <CheckCircle2
-                    aria-hidden="true"
-                    className="mt-0.5 size-4 shrink-0 text-primary"
-                  />
-                  <span>{concept}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-sm font-semibold">Expected concepts</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Use hints only when you want study guidance.
+                </p>
+              </div>
+              <Button
+                aria-expanded={areHintsVisible}
+                aria-controls={`hints-${question.id}`}
+                onClick={toggleCurrentHints}
+                type="button"
+                variant="outline"
+              >
+                {areHintsVisible ? 'Hide hints' : `Show hints for question ${questionNumber}`}
+              </Button>
+            </div>
+            {areHintsVisible ? (
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2" id={`hints-${question.id}`}>
+                {question.expectedConcepts.map((concept) => (
+                  <li className="flex items-start gap-2 text-sm text-muted-foreground" key={concept}>
+                    <CheckCircle2
+                      aria-hidden="true"
+                      className="mt-0.5 size-4 shrink-0 text-primary"
+                    />
+                    <span>{concept}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
           <div className="mt-6 border-t pt-5">
@@ -323,6 +359,34 @@ export function InterviewQuestions({
                   {currentEvaluation.improvedAnswer}
                 </p>
               </div>
+
+              <div className="mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {canCompleteInterview
+                    ? 'All answers have feedback. You can finish the session.'
+                    : 'Feedback is ready. Continue when you are ready.'}
+                </p>
+                {canCompleteInterview ? (
+                  <Button
+                    disabled={isReportLoading}
+                    onClick={onCompleteInterview}
+                    type="button"
+                  >
+                    {isReportLoading ? (
+                      <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+                    ) : null}
+                    {isReportLoading ? 'Generating report' : 'Complete interview'}
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={isLastQuestion}
+                    onClick={goToNextQuestion}
+                    type="button"
+                  >
+                    Next question
+                  </Button>
+                )}
+              </div>
             </section>
           ) : null}
         </article>
@@ -344,9 +408,7 @@ export function InterviewQuestions({
           </div>
           <Button
             disabled={isLastQuestion}
-            onClick={() =>
-              setActiveQuestionIndex((index) => Math.min(index + 1, totalQuestions - 1))
-            }
+            onClick={goToNextQuestion}
             type="button"
           >
             Next question

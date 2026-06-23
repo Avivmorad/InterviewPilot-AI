@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: interviewpilot-ai-backend
+    name: interviewpilot-ai-server
     env: node
     plan: free
-    rootDir: backend
+    rootDir: server
     buildCommand: npm install && npm run build
     startCommand: npm run start
     healthCheckPath: /api/health

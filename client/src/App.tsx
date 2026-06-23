@@ -18,7 +18,10 @@ function App() {
   const [savedConfig, setSavedConfig] = useState<InterviewConfig | null>(null)
   const [interview, setInterview] = useState<CreateInterviewResponse | null>(null)
   const [interviewResults, setInterviewResults] = useState<Record<string, InterviewQuestionResult>>({})
+  const pendingSessionFocusRef = useRef(false)
   const reportLoadingTimerRef = useRef<number | undefined>(undefined)
+  const sessionRef = useRef<HTMLElement | null>(null)
+  const setupRef = useRef<HTMLDivElement | null>(null)
   const [isReportLoading, setIsReportLoading] = useState(false)
   const [isReportVisible, setIsReportVisible] = useState(false)
   const [error, setError] = useState('')
@@ -46,6 +49,18 @@ function App() {
       clearReportLoadingTimer()
     }
   }, [])
+
+  useEffect(() => {
+    if (!interview || !pendingSessionFocusRef.current) {
+      return
+    }
+
+    pendingSessionFocusRef.current = false
+    window.requestAnimationFrame(() => {
+      sessionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      sessionRef.current?.focus({ preventScroll: true })
+    })
+  }, [interview])
 
   function clearReportLoadingTimer() {
     window.clearTimeout(reportLoadingTimerRef.current)
@@ -75,7 +90,9 @@ function App() {
     setIsLoading(true)
 
     try {
-      setInterview(await createInterview(config))
+      const nextInterview = await createInterview(config)
+      pendingSessionFocusRef.current = true
+      setInterview(nextInterview)
     } catch (requestError) {
       setError(
         requestError instanceof InterviewApiError
@@ -85,6 +102,21 @@ function App() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  function handleStartNewInterview() {
+    clearReportLoadingTimer()
+    setSavedConfig(null)
+    setInterview(null)
+    setInterviewResults({})
+    setIsReportLoading(false)
+    setIsReportVisible(false)
+    setError('')
+
+    window.requestAnimationFrame(() => {
+      setupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setupRef.current?.focus({ preventScroll: true })
+    })
   }
 
   return (
@@ -97,6 +129,7 @@ function App() {
         isReportVisible={isReportVisible}
         isLoading={isLoading}
         onCompleteInterview={handleCompleteInterview}
+        onStartNewInterview={handleStartNewInterview}
         onResultChange={(result) =>
           setInterviewResults((currentResults) => ({
             ...currentResults,
@@ -115,6 +148,8 @@ function App() {
         }}
         onStartInterview={handleStartInterview}
         savedConfig={savedConfig}
+        sessionRef={sessionRef}
+        setupRef={setupRef}
       />
     </AppLayout>
   )

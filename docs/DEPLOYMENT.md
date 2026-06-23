@@ -3,12 +3,12 @@
 This project is deployment-ready, but the actual production deploy requires
 your Vercel and Render accounts plus production environment variables.
 
-## Backend: Render
+## Server: Render
 
 1. Push the repository to GitHub.
 2. In Render, create a new Blueprint from the repository.
 3. Render will read `render.yaml` and create the backend web service from
-   `backend/`.
+   `server/`.
 4. Set these environment variables in Render:
 
 ```dotenv
@@ -34,11 +34,11 @@ Expected response:
 }
 ```
 
-## Frontend: Vercel
+## Client: Vercel
 
 1. Import the GitHub repository in Vercel.
 2. Keep the project root as the repository root.
-3. Vercel will read `vercel.json` and build only the `frontend` workspace.
+3. Vercel will read `vercel.json` and build only the `client` workspace.
 4. Set this environment variable in Vercel:
 
 ```dotenv
@@ -73,11 +73,11 @@ Also verify:
 Run these before deploying:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run lint
 npm run build
 
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run check
 npm run test
 npm run build

@@ -1,6 +1,8 @@
-import { Award, BookOpen, Route, Target } from 'lucide-react'
+import { Award, BookOpen, Clipboard, RotateCcw, Route, Target } from 'lucide-react'
 import type { ComponentType } from 'react'
+import { useState } from 'react'
 
+import { Button } from '@/components/ui/button'
 import type {
   CreateInterviewResponse,
   InterviewConfig,
@@ -10,14 +12,17 @@ import type {
 type FinalReportProps = {
   config: InterviewConfig | null
   interview: CreateInterviewResponse
+  onStartNewInterview: () => void
   results: Record<string, InterviewQuestionResult>
 }
 
 export function FinalReport({
   config,
   interview,
+  onStartNewInterview,
   results,
 }: FinalReportProps) {
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
   const orderedResults = interview.questions
     .map((question) => results[question.id])
     .filter((result): result is InterviewQuestionResult => Boolean(result))
@@ -39,6 +44,22 @@ export function FinalReport({
       ? knowledgeGaps
       : uniqueItems(orderedResults.map((result) => result.question.topic)).slice(0, 5)
   const roadmap = buildRoadmap(recommendedTopics, weaknesses)
+  const reportText = buildReportText({
+    config,
+    orderedResults,
+    recommendedTopics,
+    roadmap,
+    roundedScore,
+  })
+
+  async function copyReport() {
+    try {
+      await navigator.clipboard.writeText(reportText)
+      setCopyStatus('copied')
+    } catch {
+      setCopyStatus('failed')
+    }
+  }
 
   return (
     <section
@@ -62,6 +83,28 @@ export function FinalReport({
             <p className="mt-1 text-2xl font-semibold">{roundedScore}/5</p>
           </div>
         </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            Save this summary or start another practice session.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button onClick={copyReport} type="button" variant="outline">
+              <Clipboard aria-hidden="true" className="size-4" />
+              {copyStatus === 'copied' ? 'Report copied' : 'Copy report'}
+            </Button>
+            <Button onClick={onStartNewInterview} type="button">
+              <RotateCcw aria-hidden="true" className="size-4" />
+              Start new interview
+            </Button>
+          </div>
+        </div>
+
+        {copyStatus === 'failed' ? (
+          <p className="mt-2 text-sm text-red-700" role="alert">
+            Could not copy the report. Please try again.
+          </p>
+        ) : null}
 
         <div className="mt-7 grid gap-5 lg:grid-cols-2">
           <ReportSection
@@ -128,6 +171,54 @@ export function FinalReport({
       </div>
     </section>
   )
+}
+
+type BuildReportTextInput = {
+  config: InterviewConfig | null
+  orderedResults: InterviewQuestionResult[]
+  recommendedTopics: string[]
+  roadmap: string[]
+  roundedScore: string
+}
+
+function buildReportText({
+  config,
+  orderedResults,
+  recommendedTopics,
+  roadmap,
+  roundedScore,
+}: BuildReportTextInput): string {
+  const title = config
+    ? `${config.level} ${config.role} - ${config.interviewType} interview`
+    : 'Completed interview summary'
+  const questionBreakdown = orderedResults
+    .map(
+      (result, index) => `${index + 1}. ${result.question.question}
+Score: ${result.evaluation.score}/5
+Improved answer: ${result.evaluation.improvedAnswer}`,
+    )
+    .join('\n\n')
+
+  return `InterviewPilot AI Final Report
+${title}
+Overall score: ${roundedScore}/5
+
+Recommended topics:
+${formatReportList(recommendedTopics)}
+
+Learning roadmap:
+${formatReportList(roadmap)}
+
+Question breakdown:
+${questionBreakdown}`
+}
+
+function formatReportList(items: string[]): string {
+  if (items.length === 0) {
+    return '- None'
+  }
+
+  return items.map((item) => `- ${item}`).join('\n')
 }
 
 type ReportSectionProps = {

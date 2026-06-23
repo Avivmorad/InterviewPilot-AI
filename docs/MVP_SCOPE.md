@@ -24,7 +24,7 @@ As a software engineering candidate, I can configure and complete a short mock t
 - Resume upload or parsing
 - Analytics
 - Collaborative interviews
-- Deployment configuration
+- Hosted deployment and production verification
 - Real-time coding sandbox
 - AI-generated final report narratives
 

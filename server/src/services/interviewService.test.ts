@@ -141,6 +141,68 @@ test('rejects malformed answer evaluation JSON', () => {
   )
 })
 
+test('parses an answer evaluation from markdown-wrapped JSON', () => {
+  const result = parseAnswerEvaluation(`Here is the evaluation:
+\`\`\`json
+${validEvaluationText}
+\`\`\``)
+
+  assert.equal(result.score, 4)
+  assert.equal(result.confidenceLevel, 'medium')
+})
+
+test('parses an answer evaluation with common AI shape drift', () => {
+  const result = parseAnswerEvaluation(JSON.stringify({
+    evaluation: {
+      ...JSON.parse(validEvaluationText),
+      score: '4',
+      confidenceLevel: 'Medium',
+    },
+  }))
+
+  assert.equal(result.score, 4)
+  assert.equal(result.confidenceLevel, 'medium')
+})
+
+test('retries answer evaluation once after invalid AI output', async () => {
+  const prompts: string[] = []
+
+  const result = await evaluateAnswer(
+    {
+      question: JSON.parse(validGeneratedText).questions[0],
+      answer: 'State stores values and updates the UI.',
+    },
+    async (prompt) => {
+      prompts.push(prompt)
+      return prompts.length === 1 ? '{"score": 6}' : validEvaluationText
+    },
+  )
+
+  assert.equal(result.score, 4)
+  assert.equal(prompts.length, 2)
+  assert.match(prompts[1] ?? '', /previous response was invalid/)
+})
+
+test('rejects answer evaluation after retry output is still invalid', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    evaluateAnswer(
+      {
+        question: JSON.parse(validGeneratedText).questions[0],
+        answer: 'State stores values and updates the UI.',
+      },
+      async () => {
+        calls += 1
+        return '{"score": 6}'
+      },
+    ),
+    InterviewGenerationError,
+  )
+
+  assert.equal(calls, 2)
+})
+
 test('rejects an empty answer before calling AI', async () => {
   let calls = 0
 

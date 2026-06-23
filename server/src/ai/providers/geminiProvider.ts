@@ -35,6 +35,9 @@ export class GeminiProvider implements AIProvider {
       const response = await client.models.generateContent({
         model: this.model,
         contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+        },
       })
       const text = response.text?.trim()
 
