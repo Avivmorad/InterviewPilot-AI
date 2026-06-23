@@ -36,6 +36,14 @@ test('health and interview routes enforce the current create API contract', asyn
     'http://localhost:5173',
   )
 
+  const allowedFallbackOriginResponse = await fetch(`${baseUrl}/api/health`, {
+    headers: { origin: 'http://localhost:5174' },
+  })
+  assert.equal(
+    allowedFallbackOriginResponse.headers.get('access-control-allow-origin'),
+    'http://localhost:5174',
+  )
+
   const disallowedOriginResponse = await fetch(`${baseUrl}/api/health`, {
     headers: { origin: 'https://example.com' },
   })

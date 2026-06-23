@@ -1,4 +1,15 @@
-import { LoaderCircle, Play } from 'lucide-react'
+import {
+  Bot,
+  Code2,
+  Crown,
+  Layers3,
+  LoaderCircle,
+  MessageSquareText,
+  Play,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 import { OptionGroup } from '@/components/interview/option-group'
@@ -20,6 +31,25 @@ type InterviewConfigFormProps = {
   onSubmit: (config: InterviewConfig) => void | Promise<void>
 }
 
+const roleIcons = {
+  'Frontend Developer': Code2,
+  'Backend Developer': Layers3,
+  'Full Stack Developer': Layers3,
+  'AI Engineer': Bot,
+} satisfies Record<Role, typeof Code2>
+
+const levelIcons = {
+  Junior: UserRound,
+  'Mid-Level': UserRound,
+  Senior: Crown,
+} satisfies Record<Level, typeof UserRound>
+
+const interviewTypeIcons = {
+  Technical: Code2,
+  Behavioral: MessageSquareText,
+  Mixed: Layers3,
+} satisfies Record<InterviewType, typeof Code2>
+
 export function InterviewConfigForm({
   isLoading,
   onSubmit,
@@ -36,59 +66,99 @@ export function InterviewConfigForm({
 
   return (
     <form
-      className="flex flex-col gap-5 rounded-[1.45rem] border border-slate-200 bg-white p-6 shadow-[0_28px_70px_rgba(37,76,180,0.18)] sm:p-8"
+      className="glass-panel neon-panel reveal-in relative flex flex-col gap-6 overflow-hidden rounded-lg p-6 sm:p-8"
       onSubmit={handleSubmit}
     >
-      <div>
-        <h2 className="text-2xl font-bold tracking-[-0.02em]">Set up your interview</h2>
-        <p className="mt-2 text-base text-muted-foreground">
-          Choose a focus for this practice session.
-        </p>
+      <div className="relative z-10 flex items-start gap-4">
+        <Sparkles
+          aria-hidden="true"
+          className="mt-1 size-6 shrink-0 text-primary drop-shadow-[0_0_18px_rgb(47_107_255_/_0.8)]"
+        />
+        <div>
+          <h2 className="font-display text-3xl font-extrabold text-white sm:text-[2.15rem]">
+            Set up your interview
+          </h2>
+          <p className="mt-2 text-base leading-7 text-muted-foreground">
+            Choose a focus for this practice session.
+          </p>
+        </div>
       </div>
 
-      <OptionGroup
-        description="Choose the role you want to practice for."
-        disabled={isLoading}
-        name="role"
-        onChange={setRole}
-        options={ROLES}
-        title="Role"
-        value={role}
-      />
+      <div className="relative z-10 grid gap-6">
+        <OptionGroup
+          description="Choose the role you want to practice for."
+          disabled={isLoading}
+          name="role"
+          onChange={setRole}
+          options={ROLES}
+          renderLabel={(option) => {
+            const Icon = roleIcons[option]
 
-      <OptionGroup
-        description="Select your current experience level."
-        disabled={isLoading}
-        name="level"
-        onChange={setLevel}
-        options={LEVELS}
-        title="Level"
-        value={level}
-      />
+            return (
+              <>
+                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
+                <span>{option}</span>
+              </>
+            )
+          }}
+          title="Role"
+          value={role}
+        />
 
-      <OptionGroup
-        description="Choose the style of questions for this interview."
-        disabled={isLoading}
-        name="interviewType"
-        onChange={setInterviewType}
-        options={INTERVIEW_TYPES}
-        title="Interview type"
-        value={interviewType}
-      />
+        <OptionGroup
+          description="Select your current experience level."
+          disabled={isLoading}
+          name="level"
+          onChange={setLevel}
+          options={LEVELS}
+          renderLabel={(option) => {
+            const Icon = levelIcons[option]
 
-      <OptionGroup
-        description="Choose how many questions to include."
-        disabled={isLoading}
-        name="questionCount"
-        onChange={setQuestionCount}
-        options={QUESTION_COUNTS}
-        renderLabel={(count) => `${count}`}
-        title="Question count"
-        value={questionCount}
-      />
+            return (
+              <>
+                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
+                <span>{option}</span>
+              </>
+            )
+          }}
+          title="Level"
+          value={level}
+        />
+
+        <OptionGroup
+          description="Choose the style of questions for this interview."
+          disabled={isLoading}
+          name="interviewType"
+          onChange={setInterviewType}
+          options={INTERVIEW_TYPES}
+          renderLabel={(option) => {
+            const Icon = interviewTypeIcons[option]
+
+            return (
+              <>
+                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
+                <span>{option}</span>
+              </>
+            )
+          }}
+          title="Interview type"
+          value={interviewType}
+        />
+
+        <OptionGroup
+          description="Choose how many questions to include."
+          disabled={isLoading}
+          name="questionCount"
+          onChange={setQuestionCount}
+          options={QUESTION_COUNTS}
+          renderLabel={(count) => `${count}`}
+          title="Question count"
+          value={questionCount}
+        />
+      </div>
 
       <Button
-        className="mt-1 h-14 w-full rounded-xl text-base font-bold shadow-[0_14px_30px_rgba(36,71,232,0.3)]"
+        className="relative z-10 mt-1 h-14 w-full text-lg font-extrabold"
         disabled={isLoading}
         size="lg"
         type="submit"
@@ -98,8 +168,12 @@ export function InterviewConfigForm({
         ) : (
           <Play aria-hidden="true" />
         )}
-        {isLoading ? 'Generating Questions...' : 'Start Interview'}
+        {isLoading ? 'Generating questions...' : 'Start Interview'}
       </Button>
+      <p className="relative z-10 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
+        <ShieldCheck aria-hidden="true" className="size-4 text-slate-400" />
+        Your answers are private and used only for feedback.
+      </p>
     </form>
   )
 }

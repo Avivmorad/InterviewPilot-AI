@@ -2,7 +2,7 @@ import cors from 'cors'
 import express, { type ErrorRequestHandler, type Router } from 'express'
 
 import { AIServiceError } from './ai/types.js'
-import { config } from './config.js'
+import { isAllowedClientOrigin } from './config.js'
 import { interviewRoutes } from './routes/interviewRoutes.js'
 import {
   InterviewGenerationError,
@@ -16,7 +16,7 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
   app.use(
     cors({
       origin(origin, callback) {
-        callback(null, !origin || config.clientOrigins.includes(origin))
+        callback(null, isAllowedClientOrigin(origin))
       },
     }),
   )

@@ -1,4 +1,3 @@
-import { Check } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -26,8 +25,10 @@ export function OptionGroup<T extends string | number>({
 }: OptionGroupProps<T>) {
   return (
     <fieldset disabled={disabled}>
-      <legend className="text-base font-bold">{title}</legend>
-      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      <legend className="text-base font-extrabold text-white">
+        {title}
+      </legend>
+      <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{description}</p>
       <div
         className={cn(
           'mt-3 grid gap-3',
@@ -37,8 +38,9 @@ export function OptionGroup<T extends string | number>({
         {options.map((option) => (
           <label
             className={cn(
-              'flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-center text-base font-medium leading-tight text-slate-700 transition-colors hover:border-primary/60 hover:bg-secondary has-disabled:cursor-not-allowed has-disabled:opacity-60',
-              value === option && 'border-primary bg-blue-50 text-primary shadow-[inset_0_0_0_1px_var(--primary)]',
+              'group relative flex min-h-[3.5rem] cursor-pointer items-center justify-start gap-3 rounded-lg border border-white/10 bg-white/[0.035] px-4 text-left text-base font-bold leading-tight text-slate-100 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/45 hover:bg-primary/10 has-disabled:cursor-not-allowed has-disabled:opacity-60',
+              value === option &&
+                'border-primary bg-[linear-gradient(145deg,rgb(47_107_255_/_0.18),rgb(138_92_255_/_0.08))] text-white shadow-[inset_0_0_0_1px_rgb(47_107_255_/_0.45),0_0_30px_rgb(47_107_255_/_0.18)]',
             )}
             key={option}
           >
@@ -53,12 +55,11 @@ export function OptionGroup<T extends string | number>({
             <span
               aria-hidden="true"
               className={cn(
-                'flex size-5 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-transparent',
-                value === option && 'border-primary bg-primary text-white',
+                'size-5 shrink-0 rounded-full border-2 border-slate-600 bg-transparent transition-all',
+                value === option &&
+                  'border-[#9ba8ff] shadow-[inset_0_0_0_4px_rgb(15_23_42),0_0_16px_rgb(138_92_255_/_0.75)]',
               )}
-            >
-              <Check className="size-3.5 stroke-[3]" />
-            </span>
+            />
             <span>{renderLabel(option)}</span>
           </label>
         ))}

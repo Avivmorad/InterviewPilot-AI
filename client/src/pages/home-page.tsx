@@ -1,9 +1,9 @@
 import {
   Code2,
+  Crosshair,
   LoaderCircle,
   MessageSquareText,
   Sparkles,
-  Target,
 } from "lucide-react";
 import type { RefObject } from "react";
 
@@ -41,7 +41,7 @@ const benefits = [
     description: "Questions focused on your target engineering role.",
   },
   {
-    icon: Target,
+    icon: Crosshair,
     title: "Right level of difficulty",
     description: "Practice calibrated to your current experience.",
   },
@@ -72,36 +72,42 @@ export function HomePage({
   return (
     <>
       <section
-        className="mx-auto grid max-w-[1468px] gap-12 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_468px] lg:items-start lg:gap-20 lg:px-0 lg:pb-0 lg:pt-[6.75rem]"
+        className="relative mx-auto grid max-w-[1488px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(380px,0.9fr)_minmax(520px,1.1fr)] lg:items-start lg:gap-10 lg:px-8 lg:py-7 xl:gap-16 xl:px-12 2xl:px-0"
         id="home"
       >
-        <div className="order-2 flex flex-col justify-center lg:order-1">
-          <div className="mb-7 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm">
-            <Sparkles aria-hidden="true" className="size-4 text-primary" />
-            AI-powered interview prep
-          </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-[2%] top-12 hidden size-8 text-primary/45 lg:block"
+        >
+          <Sparkles className="size-8 float-slow" />
+        </div>
 
-          <h1 className="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[4.25rem]">
+        <div className="order-2 flex flex-col justify-center pt-4 lg:order-1 lg:pt-3">
+          <div className="hero-hologram mb-1 hidden max-w-3xl lg:block">
+            <span className="code-glyph">&lt;/&gt;</span>
+          </div>
+          <h1 className="font-display max-w-3xl text-4xl font-extrabold leading-[1.08] text-white sm:text-5xl lg:text-[3.35rem] xl:text-[4.15rem]">
             Practice smarter.
             <br />
             Interview with
             <br />
-            <span className="text-primary">confidence.</span>
+            <span className="aurora-text">confidence.</span>
           </h1>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-slate-700 sm:text-xl">
-            Prepare for technical interviews with focused sessions tailored to
-            your role and experience level.
+          <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+            AI-powered mock interviews tailored to your role and experience
+            level. Get focused practice, clear feedback, and a roadmap to keep
+            improving.
           </p>
 
-          <div className="mt-16 flex flex-col gap-10" id="how-it-works">
+          <div className="mt-7 grid gap-3 sm:max-w-2xl sm:grid-cols-3" id="how-it-works">
             {benefits.map(({ description, icon: Icon, title }) => (
-              <div className="flex max-w-2xl gap-4" key={title}>
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-primary">
-                  <Icon aria-hidden="true" className="size-5" />
+              <div className="soft-panel group flex min-h-20 items-center gap-3 rounded-lg p-4" key={title}>
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-primary/40 bg-primary/10 text-primary shadow-[0_0_20px_rgb(47_107_255_/_0.18)] transition-transform duration-200 group-hover:-translate-y-1">
+                  <Icon aria-hidden="true" className="size-6" />
                 </span>
                 <div>
-                  <h2 className="font-bold">{title}</h2>
-                  <p className="mt-1 text-base leading-6 text-slate-700">
+                  <h2 className="text-sm font-extrabold text-white">{title}</h2>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     {description}
                   </p>
                 </div>
@@ -124,7 +130,7 @@ export function HomePage({
           {isLoading ? (
             <section
               aria-live="polite"
-              className="flex items-center gap-3 rounded-2xl border bg-white p-5 shadow-sm"
+              className="soft-panel flex items-center gap-3 rounded-lg p-5"
             >
               <LoaderCircle
                 aria-hidden="true"
@@ -143,7 +149,7 @@ export function HomePage({
 
           {error ? (
             <section
-              className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm"
+              className="rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100 shadow-[0_18px_40px_rgb(185_28_28_/_0.1)]"
               role="alert"
             >
               <h2 className="font-semibold">
@@ -173,7 +179,7 @@ export function HomePage({
           aria-live="polite"
           className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
         >
-          <div className="flex items-start gap-3 rounded-lg border bg-card p-5">
+          <div className="soft-panel flex items-start gap-3 rounded-lg p-5">
             <LoaderCircle
               aria-hidden="true"
               className="mt-0.5 size-5 animate-spin text-primary"

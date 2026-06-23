@@ -1,4 +1,13 @@
-import { Award, BookOpen, Clipboard, RotateCcw, Route, Target } from 'lucide-react'
+import {
+  Award,
+  BookOpen,
+  Clipboard,
+  Code2,
+  RotateCcw,
+  Route,
+  Target,
+  TrendingUp,
+} from 'lucide-react'
 import type { ComponentType } from 'react'
 import { useState } from 'react'
 
@@ -51,6 +60,8 @@ export function FinalReport({
     roadmap,
     roundedScore,
   })
+  const scorePercent = Math.round((Number(roundedScore) / 5) * 100)
+  const displayScore = Number.isFinite(scorePercent) ? scorePercent : 0
 
   async function copyReport() {
     try {
@@ -64,59 +75,114 @@ export function FinalReport({
   return (
     <section
       aria-labelledby="final-report-title"
-      className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
+      className="mx-auto max-w-[1400px] px-5 pb-12 pt-10 sm:px-8 lg:pb-20"
     >
-      <div className="border-t pt-10">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="space-y-6">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(560px,1.1fr)] lg:items-center">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight" id="final-report-title">
-              Final report
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
+              <Award aria-hidden="true" className="size-4" />
+              Interview complete
+            </span>
+            <h2
+              className="mt-6 max-w-xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
+              id="final-report-title"
+            >
+              Your interview report
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {config
-                ? `${config.level} ${config.role} - ${config.interviewType} interview`
-                : 'Completed interview summary'}
+            <p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">
+              Here is how you performed and where to focus next.
             </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button onClick={onStartNewInterview} type="button">
+                <RotateCcw aria-hidden="true" className="size-5" />
+                Practice again
+              </Button>
+              <Button onClick={copyReport} type="button" variant="outline">
+                <Clipboard aria-hidden="true" className="size-4" />
+                {copyStatus === 'copied' ? 'Report copied' : 'Copy report'}
+              </Button>
+            </div>
+            {copyStatus === 'failed' ? (
+              <p className="mt-3 text-sm text-red-300" role="alert">
+                Could not copy the report. Please try again.
+              </p>
+            ) : null}
           </div>
-          <div className="rounded-lg border bg-card px-4 py-3 text-right">
-            <p className="text-xs font-medium text-muted-foreground">Overall score</p>
-            <p className="mt-1 text-2xl font-semibold">{roundedScore}/5</p>
+
+          <div className="glass-panel neon-panel overflow-hidden rounded-lg p-7">
+            <div className="relative z-10 grid gap-7 sm:grid-cols-[230px_minmax(0,1fr)] sm:items-center">
+              <div
+                className="grid aspect-square place-items-center rounded-full p-4"
+                style={{
+                  background: `conic-gradient(from 8deg, #8a5cff ${displayScore * 0.45}%, #2f6bff ${displayScore}%, rgba(255,255,255,0.08) ${displayScore}%)`,
+                }}
+              >
+                <div className="grid size-full place-items-center rounded-full border border-white/10 bg-[#050a16] shadow-[inset_0_0_35px_rgb(47_107_255_/_0.16)]">
+                  <div className="text-center">
+                    <p className="text-6xl font-extrabold text-white">{displayScore}</p>
+                    <p className="mt-1 text-sm font-bold text-primary">Overall score</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-2xl font-extrabold text-white">
+                  {displayScore >= 80
+                    ? 'Excellent performance'
+                    : displayScore >= 65
+                      ? 'Strong progress'
+                      : 'Keep practicing'}
+                </h3>
+                <p className="mt-4 text-base leading-7 text-muted-foreground">
+                  {config
+                    ? `${config.level} ${config.role} - ${config.interviewType} interview`
+                    : 'Completed interview summary'}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  Review your strengths, improve the weak answers, and repeat the
+                  session when you are ready.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
-            Save this summary or start another practice session.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button onClick={copyReport} type="button" variant="outline">
-              <Clipboard aria-hidden="true" className="size-4" />
-              {copyStatus === 'copied' ? 'Report copied' : 'Copy report'}
-            </Button>
-            <Button onClick={onStartNewInterview} type="button">
-              <RotateCcw aria-hidden="true" className="size-4" />
-              Start new interview
-            </Button>
+        <section className="soft-panel rounded-lg p-5">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryItem
+              icon={Code2}
+              label="Role"
+              value={config?.role ?? 'Interview practice'}
+            />
+            <SummaryItem
+              icon={TrendingUp}
+              label="Experience level"
+              value={config?.level ?? 'Custom'}
+            />
+            <SummaryItem
+              icon={Target}
+              label="Interview type"
+              value={config?.interviewType ?? 'Mixed'}
+            />
+            <SummaryItem
+              icon={BookOpen}
+              label="Questions answered"
+              value={`${orderedResults.length} / ${interview.questions.length}`}
+            />
           </div>
-        </div>
+        </section>
 
-        {copyStatus === 'failed' ? (
-          <p className="mt-2 text-sm text-red-700" role="alert">
-            Could not copy the report. Please try again.
-          </p>
-        ) : null}
-
-        <div className="mt-7 grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-4">
           <ReportSection
             icon={Award}
             items={strengths}
-            title="Strengths summary"
+            title="Strengths"
           />
           <ReportSection
             emptyText="No major weaknesses were identified."
             icon={Target}
             items={weaknesses}
-            title="Weaknesses summary"
+            title="Areas to improve"
           />
           <ReportSection
             emptyText="No major knowledge gaps were identified."
@@ -131,12 +197,12 @@ export function FinalReport({
           />
         </div>
 
-        <section className="mt-5 rounded-lg border bg-card p-5">
-          <h3 className="font-semibold">Recommended topics</h3>
+        <section className="glass-panel rounded-lg p-5">
+          <h3 className="font-extrabold text-white">Recommended topics</h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {recommendedTopics.map((topic) => (
               <span
-                className="rounded-md bg-secondary px-2.5 py-1 text-sm text-secondary-foreground"
+                className="rounded-md border border-primary/25 bg-primary/10 px-2.5 py-1 text-sm font-medium text-primary"
                 key={topic}
               >
                 {topic}
@@ -145,19 +211,19 @@ export function FinalReport({
           </div>
         </section>
 
-        <section className="mt-5 rounded-lg border bg-card p-5">
-          <h3 className="font-semibold">Question breakdown</h3>
+        <section className="glass-panel rounded-lg p-5">
+          <h3 className="font-extrabold text-white">Question breakdown</h3>
           <div className="mt-4 grid gap-4">
             {orderedResults.map((result) => (
-              <article className="border-t pt-4 first:border-t-0 first:pt-0" key={result.question.id}>
+              <article className="border-t border-white/10 pt-4 first:border-t-0 first:pt-0" key={result.question.id}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-sm font-semibold">{result.question.question}</p>
+                    <p className="text-sm font-semibold text-white">{result.question.question}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {result.question.topic} - {result.question.difficulty}
                     </p>
                   </div>
-                  <span className="rounded-md bg-primary px-2.5 py-1 text-sm font-semibold text-primary-foreground">
+                  <span className="rounded-md border border-primary/40 bg-primary/15 px-2.5 py-1 text-sm font-semibold text-white">
                     {result.evaluation.score}/5
                   </span>
                 </div>
@@ -228,6 +294,28 @@ type ReportSectionProps = {
   title: string
 }
 
+function SummaryItem({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center gap-3 border-white/10 lg:border-r lg:last:border-r-0">
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+        <Icon aria-hidden="true" className="size-5" />
+      </span>
+      <div>
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p className="mt-1 text-sm font-bold text-white">{value}</p>
+      </div>
+    </div>
+  )
+}
+
 function ReportSection({
   emptyText = 'No items available.',
   icon: Icon,
@@ -235,13 +323,15 @@ function ReportSection({
   title,
 }: ReportSectionProps) {
   return (
-    <section className="rounded-lg border bg-card p-5">
-      <div className="flex items-center gap-2">
-        <Icon aria-hidden="true" className="size-4 text-primary" />
-        <h3 className="font-semibold">{title}</h3>
+    <section className="soft-panel rounded-lg p-6">
+      <div className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary">
+        <Icon aria-hidden="true" className="size-5" />
+      </div>
+      <div className="mt-6">
+        <h3 className="text-xl font-extrabold text-white">{title}</h3>
       </div>
       {items.length > 0 ? (
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-4 space-y-2">
           {items.map((item) => (
             <li className="text-sm leading-6 text-muted-foreground" key={item}>
               {item}

@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
-import { AlertCircle, CheckCircle2, LoaderCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Code2,
+  LoaderCircle,
+  Pencil,
+  Sparkles,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { evaluateAnswer } from '@/services/interview-api'
@@ -63,6 +73,7 @@ export function InterviewQuestions({
     trimmedCurrentAnswer.length > 0 &&
     (!isSavedAnswerCurrent || Boolean(currentEvaluationError)) &&
     !isEvaluatingCurrentQuestion
+  const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
 
   useEffect(() => {
     isMountedRef.current = true
@@ -184,32 +195,45 @@ export function InterviewQuestions({
   return (
     <section
       aria-labelledby="questions-title"
-      className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
+      className="mx-auto max-w-[1488px] px-5 pb-12 pt-8 sm:px-8 lg:pb-20"
       ref={sessionRef}
       tabIndex={-1}
     >
-      <div className="border-t pt-10">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight" id="questions-title">
-              Interview session
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Work through one question at a time and use the navigation controls
-              to move through the session.
+      <div className="space-y-6">
+        <div className="soft-panel rounded-lg p-6 sm:p-8">
+          <div className="grid gap-5 md:grid-cols-[10rem_minmax(0,1fr)_10rem] md:items-center">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Question</p>
+              <p className="mt-1 text-4xl font-extrabold text-white">
+                {questionNumber}
+                <span className="ml-2 text-base font-semibold text-muted-foreground">
+                  of {totalQuestions}
+                </span>
+              </p>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-[linear-gradient(90deg,#8a5cff,#2f6bff,#39b8ff)] shadow-[0_0_18px_rgb(47_107_255_/_0.8)] transition-all"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-sm font-bold text-muted-foreground md:text-right">
+              {progressPercent}% complete
             </p>
           </div>
-          <p className="text-sm font-medium text-muted-foreground">
-            Question {questionNumber} of {totalQuestions}
-          </p>
         </div>
 
-        <article className="mt-7 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
-            <span className="rounded-md bg-primary px-2.5 py-1 text-primary-foreground">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px]">
+        <article className="glass-panel rounded-lg p-5 sm:p-7">
+          <h2 className="sr-only" id="questions-title">
+            Interview session
+          </h2>
+          <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
+            <span className="inline-flex items-center gap-2 rounded-full text-primary">
+              <Code2 aria-hidden="true" className="size-5" />
               Question {questionNumber}
             </span>
-            <span className="rounded-md bg-secondary px-2.5 py-1 text-secondary-foreground">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-secondary-foreground">
               {question.topic}
             </span>
             <span className="capitalize text-muted-foreground">
@@ -217,12 +241,17 @@ export function InterviewQuestions({
             </span>
           </div>
 
-          <p className="mt-4 text-base font-medium leading-7">{question.question}</p>
+          <p className="mt-7 max-w-3xl text-3xl font-extrabold leading-tight text-white">
+            {question.question}
+          </p>
 
-          <div className="mt-5 border-t pt-4">
+          <div className="mt-8 border-t border-white/10 pt-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-sm font-semibold">Expected concepts</h3>
+                <h3 className="flex items-center gap-2 text-lg font-extrabold text-white">
+                  <BookOpen aria-hidden="true" className="size-5 text-primary" />
+                  Expected concepts
+                </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Use hints only when you want study guidance.
                 </p>
@@ -238,12 +267,12 @@ export function InterviewQuestions({
               </Button>
             </div>
             {areHintsVisible ? (
-              <ul className="mt-3 grid gap-2 sm:grid-cols-2" id={`hints-${question.id}`}>
+              <ul className="mt-4 flex flex-wrap gap-3" id={`hints-${question.id}`}>
                 {question.expectedConcepts.map((concept) => (
-                  <li className="flex items-start gap-2 text-sm text-muted-foreground" key={concept}>
+                  <li className="flex items-center gap-2 rounded-full bg-white/[0.04] px-3 py-1.5 text-sm text-muted-foreground" key={concept}>
                     <CheckCircle2
                       aria-hidden="true"
-                      className="mt-0.5 size-4 shrink-0 text-primary"
+                      className="size-4 shrink-0 text-primary"
                     />
                     <span>{concept}</span>
                   </li>
@@ -252,9 +281,10 @@ export function InterviewQuestions({
             ) : null}
           </div>
 
-          <div className="mt-6 border-t pt-5">
+          <div className="mt-8 border-t border-white/10 pt-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <label className="text-sm font-semibold" htmlFor={`answer-${question.id}`}>
+              <label className="flex items-center gap-2 text-lg font-extrabold text-white" htmlFor={`answer-${question.id}`}>
+                <Pencil aria-hidden="true" className="size-5 text-primary" />
                 Your answer
               </label>
               {isSavedAnswerCurrent ? (
@@ -262,7 +292,7 @@ export function InterviewQuestions({
               ) : null}
             </div>
             <textarea
-              className="mt-3 min-h-36 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm leading-6 outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="mt-4 min-h-56 w-full resize-y rounded-lg border border-primary/40 bg-[#091225] px-4 py-4 text-base leading-7 text-white outline-none shadow-[inset_0_0_28px_rgb(47_107_255_/_0.08),0_0_24px_rgb(47_107_255_/_0.12)] transition-colors placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-primary/60"
               id={`answer-${question.id}`}
               onChange={(event) => updateCurrentAnswer(event.target.value)}
               placeholder="Type your answer here..."
@@ -295,11 +325,14 @@ export function InterviewQuestions({
               </Button>
             </div>
           </div>
+        </article>
+
+        <aside className="space-y-4">
 
           {isEvaluatingCurrentQuestion ? (
             <section
               aria-live="polite"
-              className="mt-5 flex items-start gap-3 rounded-lg border bg-secondary/40 p-4"
+              className="glass-panel flex items-start gap-3 rounded-lg p-5"
             >
               <LoaderCircle
                 aria-hidden="true"
@@ -316,7 +349,7 @@ export function InterviewQuestions({
 
           {currentEvaluationError ? (
             <section
-              className="mt-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800"
+              className="flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100"
               role="alert"
             >
               <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
@@ -328,20 +361,23 @@ export function InterviewQuestions({
           ) : null}
 
           {currentEvaluation && isSavedAnswerCurrent ? (
-            <section className="mt-5 rounded-lg border bg-background p-4">
+            <section className="glass-panel rounded-lg p-5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold">AI feedback</h3>
+                  <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
+                    <Sparkles aria-hidden="true" className="size-5 text-primary" />
+                    AI feedback
+                  </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Confidence: {currentEvaluation.confidenceLevel}
                   </p>
                 </div>
-                <span className="rounded-md bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground">
+                <span className="rounded-full border border-primary/40 bg-primary/15 px-4 py-2 text-sm font-extrabold text-white">
                   {currentEvaluation.score}/5
                 </span>
               </div>
 
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <div className="mt-6 grid gap-5">
                 <FeedbackList title="Strengths" items={currentEvaluation.strengths} />
                 <FeedbackList title="Weaknesses" items={currentEvaluation.weaknesses} />
               </div>
@@ -353,14 +389,14 @@ export function InterviewQuestions({
                 title="Missing concepts"
               />
 
-              <div className="mt-4 border-t pt-4">
+              <div className="mt-5 border-t border-white/10 pt-5">
                 <h4 className="text-sm font-semibold">Improved answer</h4>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {currentEvaluation.improvedAnswer}
                 </p>
               </div>
 
-              <div className="mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-5 flex flex-col gap-3 border-t border-white/10 pt-5">
                 <p className="text-sm text-muted-foreground">
                   {canCompleteInterview
                     ? 'All answers have feedback. You can finish the session.'
@@ -389,7 +425,19 @@ export function InterviewQuestions({
               </div>
             </section>
           ) : null}
-        </article>
+          {!isEvaluatingCurrentQuestion && !currentEvaluationError && !currentEvaluation ? (
+            <section className="glass-panel rounded-lg p-5">
+              <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
+                <Sparkles aria-hidden="true" className="size-5 text-primary" />
+                AI feedback
+              </h3>
+              <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                Submit your answer to unlock a score, strengths, improvements, and a stronger sample answer.
+              </p>
+            </section>
+          ) : null}
+        </aside>
+        </div>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
@@ -398,27 +446,23 @@ export function InterviewQuestions({
             type="button"
             variant="outline"
           >
+            <ArrowLeft aria-hidden="true" className="size-4" />
             Previous question
           </Button>
-          <div className="h-2 overflow-hidden rounded-full bg-secondary sm:w-56">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
-            />
-          </div>
           <Button
             disabled={isLastQuestion}
             onClick={goToNextQuestion}
             type="button"
           >
             Next question
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Button>
         </div>
 
-        <section className="mt-6 rounded-lg border bg-card p-4">
+        <section className="soft-panel mt-6 rounded-lg p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-sm font-semibold">Interview progress</h3>
+              <h3 className="text-sm font-semibold text-white">Interview progress</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 {evaluatedQuestionCount} of {totalQuestions} answers have feedback.
               </p>

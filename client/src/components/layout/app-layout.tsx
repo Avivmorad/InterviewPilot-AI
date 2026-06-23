@@ -10,7 +10,7 @@ type AppLayoutProps = {
 
 export function AppLayout({ apiConnectionStatus, children }: AppLayoutProps) {
   return (
-    <div className="min-h-svh bg-background text-foreground">
+    <div className="app-atmosphere min-h-svh text-foreground">
       <Header apiConnectionStatus={apiConnectionStatus} />
       <main>{children}</main>
     </div>
