@@ -2,8 +2,9 @@
 
 InterviewPilot AI is a technical interview simulator. The current implementation
 covers the Phase 1 flow through interview setup, AI question generation,
-question-by-question navigation, AI answer evaluation, and a local final report.
-Deployment, authentication, and persistence are still pending.
+question-by-question navigation, AI answer evaluation, and a final report.
+Deployment configuration is included for Vercel and Render. Authentication and
+persistence are still pending.
 
 ## Project Structure
 
@@ -200,6 +201,19 @@ npm run start
 
 Run `npm run build` before `npm run start` in the backend because `start` runs
 the compiled `backend/dist/server.js` file.
+
+## Deployment
+
+Deployment config is included:
+
+- `vercel.json` builds the `frontend` workspace for Vercel.
+- `render.yaml` builds and starts the `backend` service on Render.
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) lists the required production
+  environment variables and verification checklist.
+
+Production deploy still requires your Vercel and Render accounts, a GitHub repo,
+and backend AI provider keys configured as provider secrets. Never put Gemini or
+Groq keys in frontend environment variables.
 
 See [docs/manual-testing.md](docs/manual-testing.md) for browser and PowerShell
 testing steps.

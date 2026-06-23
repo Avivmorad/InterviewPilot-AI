@@ -36,12 +36,12 @@ export function InterviewConfigForm({
 
   return (
     <form
-      className="flex flex-col gap-7 rounded-2xl border bg-card p-5 shadow-sm sm:p-7"
+      className="flex flex-col gap-5 rounded-[1.45rem] border border-slate-200 bg-white p-6 shadow-[0_28px_70px_rgba(37,76,180,0.18)] sm:p-8"
       onSubmit={handleSubmit}
     >
       <div>
-        <h2 className="text-xl font-semibold tracking-tight">Set up your interview</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h2 className="text-2xl font-bold tracking-[-0.02em]">Set up your interview</h2>
+        <p className="mt-2 text-base text-muted-foreground">
           Choose a focus for this practice session.
         </p>
       </div>
@@ -87,7 +87,12 @@ export function InterviewConfigForm({
         value={questionCount}
       />
 
-      <Button className="w-full" disabled={isLoading} size="lg" type="submit">
+      <Button
+        className="mt-1 h-14 w-full rounded-xl text-base font-bold shadow-[0_14px_30px_rgba(36,71,232,0.3)]"
+        disabled={isLoading}
+        size="lg"
+        type="submit"
+      >
         {isLoading ? (
           <LoaderCircle aria-hidden="true" className="animate-spin" />
         ) : (

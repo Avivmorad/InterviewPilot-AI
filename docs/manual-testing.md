@@ -5,7 +5,8 @@ This guide covers manual testing for the current local InterviewPilot AI MVP flo
 - Start the frontend and backend.
 - Check that the backend is healthy.
 - Generate interview questions with role, level, interview type, and count.
-- Move through questions and locally save user answers.
+- Move through questions, submit answers, and review AI feedback.
+- Complete the interview and review the final report.
 - Understand common development errors.
 
 Run commands from PowerShell. Keep the frontend and backend running in separate
@@ -164,8 +165,39 @@ The generated wording will vary. Verify that:
   `expectedConcepts`.
 - The frontend displays a loading state and then shows one generated question at
   a time.
-- The answer textarea accepts text, blocks empty submissions, and shows
-  `Answer saved` after the current answer is submitted.
+- The answer textarea accepts text, blocks empty submissions, shows an
+  evaluation loading state, and displays structured feedback after submission.
+- The interview can be completed only after every question has feedback.
+- The final report shows the overall score, strengths, weaknesses, knowledge
+  gaps, recommended topics, learning roadmap, and per-question breakdown.
+
+## 6. Test `POST /api/interview/evaluate` with PowerShell
+
+With the backend running and at least one API key configured, run:
+
+```powershell
+$body = @{
+  question = @{
+    id = "q1"
+    topic = "React"
+    difficulty = "junior"
+    question = "How does React state differ from props?"
+    expectedConcepts = @("Props are passed in", "State is owned by a component")
+  }
+  answer = "Props come from parent components. State is owned by the component and can change over time."
+} | ConvertTo-Json -Depth 5
+
+$response = Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:3001/api/interview/evaluate `
+  -ContentType "application/json" `
+  -Body $body
+
+$response | ConvertTo-Json -Depth 10
+```
+
+Verify that the response contains `score`, `strengths`, `weaknesses`,
+`missingConcepts`, `improvedAnswer`, and `confidenceLevel`.
 
 ## Common Errors
 
@@ -235,13 +267,20 @@ Fix:
 
 1. Check the frontend URL printed by Vite.
 2. Set `CLIENT_ORIGIN` in `backend/.env` to that exact URL without a trailing
-   slash.
+   slash. Use comma-separated values when you need to allow both local and
+   production frontend origins.
 3. Restart the backend.
 
 Example:
 
 ```dotenv
 CLIENT_ORIGIN=http://localhost:5174
+```
+
+Production example:
+
+```dotenv
+CLIENT_ORIGIN=http://localhost:5173,https://your-vercel-domain.vercel.app
 ```
 
 A CORS error only applies to browser requests. PowerShell requests are not

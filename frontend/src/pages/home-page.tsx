@@ -1,4 +1,4 @@
-import { Code2, LoaderCircle, MessageSquareText, Target } from 'lucide-react'
+import { Code2, LoaderCircle, MessageSquareText, Sparkles, Target } from 'lucide-react'
 
 import { FinalReport } from '@/components/interview/final-report'
 import { InterviewConfigForm } from '@/components/interview/interview-config-form'
@@ -58,27 +58,36 @@ export function HomePage({
   return (
     <>
       <section
-        className="mx-auto grid max-w-7xl gap-12 px-5 py-12 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:py-20"
+        className="mx-auto grid max-w-[1468px] gap-12 px-5 py-12 sm:px-8 lg:grid-cols-[minmax(0,1fr)_468px] lg:items-start lg:gap-20 lg:px-0 lg:pb-0 lg:pt-[6.75rem]"
         id="home"
       >
         <div className="flex flex-col justify-center">
-          <h1 className="max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-            Practice smarter. Interview with confidence.
+          <div className="mb-7 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm">
+            <Sparkles aria-hidden="true" className="size-4 text-primary" />
+            AI-powered interview prep
+          </div>
+
+          <h1 className="max-w-3xl text-5xl font-bold leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[4.25rem]">
+            Practice smarter.
+            <br />
+            Interview with
+            <br />
+            <span className="text-primary">confidence.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+          <p className="mt-8 max-w-xl text-lg leading-8 text-slate-700 sm:text-xl">
             Prepare for technical interviews with focused sessions tailored to your
             role and experience level.
           </p>
 
-          <div className="mt-10 flex flex-col gap-6" id="how-it-works">
+          <div className="mt-16 flex flex-col gap-10" id="how-it-works">
             {benefits.map(({ description, icon: Icon, title }) => (
-              <div className="flex gap-4" key={title}>
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border bg-card text-primary">
+              <div className="flex max-w-2xl gap-4" key={title}>
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-primary">
                   <Icon aria-hidden="true" className="size-5" />
                 </span>
                 <div>
-                  <h2 className="font-semibold">{title}</h2>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  <h2 className="font-bold">{title}</h2>
+                  <p className="mt-1 text-base leading-6 text-slate-700">
                     {description}
                   </p>
                 </div>
@@ -94,7 +103,7 @@ export function HomePage({
           {isLoading ? (
             <section
               aria-live="polite"
-              className="flex items-center gap-3 rounded-2xl border bg-card p-5 shadow-sm"
+              className="flex items-center gap-3 rounded-2xl border bg-white p-5 shadow-sm"
             >
               <LoaderCircle aria-hidden="true" className="size-5 animate-spin text-primary" />
               <div>

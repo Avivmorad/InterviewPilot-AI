@@ -101,7 +101,8 @@ Response:
 }
 ```
 
-Interview summaries are planned for the final report phase.
+The MVP final report is generated in the frontend from validated answer
+evaluation results. There is no separate final-report API endpoint in Phase 1.
 
 ## Error Shape
 

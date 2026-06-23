@@ -15,7 +15,7 @@ Some actions will be needed soon:
   renamed to `client/` and `server/`.
 - Add a backend AI API key locally before testing real AI generation.
 - Decide what a good final report should include before Phase 9.
-- Create or confirm deployment accounts before the deployment phase.
+- Create or confirm deployment accounts before running the production deploy.
 
 ## Q1: Do you need to do anything before development continues?
 
@@ -111,26 +111,27 @@ be exposed. The backend is the safer place for private keys.
 
 ## Q4: Is deployment blocked?
 
-Deployment is not needed for the current Phase 8 coding work, but it will need
-your input later.
+Deployment config now exists, but the actual online deployment still needs your
+Vercel and Render accounts, a GitHub repository, and production environment
+variables.
 
 The task tracker lists these deployment tasks:
 
-- deploy frontend to Vercel
-- deploy backend to Render
+- deploy frontend to Vercel using `vercel.json`
+- deploy backend to Render using `render.yaml`
 - test the production app
 - verify AI works in production
 - verify API keys are not exposed
 
 Suggestion:
 
-Wait until answer evaluation and the final report work locally before deploying.
-When deployment begins, confirm which accounts and project names should be used.
+Use [DEPLOYMENT.md](DEPLOYMENT.md) when deployment begins. Confirm which
+accounts and project names should be used, then set provider keys only in Render.
 
 Easy explanation:
 
-Deploying too early means you may need to redeploy repeatedly while core features
-are still missing. Finish the MVP locally first, then publish it.
+The code is ready to publish, but Codex cannot complete account login, secret
+setup, or production URL verification without those external account actions.
 
 ## Q5: What should be decided before the final report phase?
 
@@ -211,6 +212,6 @@ if many advanced features are started but unstable.
 ## Current User-Side Checklist
 
 - [ ] Optional: confirm keeping `frontend/` and `backend/`.
-- [ ] Before AI browser testing: create `backend/.env` with a provider API key.
+- [x] Before AI browser testing: create `backend/.env` with a provider API key.
 - [ ] Before deployment: confirm Vercel and Render account/project choices.
 - [ ] Before final report work: confirm whether the suggested report sections are enough.

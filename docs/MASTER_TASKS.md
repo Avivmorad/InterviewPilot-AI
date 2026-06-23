@@ -30,30 +30,107 @@ Phase 1 - MVP
 ## Phase Status
 
 - [ ] Phase 1 - MVP
-  - Why not implemented: Deployment is still unfinished.
+  - Why not implemented: The local MVP flow is complete and checks pass, but
+    Phase 1 is not fully complete until the app is deployed, configured with
+    production secrets, verified online, and pushed to GitHub.
 
 ## Current Sprint
 
-Deployment
+Production deployment and verification
 
 - [ ] \***\*Stage 12 Tasks\*\***
-  - Why not implemented: The frontend and backend have not been deployed.
+  - Why not implemented: The frontend and backend are configured for deployment,
+    but live Vercel and Render services still need account access, production
+    environment variables, and production URL verification.
+
+## Latest Local Deployment Readiness Check
+
+- [x] DONE: `npm run check` passed locally on the current branch
+  `final-report-mvp-flow`.
+
+Explanation:
+
+The local project is ready to publish to GitHub before importing into Vercel and
+Render. The remaining Stage 12 work requires GitHub, Vercel, Render, and secret
+management actions.
+
+## Action Needed From Daniel
+
+1. Decide whether Codex should commit and push the current deployment-ready
+   changes, or do it manually.
+2. If doing it manually, push the current branch to GitHub:
+
+```powershell
+git status
+git add README.md `
+  backend/src/app.ts backend/src/config.ts `
+  docs/API_DESIGN.md docs/DEPLOYMENT.md docs/DevQ&A.md `
+  docs/MASTER_TASKS.md docs/MVP_SCOPE.md docs/manual-testing.md `
+  frontend/src/components/interview/interview-config-form.tsx `
+  frontend/src/components/interview/option-group.tsx `
+  frontend/src/components/layout/header.tsx `
+  frontend/src/components/ui/button.tsx `
+  frontend/src/index.css frontend/src/pages/home-page.tsx `
+  render.yaml vercel.json
+git commit -m "Prepare MVP deployment"
+git push -u origin final-report-mvp-flow
+```
+
+3. Open a pull request on GitHub and merge it to `main` if Vercel and Render
+   should deploy from `main`.
+4. Deploy the backend on Render first, because Vercel needs the live backend URL.
+5. Deploy the frontend on Vercel after the Render backend URL is available.
+
+## What Is Needed To Finish Phase 1
+
+- [ ] Push the current repository changes to GitHub.
+  - Why not implemented: Codex was not explicitly asked to commit or push.
+- [ ] Create the backend service on Render from `render.yaml`.
+  - Why not implemented: Requires Render account access and production secrets.
+- [ ] Set Render environment variables: `CLIENT_ORIGIN`, `GEMINI_API_KEY`, and
+  optionally `GROQ_API_KEY`.
+  - Why not implemented: Secrets must be added in the Render dashboard.
+- [ ] Verify Render health endpoint: `/api/health`.
+  - Why not implemented: There is no live Render backend URL yet.
+- [ ] Create the frontend project on Vercel from `vercel.json`.
+  - Why not implemented: Requires Vercel account access and GitHub import.
+- [ ] Set Vercel environment variable: `VITE_API_URL`.
+  - Why not implemented: Requires the live Render backend URL.
+- [ ] Verify the full MVP flow on the deployed Vercel URL.
+  - Why not implemented: There is no live Vercel frontend URL yet.
+- [ ] Confirm frontend browser requests do not expose API keys.
+  - Why not implemented: Requires production browser verification after deploy.
 
 ## Next Task
 
-- [ ] TODO: Deploy frontend to Vercel
-  - Why not implemented: The frontend has not been prepared or deployed to a production environment.
+- [ ] TODO: Push repository changes to GitHub
+  - Why not implemented: Vercel and Render deployment should import the latest
+    project state from GitHub. Local checks pass, but Codex still needs an
+    explicit commit and push request before changing Git history or publishing
+    the branch.
 
 ---
 
-## \***\*Stage 1 Tasks\*\***
+## \***\*Stage 12 Tasks\*\***
 
 - [ ] \***\*Stage 12 - Deployment\*\***
+
+#### 12.0 Update GitHub Repository
+
+- [ ] TODO: Commit and push deployment-ready changes to GitHub
+  - Why not implemented: Codex must not commit or push unless explicitly asked.
+
+Explanation:
+
+Vercel and Render should deploy from the latest GitHub repository state.
 
 #### 12.1 Deploy Frontend
 
 - [ ] TODO: Deploy frontend to Vercel
-  - Why not implemented: The frontend has not been prepared or deployed to a production environment.
+- [ ] TODO: Set `VITE_API_URL` in Vercel to the live Render backend URL
+  - Why not implemented: `vercel.json` is ready, but Vercel account login,
+    GitHub project import, environment variable setup, and production URL
+    verification still need to happen outside the local workspace.
 
 Explanation:
 
@@ -64,7 +141,12 @@ Vercel hosts the website.
 #### 12.2 Deploy Backend
 
 - [ ] TODO: Deploy backend to Render
-  - Why not implemented: The backend has not been prepared or deployed to a production environment.
+- [ ] TODO: Set `CLIENT_ORIGIN` in Render to the live Vercel frontend URL
+- [ ] TODO: Set `GEMINI_API_KEY` in Render
+- [ ] TODO: Optionally set `GROQ_API_KEY` in Render for fallback AI generation
+  - Why not implemented: `render.yaml` is ready, but Render account access,
+    secret setup, service creation, and production URL verification still need
+    to happen outside the local workspace.
 
 Explanation:
 
@@ -74,14 +156,35 @@ Render hosts the backend server.
 
 #### 12.3 Test Production App
 
+- [ ] TODO: Verify Render health endpoint returns `status: ok`
 - [ ] TODO: Test full interview flow online
 - [ ] TODO: Verify AI works in production
 - [ ] TODO: Verify no API keys are exposed in frontend
-  - Why not implemented: There is no production deployment to test.
+  - Why not implemented: There is no production deployment URL to test yet.
 
 Explanation:
 
 This confirms the project is ready to share.
+
+---
+
+## \***\*Stage 12 Done Tasks\*\***
+
+- [x] \***\*Stage 12 - Deployment Preparation\*\***
+
+#### 12.0 Prepare Production Deployment
+
+- [x] DONE: Add Vercel config for frontend deployment
+- [x] DONE: Add Render Blueprint config for backend deployment
+- [x] DONE: Document required production environment variables
+- [x] DONE: Document production verification checklist
+- [x] DONE: Verify frontend lint and build pass locally
+- [x] DONE: Verify backend check and build pass locally
+
+Explanation:
+
+The repository is ready to import into Vercel and Render. The remaining work is
+account-bound deployment, secret setup, and online verification.
 
 ---
 
@@ -528,10 +631,12 @@ This makes the project feel more production-ready.
 - [x] DONE: User can move between questions
 - [x] DONE: Final report is generated
 - [ ] TODO: App works online
-  - Why not implemented: The frontend and backend have not been deployed.
+  - Why not implemented: Deployment configuration is ready, but there is no
+    verified live Vercel/Render production URL yet.
 - [x] DONE: README is complete
 - [ ] TODO: GitHub repository is updated
-  - Why not implemented: Current local changes have not been committed and pushed yet.
+  - Why not implemented: Codex was not explicitly asked to commit or push, and
+    current local changes have not been committed and pushed yet.
 
 ---
 

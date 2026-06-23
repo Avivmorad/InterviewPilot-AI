@@ -21,16 +21,16 @@
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   color-scheme: light;
   --radius: 0.625rem;
-  --background: oklch(0.99 0.004 264);
-  --foreground: oklch(0.2 0.035 264);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.035 264);
-  --primary: oklch(0.48 0.2 265);
-  --primary-foreground: oklch(0.98 0.01 264);
-  --secondary: oklch(0.95 0.02 264);
-  --secondary-foreground: oklch(0.28 0.06 264);
-  --muted-foreground: oklch(0.5 0.035 264);
-  --border: oklch(0.9 0.02 264);
+  --background: #f7faff;
+  --foreground: #0f1422;
+  --card: #ffffff;
+  --card-foreground: #0f1422;
+  --primary: #2447e8;
+  --primary-foreground: #ffffff;
+  --secondary: #eef4ff;
+  --secondary-foreground: #334155;
+  --muted-foreground: #536174;
+  --border: #dce4f0;
 }
 
 * {
@@ -41,7 +41,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100svh;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 78% 29%, rgb(36 71 232 / 0.07), transparent 25rem),
+    var(--background);
 }
 
 button,

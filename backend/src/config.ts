@@ -10,7 +10,20 @@ function readPort(value: string | undefined): number {
   return port
 }
 
+function readClientOrigins(value: string | undefined): string[] {
+  const origins = (value ?? 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
+  if (origins.length === 0) {
+    throw new Error('CLIENT_ORIGIN must include at least one allowed origin.')
+  }
+
+  return origins
+}
+
 export const config = {
   port: readPort(process.env.PORT),
-  clientOrigin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+  clientOrigins: readClientOrigins(process.env.CLIENT_ORIGIN),
 }

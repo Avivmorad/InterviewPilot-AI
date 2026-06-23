@@ -16,7 +16,7 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
   app.use(
     cors({
       origin(origin, callback) {
-        callback(null, !origin || origin === config.clientOrigin)
+        callback(null, !origin || config.clientOrigins.includes(origin))
       },
     }),
   )
