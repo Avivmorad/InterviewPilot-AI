@@ -8,6 +8,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck",
+    "eval": "tsx src/evals/runEvaluation.ts",
     "test": "tsx --test src/app.test.ts src/ai/aiService.test.ts src/services/interviewService.test.ts",
     "start": "node dist/server.js"
   },

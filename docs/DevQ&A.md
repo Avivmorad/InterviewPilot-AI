@@ -88,7 +88,9 @@ Before testing AI generation in the browser, create `server/.env` from
 Keep these rules:
 
 - Put `GEMINI_API_KEY` only in `server/.env`.
-- Do not put Gemini or Groq keys in `client/.env`.
+- Put `GROQ_API_KEY` only in `server/.env` when Groq fallback is used.
+- Put only `VITE_API_URL` in `client/.env` or Vercel.
+- Do not put Gemini or Groq keys in `client/.env` or Vercel.
 - Do not commit `.env` files.
 - Restart the backend after changing environment variables.
 

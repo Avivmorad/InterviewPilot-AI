@@ -16,6 +16,10 @@ As a software engineering candidate, I can configure and complete a short mock t
   topics, and a learning roadmap
 - Handle missing configuration, AI loading, provider failure, and invalid input
 
+Current role options are Frontend Developer, Backend Developer, Full Stack
+Developer, AI Engineer, and Generative AI Engineer. Current experience levels
+are Intern, Junior, Mid-Level, and Senior.
+
 ## Excluded
 
 - Authentication and persistence

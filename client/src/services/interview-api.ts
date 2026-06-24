@@ -37,7 +37,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isDifficulty(value: unknown): value is Difficulty {
-  return value === 'junior' || value === 'mid-level' || value === 'senior'
+  return (
+    value === 'intern' ||
+    value === 'junior' ||
+    value === 'mid-level' ||
+    value === 'senior'
+  )
 }
 
 function isConfidenceLevel(value: unknown): value is AnswerEvaluation['confidenceLevel'] {

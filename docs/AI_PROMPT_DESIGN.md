@@ -32,6 +32,24 @@ The prompt should define:
 - No answer reveal before the candidate responds
 - Concise follow-ups when clarification is useful
 
+The supported role values are `frontend-developer`, `backend-developer`,
+`full-stack-developer`, `ai-engineer`, and `generative-ai-engineer`. The
+supported level values are `intern`, `junior`, `mid-level`, and `senior`.
+
+Intern prompts focus on fundamentals, terminology, simple practical scenarios,
+coursework or personal projects, communication, curiosity, learning ability, and
+basic debugging. They avoid senior-level architecture, leadership, scaling, or
+production incident ownership expectations.
+
+AI Engineer and Generative AI Engineer are intentionally separate. AI Engineer
+remains broader, covering ML fundamentals, data pipelines, model training or
+inference, deployment, feature engineering, MLOps, and general production AI
+systems. Generative AI Engineer focuses on LLM application engineering, prompt
+engineering, structured outputs, JSON schema validation, model APIs, context
+windows, hallucination handling, grounding, RAG, tool calling, evaluation
+datasets, prompt regression testing, provider fallback, retries, rate limits,
+safety, cost, latency, observability, and production reliability.
+
 Question generation uses the selected interview type to tune the question mix, then requests strict JSON containing the topic, selected-level
 difficulty, question text, and expected concepts. Generated output is parsed and
 validated before it is returned by the API. The backend assigns stable
@@ -57,6 +75,14 @@ The backend validates this contract before returning feedback:
 }
 ```
 
+Intern answer evaluation is scored against Intern expectations: fundamental
+understanding, clear reasoning, communication, willingness to learn, awareness
+of missing knowledge, and the ability to connect concepts to coursework or small
+projects. Generative AI Engineer evaluations consider role-specific missing
+concepts only when relevant to the question, such as schema validation,
+hallucination handling, grounding, evaluation, retries, fallbacks, cost,
+latency, and observability.
+
 ## Final Report Generation
 
 The MVP final report does not call Gemini with a separate final-report prompt.
@@ -76,6 +102,20 @@ The report derives:
 If a future phase adds an AI-generated narrative report, that prompt should
 request strict JSON, avoid markdown-wrapped output, validate required fields,
 and fall back to the deterministic report when provider output is invalid.
+
+## Evaluation Pipeline
+
+The repository includes a small offline evaluation runner:
+
+```powershell
+npm run eval
+```
+
+The runner uses fixed mocked provider responses to verify prompt guidance,
+schema validation, score ranges, and expected missing concepts for representative
+answer-evaluation cases. It does not call Gemini or Groq yet. Real provider
+evaluation will require server-side `GEMINI_API_KEY` or `GROQ_API_KEY`
+configuration.
 
 ## Safety and Reliability
 

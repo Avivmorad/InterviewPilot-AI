@@ -12,8 +12,8 @@ import {
 import type { CreateInterviewRequest } from '../types/interviewTypes.js'
 
 const request: CreateInterviewRequest = {
-  role: 'Frontend Developer',
-  level: 'Junior',
+  role: 'frontend-developer',
+  level: 'junior',
   interviewType: 'Mixed',
   questionCount: 3,
 }
@@ -108,6 +108,34 @@ test('rejects an invalid interview type before calling AI', async () => {
   assert.equal(calls, 0)
 })
 
+test('rejects invalid roles and levels before calling AI', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    createInterview(
+      { ...request, role: 'gen-ai-engineer' },
+      async () => {
+        calls += 1
+        return validGeneratedText
+      },
+    ),
+    InterviewValidationError,
+  )
+
+  await assert.rejects(
+    createInterview(
+      { ...request, level: 'entry-level' },
+      async () => {
+        calls += 1
+        return validGeneratedText
+      },
+    ),
+    InterviewValidationError,
+  )
+
+  assert.equal(calls, 0)
+})
+
 test('evaluates an answer from valid generated JSON', async () => {
   let receivedPrompt = ''
 
@@ -131,7 +159,102 @@ test('evaluates an answer from valid generated JSON', async () => {
   assert.match(receivedPrompt, /professional technical interviewer/)
   assert.match(receivedPrompt, /What problem does React state solve/)
   assert.match(receivedPrompt, /Candidate answer/)
+  assert.match(receivedPrompt, /schema validation/)
   assert.match(receivedPrompt, /strict JSON only/)
+})
+
+test('evaluates intern answers with intern-appropriate expectations', async () => {
+  let receivedPrompt = ''
+
+  await evaluateAnswer(
+    {
+      question: {
+        id: 'q1',
+        topic: 'Structured outputs',
+        difficulty: 'intern',
+        question: 'Why might an app ask an LLM to return JSON?',
+        expectedConcepts: ['Parsing', 'Validation'],
+      },
+      answer: 'JSON is easier for the app to read and check.',
+    },
+    async (prompt) => {
+      receivedPrompt = prompt
+      return validEvaluationText
+    },
+  )
+
+  assert.match(receivedPrompt, /realistic Intern expectations/)
+  assert.match(receivedPrompt, /Do not penalize/)
+})
+
+test('accepts generative AI engineer intern interviews and adds focused prompt guidance', async () => {
+  let receivedPrompt = ''
+  const internRequest: CreateInterviewRequest = {
+    role: 'generative-ai-engineer',
+    level: 'intern',
+    interviewType: 'Technical',
+    questionCount: 3,
+  }
+  const internGeneratedText = JSON.stringify({
+    questions: [
+      {
+        topic: 'Prompt engineering',
+        difficulty: 'intern',
+        question: 'How would you write a prompt for a simple AI study helper?',
+        expectedConcepts: ['Prompt clarity', 'Simple AI API call'],
+      },
+      {
+        topic: 'Structured outputs',
+        difficulty: 'intern',
+        question: 'Why might an app ask an LLM to return JSON?',
+        expectedConcepts: ['Parsing', 'Validation'],
+      },
+      {
+        topic: 'Hallucinations',
+        difficulty: 'intern',
+        question: 'What is a hallucination in an AI response?',
+        expectedConcepts: ['Incorrect output', 'Verification'],
+      },
+    ],
+  })
+
+  const result = await createInterview(internRequest, async (prompt) => {
+    receivedPrompt = prompt
+    return internGeneratedText
+  })
+
+  assert.equal(result.questions.length, 3)
+  assert.equal(result.questions[0]?.difficulty, 'intern')
+  assert.match(receivedPrompt, /Generative AI Engineer/)
+  assert.match(receivedPrompt, /Intern/)
+  assert.match(receivedPrompt, /LLM application engineering/)
+  assert.match(receivedPrompt, /prompt-writing fundamentals/)
+  assert.match(receivedPrompt, /Avoid senior-level expectations/)
+})
+
+test('keeps AI engineer broader than generative AI engineer in prompts', async () => {
+  let receivedPrompt = ''
+
+  await createInterview(
+    {
+      role: 'ai-engineer',
+      level: 'intern',
+      interviewType: 'Mixed',
+      questionCount: 3,
+    },
+    async (prompt) => {
+      receivedPrompt = prompt
+      return JSON.stringify({
+        questions: JSON.parse(validGeneratedText).questions.map((question: unknown) => ({
+          ...(question as Record<string, unknown>),
+          difficulty: 'intern',
+        })),
+      })
+    },
+  )
+
+  assert.match(receivedPrompt, /machine learning fundamentals/)
+  assert.match(receivedPrompt, /broader than Generative AI Engineer/)
 })
 
 test('rejects malformed answer evaluation JSON', () => {

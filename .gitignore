@@ -7,5 +7,6 @@ dist/
 .vite/
 coverage/
 .vscode/
+.playwright-mcp/
 
 .vercel

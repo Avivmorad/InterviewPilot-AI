@@ -2,6 +2,7 @@ import {
   Bot,
   Code2,
   Crown,
+  GraduationCap,
   Layers3,
   LoaderCircle,
   MessageSquareText,
@@ -19,6 +20,8 @@ import {
   LEVELS,
   QUESTION_COUNTS,
   ROLES,
+  getLevelLabel,
+  getRoleLabel,
   type InterviewConfig,
   type InterviewType,
   type Level,
@@ -32,16 +35,18 @@ type InterviewConfigFormProps = {
 }
 
 const roleIcons = {
-  'Frontend Developer': Code2,
-  'Backend Developer': Layers3,
-  'Full Stack Developer': Layers3,
-  'AI Engineer': Bot,
+  'frontend-developer': Code2,
+  'backend-developer': Layers3,
+  'full-stack-developer': Layers3,
+  'ai-engineer': Bot,
+  'generative-ai-engineer': Sparkles,
 } satisfies Record<Role, typeof Code2>
 
 const levelIcons = {
-  Junior: UserRound,
-  'Mid-Level': UserRound,
-  Senior: Crown,
+  intern: GraduationCap,
+  junior: UserRound,
+  'mid-level': UserRound,
+  senior: Crown,
 } satisfies Record<Level, typeof UserRound>
 
 const interviewTypeIcons = {
@@ -54,8 +59,8 @@ export function InterviewConfigForm({
   isLoading,
   onSubmit,
 }: InterviewConfigFormProps) {
-  const [role, setRole] = useState<Role>('Frontend Developer')
-  const [level, setLevel] = useState<Level>('Mid-Level')
+  const [role, setRole] = useState<Role>('frontend-developer')
+  const [level, setLevel] = useState<Level>('mid-level')
   const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
   const [questionCount, setQuestionCount] = useState<QuestionCount>(5)
 
@@ -97,7 +102,7 @@ export function InterviewConfigForm({
             return (
               <>
                 <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
-                <span>{option}</span>
+                <span>{getRoleLabel(option)}</span>
               </>
             )
           }}
@@ -117,7 +122,7 @@ export function InterviewConfigForm({
             return (
               <>
                 <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
-                <span>{option}</span>
+                <span>{getLevelLabel(option)}</span>
               </>
             )
           }}

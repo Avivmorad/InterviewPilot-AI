@@ -5,7 +5,11 @@ import {
   MessagesSquare,
 } from 'lucide-react'
 
-import type { InterviewConfig } from '@/types/interview'
+import {
+  getLevelLabel,
+  getRoleLabel,
+  type InterviewConfig,
+} from '@/types/interview'
 
 type SavedConfigSummaryProps = {
   config: InterviewConfig
@@ -19,6 +23,12 @@ const summaryItems = [
 ] as const
 
 export function SavedConfigSummary({ config }: SavedConfigSummaryProps) {
+  const displayConfig = {
+    ...config,
+    role: getRoleLabel(config.role),
+    level: getLevelLabel(config.level),
+  }
+
   return (
     <section
       aria-live="polite"
@@ -34,7 +44,7 @@ export function SavedConfigSummary({ config }: SavedConfigSummaryProps) {
             <Icon aria-hidden="true" className="size-5 shrink-0 text-primary" />
             <div className="min-w-0">
               <dt className="text-xs text-muted-foreground">{label}</dt>
-              <dd className="text-sm font-medium text-white">{config[key]}</dd>
+              <dd className="text-sm font-medium text-white">{displayConfig[key]}</dd>
             </div>
           </div>
         ))}

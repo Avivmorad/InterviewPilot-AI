@@ -1,19 +1,25 @@
 export const INTERVIEW_ROLES = [
-  'Frontend Developer',
-  'Backend Developer',
-  'Full Stack Developer',
-  'AI Engineer',
+  { value: 'frontend-developer', label: 'Frontend Developer' },
+  { value: 'backend-developer', label: 'Backend Developer' },
+  { value: 'full-stack-developer', label: 'Full Stack Developer' },
+  { value: 'ai-engineer', label: 'AI Engineer' },
+  { value: 'generative-ai-engineer', label: 'Generative AI Engineer' },
 ] as const
 
-export const INTERVIEW_LEVELS = ['Junior', 'Mid-Level', 'Senior'] as const
+export const INTERVIEW_LEVELS = [
+  { value: 'intern', label: 'Intern' },
+  { value: 'junior', label: 'Junior' },
+  { value: 'mid-level', label: 'Mid-Level' },
+  { value: 'senior', label: 'Senior' },
+] as const
 export const INTERVIEW_TYPES = ['Technical', 'Behavioral', 'Mixed'] as const
 export const QUESTION_COUNTS = [3, 5, 10] as const
 
-export type Role = (typeof INTERVIEW_ROLES)[number]
-export type Level = (typeof INTERVIEW_LEVELS)[number]
+export type Role = (typeof INTERVIEW_ROLES)[number]['value']
+export type Level = (typeof INTERVIEW_LEVELS)[number]['value']
 export type InterviewType = (typeof INTERVIEW_TYPES)[number]
 export type QuestionCount = (typeof QUESTION_COUNTS)[number]
-export type Difficulty = Lowercase<Level>
+export type Difficulty = Level
 
 export type InterviewQuestion = {
   id: string
@@ -49,4 +55,12 @@ export type AnswerEvaluation = {
   missingConcepts: string[]
   improvedAnswer: string
   confidenceLevel: EvaluationConfidenceLevel
+}
+
+export function getRoleLabel(roleValue: Role): string {
+  return INTERVIEW_ROLES.find((role) => role.value === roleValue)?.label ?? roleValue
+}
+
+export function getLevelLabel(levelValue: Level): string {
+  return INTERVIEW_LEVELS.find((level) => level.value === levelValue)?.label ?? levelValue
 }

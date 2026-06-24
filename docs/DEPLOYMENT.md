@@ -45,6 +45,9 @@ Expected response:
 VITE_API_URL=https://your-render-service.onrender.com
 ```
 
+Do not add `GEMINI_API_KEY` or `GROQ_API_KEY` to Vercel. Those keys belong in
+Render because the AI calls run in the backend only.
+
 5. Deploy the frontend.
 
 ## Production Verification

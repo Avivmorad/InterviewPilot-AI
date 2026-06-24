@@ -68,6 +68,22 @@ test('health and interview routes enforce the current create API contract', asyn
     code: 'INVALID_REQUEST',
   })
 
+  const invalidLevelResponse = await fetch(`${baseUrl}/api/interview/create`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      role: 'generative-ai-engineer',
+      level: 'entry-level',
+      interviewType: 'Technical',
+      questionCount: 3,
+    }),
+  })
+  assert.equal(invalidLevelResponse.status, 400)
+  assert.deepEqual(await invalidLevelResponse.json(), {
+    error: 'Select a valid level.',
+    code: 'INVALID_REQUEST',
+  })
+
   const missingBodyResponse = await fetch(`${baseUrl}/api/interview/create`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -121,18 +137,22 @@ test('malformed JSON returns a readable JSON error', async (context) => {
 })
 
 test('create route returns the required interview response shape', async (context) => {
-  const createController = createCreateInterviewController(async () => ({
-    interviewId: 'interview-test',
-    questions: [
-      {
-        id: 'q1',
-        topic: 'React',
-        difficulty: 'junior',
-        question: 'What problem does React state solve?',
-        expectedConcepts: ['State', 'Rendering'],
-      },
-    ],
-  }))
+  let receivedInput: unknown
+  const createController = createCreateInterviewController(async (input) => {
+    receivedInput = input
+    return {
+      interviewId: 'interview-test',
+      questions: [
+        {
+          id: 'q1',
+          topic: 'Structured outputs',
+          difficulty: 'intern',
+          question: 'Why might an app ask an LLM to return JSON?',
+          expectedConcepts: ['Parsing', 'Validation'],
+        },
+      ],
+    }
+  })
   const testApp = createApp(createInterviewRoutes(createController))
   const server = testApp.listen(0)
   await new Promise<void>((resolve) => server.once('listening', resolve))
@@ -145,8 +165,8 @@ test('create route returns the required interview response shape', async (contex
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        role: 'Frontend Developer',
-        level: 'Junior',
+        role: 'generative-ai-engineer',
+        level: 'intern',
         interviewType: 'Technical',
         questionCount: 3,
       }),
@@ -154,15 +174,21 @@ test('create route returns the required interview response shape', async (contex
   )
 
   assert.equal(response.status, 201)
+  assert.deepEqual(receivedInput, {
+    role: 'generative-ai-engineer',
+    level: 'intern',
+    interviewType: 'Technical',
+    questionCount: 3,
+  })
   assert.deepEqual(await response.json(), {
     interviewId: 'interview-test',
     questions: [
       {
         id: 'q1',
-        topic: 'React',
-        difficulty: 'junior',
-        question: 'What problem does React state solve?',
-        expectedConcepts: ['State', 'Rendering'],
+        topic: 'Structured outputs',
+        difficulty: 'intern',
+        question: 'Why might an app ask an LLM to return JSON?',
+        expectedConcepts: ['Parsing', 'Validation'],
       },
     ],
   })

@@ -98,8 +98,8 @@ With the backend running and at least one API key configured, run:
 
 ```powershell
 $body = @{
-  role = "Frontend Developer"
-  level = "Junior"
+  role = "generative-ai-engineer"
+  level = "intern"
   interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
@@ -115,16 +115,24 @@ $response | ConvertTo-Json -Depth 10
 
 Valid roles:
 
-- `Frontend Developer`
-- `Backend Developer`
-- `Full Stack Developer`
-- `AI Engineer`
+- `frontend-developer` - Frontend Developer
+- `backend-developer` - Backend Developer
+- `full-stack-developer` - Full Stack Developer
+- `ai-engineer` - AI Engineer
+- `generative-ai-engineer` - Generative AI Engineer
 
 Valid levels:
 
-- `Junior`
-- `Mid-Level`
-- `Senior`
+- `intern` - Intern
+- `junior` - Junior
+- `mid-level` - Mid-Level
+- `senior` - Senior
+
+AI Engineer is the broader role for ML systems, data pipelines, model training
+or inference, deployment, feature engineering, and MLOps. Generative AI
+Engineer focuses on LLM applications, prompt engineering, structured outputs,
+RAG, evaluations, provider fallback, safety, cost, latency, and production
+reliability.
 
 Valid interview types:
 

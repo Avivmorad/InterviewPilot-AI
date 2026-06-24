@@ -1,18 +1,28 @@
-export const ROLES = [
-  'Frontend Developer',
-  'Backend Developer',
-  'Full Stack Developer',
-  'AI Engineer',
+export const INTERVIEW_ROLES = [
+  { value: 'frontend-developer', label: 'Frontend Developer' },
+  { value: 'backend-developer', label: 'Backend Developer' },
+  { value: 'full-stack-developer', label: 'Full Stack Developer' },
+  { value: 'ai-engineer', label: 'AI Engineer' },
+  { value: 'generative-ai-engineer', label: 'Generative AI Engineer' },
 ] as const
 
-export const LEVELS = ['Junior', 'Mid-Level', 'Senior'] as const
+export const EXPERIENCE_LEVELS = [
+  { value: 'intern', label: 'Intern' },
+  { value: 'junior', label: 'Junior' },
+  { value: 'mid-level', label: 'Mid-Level' },
+  { value: 'senior', label: 'Senior' },
+] as const
+
+export const ROLES = INTERVIEW_ROLES.map((role) => role.value)
+
+export const LEVELS = EXPERIENCE_LEVELS.map((level) => level.value)
 
 export const INTERVIEW_TYPES = ['Technical', 'Behavioral', 'Mixed'] as const
 
 export const QUESTION_COUNTS = [3, 5, 10] as const
 
-export type Role = (typeof ROLES)[number]
-export type Level = (typeof LEVELS)[number]
+export type Role = (typeof INTERVIEW_ROLES)[number]['value']
+export type Level = (typeof EXPERIENCE_LEVELS)[number]['value']
 export type InterviewType = (typeof INTERVIEW_TYPES)[number]
 export type QuestionCount = (typeof QUESTION_COUNTS)[number]
 export type ApiConnectionStatus = 'checking' | 'connected' | 'unavailable'
@@ -54,4 +64,12 @@ export type InterviewQuestionResult = {
   question: InterviewQuestion
   answer: string
   evaluation: AnswerEvaluation
+}
+
+export function getRoleLabel(roleValue: Role): string {
+  return INTERVIEW_ROLES.find((role) => role.value === roleValue)?.label ?? roleValue
+}
+
+export function getLevelLabel(levelValue: Level): string {
+  return EXPERIENCE_LEVELS.find((level) => level.value === levelValue)?.label ?? levelValue
 }

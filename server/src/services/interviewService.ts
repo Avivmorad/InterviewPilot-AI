@@ -33,11 +33,11 @@ export class InterviewGenerationError extends Error {
 type TextGenerator = (prompt: string) => Promise<string>
 
 function isRole(value: unknown): value is Role {
-  return INTERVIEW_ROLES.includes(value as Role)
+  return INTERVIEW_ROLES.some((role) => role.value === value)
 }
 
 function isLevel(value: unknown): value is Level {
-  return INTERVIEW_LEVELS.includes(value as Level)
+  return INTERVIEW_LEVELS.some((level) => level.value === value)
 }
 
 function isInterviewType(value: unknown): value is InterviewType {
@@ -49,7 +49,7 @@ function isQuestionCount(value: unknown): value is QuestionCount {
 }
 
 function isDifficulty(value: unknown): value is Difficulty {
-  return value === 'junior' || value === 'mid-level' || value === 'senior'
+  return isLevel(value)
 }
 
 function isConfidenceLevel(value: unknown): value is EvaluationConfidenceLevel {
@@ -63,11 +63,14 @@ function validateCreateInterviewRequest(
     throw new InterviewValidationError('Request body must be a JSON object.')
   }
 
-  if (!isRole(input.role)) {
+  const role = normalizeRole(input.role)
+  const level = normalizeLevel(input.level)
+
+  if (!role) {
     throw new InterviewValidationError('Select a valid role.')
   }
 
-  if (!isLevel(input.level)) {
+  if (!level) {
     throw new InterviewValidationError('Select a valid level.')
   }
 
@@ -80,11 +83,35 @@ function validateCreateInterviewRequest(
   }
 
   return {
-    role: input.role,
-    level: input.level,
+    role,
+    level,
     interviewType: input.interviewType,
     questionCount: input.questionCount,
   }
+}
+
+function normalizeRole(value: unknown): Role | null {
+  if (isRole(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  return INTERVIEW_ROLES.find((role) => role.label === value)?.value ?? null
+}
+
+function normalizeLevel(value: unknown): Level | null {
+  if (isLevel(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  return INTERVIEW_LEVELS.find((level) => level.label === value)?.value ?? null
 }
 
 function validateEvaluateAnswerRequest(input: unknown): EvaluateAnswerRequest {
@@ -311,7 +338,7 @@ export function parseGeneratedInterview(
     )
   }
 
-  const expectedDifficulty = request.level.toLowerCase() as Difficulty
+  const expectedDifficulty = request.level
 
   return parsed.questions.map((question, index) =>
     parseQuestion(question, index, expectedDifficulty),

@@ -38,6 +38,12 @@ Responsibilities:
 - store submitted answers and AI evaluations for the current session
 - build the deterministic final report after every answer has feedback
 
+Role and level selectors use central client configuration with stable values and
+display labels. The current supported role values are `frontend-developer`,
+`backend-developer`, `full-stack-developer`, `ai-engineer`, and
+`generative-ai-engineer`. The supported level values are `intern`, `junior`,
+`mid-level`, and `senior`.
+
 The current application stores generated interview data in React state. User
 accounts, persistence, and interview history are planned for later phases.
 
@@ -65,6 +71,13 @@ service exposes a provider-independent text generation interface.
 The question-generation prompt requires English-only, strict JSON output. The
 backend rejects malformed output, incorrect question counts, invalid difficulty
 values, and missing expected concepts instead of attempting to guess.
+
+Intern interviews use lower-difficulty guidance focused on fundamentals,
+communication, curiosity, simple debugging, and learning ability. Generative AI
+Engineer interviews are separate from broader AI Engineer interviews and focus
+on LLM application engineering, prompt engineering, structured outputs, RAG,
+evaluations, provider fallback, safety, cost, latency, and production
+reliability.
 
 API keys are read from server environment variables and are never exposed to
 the frontend.

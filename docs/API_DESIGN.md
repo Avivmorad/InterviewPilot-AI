@@ -33,14 +33,29 @@ returning the response.
 
 Request fields: `role`, `level`, `interviewType`, `questionCount`.
 
+Allowed role values:
+
+- `frontend-developer` - Frontend Developer
+- `backend-developer` - Backend Developer
+- `full-stack-developer` - Full Stack Developer
+- `ai-engineer` - AI Engineer
+- `generative-ai-engineer` - Generative AI Engineer
+
+Allowed level values:
+
+- `intern` - Intern
+- `junior` - Junior
+- `mid-level` - Mid-Level
+- `senior` - Senior
+
 Allowed interview types: `Technical`, `Behavioral`, `Mixed`.
 
 Request:
 
 ```json
 {
-  "role": "AI Engineer",
-  "level": "Junior",
+  "role": "generative-ai-engineer",
+  "level": "intern",
   "interviewType": "Mixed",
   "questionCount": 5
 }
@@ -54,8 +69,8 @@ Response:
   "questions": [
     {
       "id": "q1",
-      "topic": "React",
-      "difficulty": "junior",
+      "topic": "Structured outputs",
+      "difficulty": "intern",
       "question": "Question text",
       "expectedConcepts": ["Concept one", "Concept two"]
     }

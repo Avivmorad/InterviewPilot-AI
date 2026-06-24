@@ -17,6 +17,7 @@ import type {
   InterviewConfig,
   InterviewQuestionResult,
 } from '@/types/interview'
+import { getLevelLabel, getRoleLabel } from '@/types/interview'
 
 type FinalReportProps = {
   config: InterviewConfig | null
@@ -62,6 +63,8 @@ export function FinalReport({
   })
   const scorePercent = Math.round((Number(roundedScore) / 5) * 100)
   const displayScore = Number.isFinite(scorePercent) ? scorePercent : 0
+  const roleLabel = config ? getRoleLabel(config.role) : 'Interview practice'
+  const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
 
   async function copyReport() {
     try {
@@ -135,7 +138,7 @@ export function FinalReport({
                 </h3>
                 <p className="mt-4 text-base leading-7 text-muted-foreground">
                   {config
-                    ? `${config.level} ${config.role} - ${config.interviewType} interview`
+                    ? `${levelLabel} ${roleLabel} - ${config.interviewType} interview`
                     : 'Completed interview summary'}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -152,12 +155,12 @@ export function FinalReport({
             <SummaryItem
               icon={Code2}
               label="Role"
-              value={config?.role ?? 'Interview practice'}
+              value={roleLabel}
             />
             <SummaryItem
               icon={TrendingUp}
               label="Experience level"
-              value={config?.level ?? 'Custom'}
+              value={levelLabel}
             />
             <SummaryItem
               icon={Target}
@@ -255,7 +258,7 @@ function buildReportText({
   roundedScore,
 }: BuildReportTextInput): string {
   const title = config
-    ? `${config.level} ${config.role} - ${config.interviewType} interview`
+    ? `${getLevelLabel(config.level)} ${getRoleLabel(config.role)} - ${config.interviewType} interview`
     : 'Completed interview summary'
   const questionBreakdown = orderedResults
     .map(

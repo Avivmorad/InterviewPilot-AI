@@ -37,6 +37,20 @@ interviewpilot-ai/
 Provider SDKs and API keys remain in the backend. The frontend only knows the
 JSON API contract.
 
+Supported roles are Frontend Developer, Backend Developer, Full Stack
+Developer, AI Engineer, and Generative AI Engineer. The stored API values are
+`frontend-developer`, `backend-developer`, `full-stack-developer`,
+`ai-engineer`, and `generative-ai-engineer`.
+
+Supported experience levels are Intern, Junior, Mid-Level, and Senior. The
+stored API values are `intern`, `junior`, `mid-level`, and `senior`.
+
+AI Engineer remains the broader role for ML systems, data pipelines, model
+training or inference, deployment, feature engineering, and MLOps. Generative AI
+Engineer focuses on LLM application engineering, prompt design, structured
+outputs, RAG, evaluations, provider fallback, safety, cost, latency, and
+production reliability.
+
 ## Install Dependencies
 
 From the project root:
@@ -123,8 +137,8 @@ used as the fallback.
 
 ```powershell
 $body = @{
-  role = "Frontend Developer"
-  level = "Junior"
+  role = "generative-ai-engineer"
+  level = "intern"
   interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
@@ -187,12 +201,15 @@ npm run dev:server
 npm run typecheck
 npm run build
 npm run check
+npm run eval
 ```
 
 - `npm run typecheck` checks frontend and backend TypeScript without building.
 - `npm run build` creates production builds for frontend and backend.
 - `npm run check` runs frontend linting, all typechecks, existing backend tests,
   and production builds.
+- `npm run eval` runs the offline mocked evaluation dataset for answer-feedback
+  prompt and schema behavior.
 
 To run scripts from an individual workspace:
 
