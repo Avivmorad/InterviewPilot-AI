@@ -14,7 +14,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: CLIENT_ORIGIN
-        sync: false
+        value: https://interviewpilot-ai-bice.vercel.app,https://interviewpilot-ai-avivmoradteam.vercel.app,https://interviewpilot-ai-git-final-report-mvp-flow-avivmoradteam.vercel.app
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL

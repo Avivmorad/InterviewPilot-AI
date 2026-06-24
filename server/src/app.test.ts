@@ -44,6 +44,14 @@ test('health and interview routes enforce the current create API contract', asyn
     'http://localhost:5174',
   )
 
+  const allowedProductionOriginResponse = await fetch(`${baseUrl}/api/health`, {
+    headers: { origin: 'https://interviewpilot-ai-bice.vercel.app' },
+  })
+  assert.equal(
+    allowedProductionOriginResponse.headers.get('access-control-allow-origin'),
+    'https://interviewpilot-ai-bice.vercel.app',
+  )
+
   const disallowedOriginResponse = await fetch(`${baseUrl}/api/health`, {
     headers: { origin: 'https://example.com' },
   })
