@@ -269,6 +269,24 @@ function parseJsonObjectText(text: string): unknown {
   }
 }
 
+function normalizeGeneratedQuestions(value: unknown): unknown[] {
+  if (Array.isArray(value)) {
+    const firstItem = value[0]
+
+    if (isRecord(firstItem) && Array.isArray(firstItem.questions)) {
+      return [...firstItem.questions, ...value.slice(1)]
+    }
+
+    return value
+  }
+
+  if (isRecord(value) && Array.isArray(value.questions)) {
+    return value.questions
+  }
+
+  throw new InterviewGenerationError()
+}
+
 function extractFirstJsonObject(text: string): string | null {
   let startIndex = -1
   let depth = 0
@@ -327,12 +345,9 @@ export function parseGeneratedInterview(
   request: CreateInterviewRequest,
 ): InterviewQuestion[] {
   const parsed = parseJsonObjectText(text)
+  const generatedQuestions = normalizeGeneratedQuestions(parsed)
 
-  if (!isRecord(parsed) || !Array.isArray(parsed.questions)) {
-    throw new InterviewGenerationError()
-  }
-
-  if (parsed.questions.length !== request.questionCount) {
+  if (generatedQuestions.length !== request.questionCount) {
     throw new InterviewGenerationError(
       `The AI must return exactly ${request.questionCount} questions.`,
     )
@@ -340,7 +355,7 @@ export function parseGeneratedInterview(
 
   const expectedDifficulty = request.level
 
-  return parsed.questions.map((question, index) =>
+  return generatedQuestions.map((question, index) =>
     parseQuestion(question, index, expectedDifficulty),
   )
 }

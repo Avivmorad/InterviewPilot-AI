@@ -264,6 +264,41 @@ test('rejects malformed answer evaluation JSON', () => {
   )
 })
 
+test('parses a generated interview from Gemini array-wrapped shape drift', () => {
+  const arrayWrappedResponse = JSON.stringify([
+    {
+      questions: [
+        {
+          topic: 'Generative AI',
+          difficulty: 'junior',
+          question: 'How would you ask an LLM for strict JSON output?',
+          expectedConcepts: ['Prompting', 'Schema validation'],
+        },
+      ],
+    },
+    {
+      topic: 'Embeddings',
+      difficulty: 'junior',
+      question: 'What are embeddings used for in RAG systems?',
+      expectedConcepts: ['Similarity search', 'Retrieval'],
+    },
+    {
+      topic: 'Hallucinations',
+      difficulty: 'junior',
+      question: 'How would you reduce hallucinations in an LLM app?',
+      expectedConcepts: ['Grounding', 'Validation'],
+    },
+  ])
+
+  const questions = parseGeneratedInterview(arrayWrappedResponse, request)
+
+  assert.equal(questions.length, 3)
+  assert.equal(questions[0]?.id, 'q1')
+  assert.equal(questions[1]?.id, 'q2')
+  assert.equal(questions[2]?.id, 'q3')
+  assert.equal(questions[0]?.topic, 'Generative AI')
+})
+
 test('parses an answer evaluation from markdown-wrapped JSON', () => {
   const result = parseAnswerEvaluation(`Here is the evaluation:
 \`\`\`json

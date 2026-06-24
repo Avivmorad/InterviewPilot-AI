@@ -25,7 +25,7 @@ Rules:
 
 # Current Progress
 
-TODO Progress: Tasks Done: 274/324 (85%)
+TODO Progress: Tasks Done: 287/324 (89%)
 
 ## Active Phase
 
@@ -72,12 +72,10 @@ explicitly asks for that work.
 
 ## Action Needed From Daniel
 
-1. Provide or configure AI provider secrets only in server environments when
-   real AI testing or deployment is needed.
-   - Needed next for: real 3-question local browser smoke test, real answer
-     evaluation smoke test, and production AI verification.
-   - Local place: `server/.env`.
-   - Production place: Render environment variables only.
+1. Keep AI provider secrets only in server environments.
+   - Local verification is now configured in `server/.env`.
+   - Production provider secrets are configured in Render only.
+   - Do not put Gemini or Groq provider keys in the client or Vercel.
 2. Explicitly ask Codex before any commit, push, branch change, GitHub action, or
    production deployment.
    - Needed next for: staging, committing, pushing to GitHub, or opening a PR.
@@ -116,26 +114,36 @@ explicitly asks for that work.
 - Evidence: The `final-report-mvp-flow` branch was pushed to GitHub after the
   commit `1cc2d40`.
 
-18. [ ] Create the backend service on Render from `render.yaml`.
+18. [x] DONE: Create the backend service on Render from `render.yaml`.
 
-- Why not implemented: Requires Render account access and production secrets.
+- Evidence: Render deployed the backend at
+  `https://interviewpilot-ai-server.onrender.com` and started
+  `node dist/server.js` successfully.
 
-19. [ ] Set Render environment variables: `CLIENT_ORIGIN`, `GEMINI_API_KEY`, and
+19. [x] DONE: Set Render environment variables: `CLIENT_ORIGIN`, `GEMINI_API_KEY`, and
         optionally `GROQ_API_KEY`.
 
-- Why not implemented: Secrets must be added in the Render dashboard.
+- Evidence: Render shows `CLIENT_ORIGIN`, `GEMINI_API_KEY`, `GEMINI_MODEL`,
+  `GROQ_API_KEY`, `GROQ_MODEL`, and `NODE_ENV` configured. Secret values were
+  masked in the dashboard. Follow-up production CORS checks showed the live
+  `CLIENT_ORIGIN` did not match the Vercel domains, so `render.yaml` now also
+  carries the non-secret Vercel origin allowlist for the next deploy.
 
-20. [ ] Verify Render health endpoint: `/api/health`.
+20. [x] DONE: Verify Render health endpoint: `/api/health`.
 
-- Why not implemented: There is no live Render backend URL yet.
+- Evidence: `https://interviewpilot-ai-server.onrender.com/api/health`
+  returned `status: ok`.
 
-21. [ ] Create the frontend project on Vercel from `vercel.json`.
+21. [x] DONE: Create the frontend project on Vercel from `vercel.json`.
 
-- Why not implemented: Requires Vercel account access and GitHub import.
+- Evidence: The frontend is deployed at
+  `https://interviewpilot-ai-bice.vercel.app`.
 
-22. [ ] Set Vercel environment variable: `VITE_API_URL`.
+22. [x] DONE: Set Vercel environment variable: `VITE_API_URL`.
 
-- Why not implemented: Requires the live Render backend URL.
+- Evidence: The deployed Vercel JavaScript bundle contains
+  `https://interviewpilot-ai-server.onrender.com` and no longer points to
+  `http://localhost:3001`.
 
 23. [ ] Verify the full MVP flow on the deployed Vercel URL.
 
@@ -147,11 +155,14 @@ explicitly asks for that work.
 
 ## Next Task
 
-25. [ ] TODO: Verify the local MVP flow with real AI provider credentials
+25. [x] DONE: Verify the local AI-backed interview flow with real provider credentials.
 
-- Why not implemented: The browser flow was verified with controlled
-  create/evaluate API responses. A real provider walkthrough requires Daniel
-  to configure `GEMINI_API_KEY` or `GROQ_API_KEY` in `server/.env`.
+- Evidence: With `GEMINI_API_KEY` and `GROQ_API_KEY` configured in
+  `server/.env`, the local backend health check passed, a real
+  `POST /api/interview/create` request returned 3 valid questions, a real
+  `POST /api/interview/evaluate` request returned a valid structured
+  evaluation, and the parser was patched to handle the Gemini array-wrapped
+  response shape observed during live testing.
 
 26. [ ] TODO: If Daniel wants GitHub updated next, decide the `AGENTS.md` publish
         scope and explicitly ask Codex to commit and push.
@@ -336,14 +347,17 @@ decision.
 
 #### 12.9 Deploy Backend
 
-69. [ ] TODO: Create the backend service on Render from `render.yaml`.
+69. [x] DONE: Create the backend service on Render from `render.yaml`.
 70. [ ] TODO: Set `CLIENT_ORIGIN` in Render to the live Vercel frontend URL.
-71. [ ] TODO: Set `GEMINI_API_KEY` in Render.
-72. [ ] TODO: Optionally set `GROQ_API_KEY` in Render for fallback AI generation.
-73. [ ] TODO: Verify Render health endpoint returns `status: ok`.
+71. [x] DONE: Set `GEMINI_API_KEY` in Render.
+72. [x] DONE: Optionally set `GROQ_API_KEY` in Render for fallback AI generation.
+73. [x] DONE: Verify Render health endpoint returns `status: ok`.
 
-- Why not implemented: Requires Render account access, production secrets, and
-  a live Render service URL.
+- Evidence: The backend is live at
+  `https://interviewpilot-ai-server.onrender.com`, Render shows provider
+  variables configured with masked values, and `/api/health` returned
+  `status: ok`. Current live CORS checks still need the next Render deploy to
+  pick up the Vercel origin allowlist committed in `render.yaml`.
 
 Explanation:
 
@@ -353,13 +367,14 @@ The backend must be live before configuring the frontend production API URL.
 
 #### 12.10 Deploy Frontend
 
-74. [ ] TODO: Create the frontend project on Vercel from `vercel.json`.
-75. [ ] TODO: Set `VITE_API_URL` in Vercel to the live Render backend URL.
-76. [ ] TODO: Deploy the frontend.
+74. [x] DONE: Create the frontend project on Vercel from `vercel.json`.
+75. [x] DONE: Set `VITE_API_URL` in Vercel to the live Render backend URL.
+76. [x] DONE: Deploy the frontend.
 77. [ ] TODO: Verify the deployed frontend loads without console errors.
 
-- Why not implemented: Requires Vercel account access, GitHub import,
-  environment variable setup, and the live Render backend URL.
+- Evidence: `https://interviewpilot-ai-bice.vercel.app` returns the deployed
+  frontend HTML, and the current bundle points at the Render backend URL.
+  Browser-console verification is still pending.
 
 Explanation:
 
@@ -371,15 +386,17 @@ Vercel hosts the user-facing app.
 
 78. [ ] TODO: Verify the deployed Vercel URL can reach the Render backend.
 79. [ ] TODO: Test the full MVP flow online.
-80. [ ] TODO: Verify AI question generation works in production.
-81. [ ] TODO: Verify AI answer evaluation works in production.
+80. [x] DONE: Verify AI question generation works in production.
+81. [x] DONE: Verify AI answer evaluation works in production.
 82. [ ] TODO: Verify final report generation works in production.
 83. [ ] TODO: Verify production user-facing errors stay simple and safe.
 84. [ ] TODO: Verify browser network requests do not expose Gemini or Groq keys.
 85. [ ] TODO: Update docs with final production URLs only if they are intended to
         be public project documentation.
 
-- Why not implemented: There is no verified production deployment URL yet.
+- Why not implemented: Backend production AI verification passed, and Vercel
+  now points at Render, but live CORS checks still fail until Render deploys
+  the updated origin allowlist.
 
 Explanation:
 

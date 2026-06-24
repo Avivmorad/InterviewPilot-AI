@@ -1,5 +1,11 @@
 import 'dotenv/config'
 
+const productionClientOrigins = [
+  'https://interviewpilot-ai-bice.vercel.app',
+  'https://interviewpilot-ai-avivmoradteam.vercel.app',
+  'https://interviewpilot-ai-git-final-report-mvp-flow-avivmoradteam.vercel.app',
+] as const
+
 function readPort(value: string | undefined): number {
   const port = Number(value ?? 3001)
 
@@ -42,12 +48,14 @@ function isLocalViteOrigin(origin: string): boolean {
 export const config = {
   port: readPort(process.env.PORT),
   clientOrigins: readClientOrigins(process.env.CLIENT_ORIGIN),
+  productionClientOrigins,
 }
 
 export function isAllowedClientOrigin(origin: string | undefined): boolean {
   return (
     !origin ||
     config.clientOrigins.includes(origin) ||
+    config.productionClientOrigins.includes(origin as (typeof productionClientOrigins)[number]) ||
     isLocalViteOrigin(origin)
   )
 }
