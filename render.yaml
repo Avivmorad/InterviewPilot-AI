@@ -1,8 +1,11 @@
 services:
   - type: web
     name: interviewpilot-ai-server
-    env: node
+    runtime: node
     plan: free
+    repo: https://github.com/Avivmorad/InterviewPilot-AI
+    branch: main
+    autoDeployTrigger: commit
     rootDir: server
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start
