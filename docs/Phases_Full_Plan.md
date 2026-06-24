@@ -58,7 +58,7 @@ backend  = the API server
 Create a React app using Vite.
 
 ```txt
-frontend/
+client/
 ```
 
 ### What this means
@@ -147,7 +147,7 @@ This prevents you from building everything from scratch.
 Create a folder:
 
 ```txt
-backend/
+server/
 ```
 
 Then create an Express server.
@@ -218,6 +218,7 @@ Frontend Developer
 Backend Developer
 Full Stack Developer
 AI Engineer
+Generative AI Engineer
 ```
 
 ### What this means
@@ -235,6 +236,7 @@ This choice affects the questions the AI will generate.
 Add options:
 
 ```txt
+Intern
 Junior
 Mid-Level
 Senior
@@ -247,7 +249,8 @@ The level controls the difficulty of the questions.
 Example:
 
 ```txt
-Junior = basic questions
+Intern = fundamentals, coursework or personal projects, communication, and learning ability
+Junior = basic professional questions
 Senior = deep architecture and advanced questions
 ```
 
@@ -294,7 +297,7 @@ This is the information the system sends to the AI.
 Example:
 
 ```txt
-AI Engineer + Junior + Technical
+Generative AI Engineer + Intern + Technical
 ```
 
 The AI will use this to create a relevant interview.
@@ -469,7 +472,7 @@ Create a prompt that tells the AI how to evaluate an answer.
 The AI receives clear instructions:
 
 ```txt
-Give a score from 1-10.
+Give a score from 1-5.
 Write strengths.
 Write weaknesses.
 Write missing concepts.
@@ -508,7 +511,7 @@ This is very important for a serious AI project.
 After the user submits an answer, display:
 
 ```txt
-Score: 8/10
+Score: 4/5
 Strengths
 Weaknesses
 Missing Concepts
@@ -595,7 +598,7 @@ If the scores are:
 The overall score will be:
 
 ```txt
-7.6/10
+3.8/5
 ```
 
 ---
@@ -762,7 +765,7 @@ First, build a working product.
 1. Setup project
 2. Setup frontend
 3. Setup backend
-4. Connect frontend/backend
+4. Connect client/backend
 5. Build homepage
 6. Build role selection
 7. Build level selection

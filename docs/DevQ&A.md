@@ -6,51 +6,42 @@ implementation.
 
 ## Quick Answer
 
-There is no required action from your side before continuing with the next coding
-task, which is the Phase 8 answer evaluation prompt builder.
+There is no required action from your side for local code work. The Phase 1 MVP
+flow is implemented locally, and the current remaining blockers are deployment,
+production secrets, and online verification.
 
 Some actions will be needed soon:
 
-- Confirm whether the project should keep `frontend/` and `backend/`, or be
-  renamed to `client/` and `server/`.
-- Add a backend AI API key locally before testing real AI generation.
-- Decide what a good final report should include before Phase 9.
-- Create or confirm deployment accounts before the deployment phase.
+- Add a server AI API key locally before testing real AI generation.
+- Create or confirm deployment accounts before running the production deploy.
 
 ## Q1: Do you need to do anything before development continues?
 
-Short answer: not for the next task.
+Short answer: not for local development. The next user-side actions are account
+and secret setup for deployment.
 
-The current task tracker says the next task is:
+Current local MVP capabilities:
 
-```text
-Create prompt builder for answer evaluation
-```
-
-That can be built without extra input from you because the existing docs already
-describe the intended answer evaluation fields:
-
-- score
-- strengths
-- weaknesses
-- missing concepts
-- improved answer
-- confidence level
+- configure role, level, interview type, and question count
+- generate interview questions
+- submit answers
+- receive structured AI feedback
+- complete the interview
+- view a deterministic final report
 
 Suggestion:
 
-Continue with Phase 8 and implement the evaluation prompt first. This is the
-right next step because it keeps the MVP moving toward the full interview flow:
-answer questions, receive feedback, complete interview, and view a final report.
+Use the manual testing guide to verify the local flow with real provider keys,
+then use the deployment guide when Vercel and Render are ready.
 
 Easy explanation:
 
-The app already asks questions. The next missing piece is teaching the backend
-how to ask the AI, "Was this answer good, and how can it be better?"
+The app can run locally. The remaining work is proving the same flow works in
+production.
 
 ## Q2: Is there a project structure issue?
 
-Yes. There is a naming mismatch.
+No. The current folder names now match the expected structure.
 
 The extra instructions mention this expected structure:
 
@@ -60,19 +51,18 @@ InterviewPilot-AI/
   server/
 ```
 
-But the actual project and existing documentation use:
+The actual project uses the same layout:
 
 ```text
 InterviewPilot-AI/
-  frontend/
-  backend/
+  client/
+  server/
 ```
 
 Suggestion:
 
-Keep `frontend/` and `backend/` for now. They are already used by the root
-workspace, README, docs, and task tracker. Renaming folders would touch many
-files and is not needed for the MVP.
+Keep `client/` and `server/`. They are now used by the root workspace,
+deployment configs, README, docs, and task tracker.
 
 Easy explanation:
 
@@ -81,26 +71,26 @@ Both names mean almost the same thing:
 - `frontend` or `client` means the website users see.
 - `backend` or `server` means the API that talks to AI providers.
 
-Changing the folder names now would not add a user feature. It would mostly
-create cleanup work.
+The names are already aligned, so no further structure rename is needed.
 
 ## Q3: Are API keys needed?
 
 Yes, but only for real AI generation or evaluation testing.
 
-The backend has `backend/.env.example`, but no real backend `.env` file was
-found during this check. The frontend has an `.env` file, but API provider keys
-must not be placed in the frontend.
+The server has `server/.env.example`. API provider keys must not be placed in
+the client.
 
 Suggestion:
 
-Before testing AI generation in the browser, create `backend/.env` from
-`backend/.env.example` and add at least one provider key there.
+Before testing AI generation in the browser, create `server/.env` from
+`server/.env.example` and add at least one provider key there.
 
 Keep these rules:
 
-- Put `GEMINI_API_KEY` only in `backend/.env`.
-- Do not put Gemini or Groq keys in `frontend/.env`.
+- Put `GEMINI_API_KEY` only in `server/.env`.
+- Put `GROQ_API_KEY` only in `server/.env` when Groq fallback is used.
+- Put only `VITE_API_URL` in `client/.env` or Vercel.
+- Do not put Gemini or Groq keys in `client/.env` or Vercel.
 - Do not commit `.env` files.
 - Restart the backend after changing environment variables.
 
@@ -111,26 +101,27 @@ be exposed. The backend is the safer place for private keys.
 
 ## Q4: Is deployment blocked?
 
-Deployment is not needed for the current Phase 8 coding work, but it will need
-your input later.
+Deployment config now exists, but the actual online deployment still needs your
+Vercel and Render accounts, a GitHub repository, and production environment
+variables.
 
 The task tracker lists these deployment tasks:
 
-- deploy frontend to Vercel
-- deploy backend to Render
+- deploy the client to Vercel using `vercel.json`
+- deploy the server to Render using `render.yaml`
 - test the production app
 - verify AI works in production
 - verify API keys are not exposed
 
 Suggestion:
 
-Wait until answer evaluation and the final report work locally before deploying.
-When deployment begins, confirm which accounts and project names should be used.
+Use [DEPLOYMENT.md](DEPLOYMENT.md) when deployment begins. Confirm which
+accounts and project names should be used, then set provider keys only in Render.
 
 Easy explanation:
 
-Deploying too early means you may need to redeploy repeatedly while core features
-are still missing. Finish the MVP locally first, then publish it.
+The code is ready to publish, but Codex cannot complete account login, secret
+setup, or production URL verification without those external account actions.
 
 ## Q5: What should be decided before the final report phase?
 
@@ -153,8 +144,8 @@ or saved history until Phase 2.
 
 Easy explanation:
 
-For the MVP, the final report only needs to work during the current interview
-session. Saving reports for later is useful, but it belongs to a later phase.
+For the MVP, the final report works during the current interview session. Saving
+reports for later is useful, but it belongs to a later phase.
 
 ## Q6: What should the answer evaluation API return?
 
@@ -200,17 +191,16 @@ if many advanced features are started but unstable.
 
 ## Recommended Next Steps
 
-1. Build the answer evaluation prompt builder.
-2. Add the `POST /api/interview/evaluate` backend endpoint.
-3. Display evaluation feedback in the frontend.
-4. Store answers and evaluations in frontend state for the final report.
-5. Build the final report screen.
-6. Update docs and README after the full MVP flow works.
-7. Deploy only after local testing passes.
+1. Run the local manual MVP smoke test with real provider credentials.
+2. Review the final git diff.
+3. Commit and push only when explicitly requested.
+4. Deploy the server to Render.
+5. Configure the client with the live Render API URL and deploy to Vercel.
+6. Verify the full production MVP flow and confirm API keys are not exposed.
 
 ## Current User-Side Checklist
 
-- [ ] Optional: confirm keeping `frontend/` and `backend/`.
-- [ ] Before AI browser testing: create `backend/.env` with a provider API key.
+- [x] Structure: use `client/` and `server/`.
+- [x] Before AI browser testing: create `server/.env` with a provider API key.
 - [ ] Before deployment: confirm Vercel and Render account/project choices.
-- [ ] Before final report work: confirm whether the suggested report sections are enough.
+- [ ] Before production verification: set provider keys only in Render.

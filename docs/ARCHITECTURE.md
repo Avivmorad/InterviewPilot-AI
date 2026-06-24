@@ -2,7 +2,7 @@
 
 ## Overview
 
-InterviewPilot AI is a TypeScript monorepo with separate frontend and backend
+InterviewPilot AI is a TypeScript monorepo with separate `client` and `server`
 workspaces.
 
 ```txt
@@ -26,22 +26,30 @@ All AI requests pass through the backend.
 
 ## Frontend
 
-The `frontend` workspace uses React, Vite, TypeScript, Tailwind CSS, and
+The `client` workspace uses React, Vite, TypeScript, Tailwind CSS, and
 shadcn/ui conventions.
 
 Responsibilities:
 
-- collect the interview role, experience level, and question count
+- collect the interview role, experience level, interview type, and question count
 - call the backend through the interview API service
 - display loading, success, and safe error states
 - validate the shape of backend responses before rendering them
+- store submitted answers and AI evaluations for the current session
+- build the deterministic final report after every answer has feedback
+
+Role and level selectors use central client configuration with stable values and
+display labels. The current supported role values are `frontend-developer`,
+`backend-developer`, `full-stack-developer`, `ai-engineer`, and
+`generative-ai-engineer`. The supported level values are `intern`, `junior`,
+`mid-level`, and `senior`.
 
 The current application stores generated interview data in React state. User
 accounts, persistence, and interview history are planned for later phases.
 
 ## Backend
 
-The `backend` workspace uses Express and TypeScript.
+The `server` workspace uses Express and TypeScript.
 
 The request flow is:
 
@@ -52,7 +60,7 @@ The request flow is:
 5. The interview service validates the generated JSON and assigns question IDs.
 6. Express returns a predictable JSON response or a user-safe JSON error.
 
-Provider-specific SDK code stays inside `backend/src/ai/providers`. Routes and
+Provider-specific SDK code stays inside `server/src/ai/providers`. Routes and
 controllers do not depend directly on Gemini or Groq.
 
 ## AI Flow
@@ -64,7 +72,14 @@ The question-generation prompt requires English-only, strict JSON output. The
 backend rejects malformed output, incorrect question counts, invalid difficulty
 values, and missing expected concepts instead of attempting to guess.
 
-API keys are read from backend environment variables and are never exposed to
+Intern interviews use lower-difficulty guidance focused on fundamentals,
+communication, curiosity, simple debugging, and learning ability. Generative AI
+Engineer interviews are separate from broader AI Engineer interviews and focus
+on LLM application engineering, prompt engineering, structured outputs, RAG,
+evaluations, provider fallback, safety, cost, latency, and production
+reliability.
+
+API keys are read from server environment variables and are never exposed to
 the frontend.
 
 ## API Structure
@@ -97,6 +112,8 @@ returned to users.
 
 ## Current Boundaries
 
-The current architecture does not include authentication, a database, saved
-interviews, answer evaluation, or final reports. These capabilities should be
-added without allowing the frontend to access provider credentials directly.
+The current architecture includes AI-generated questions, AI answer evaluation,
+and a deterministic frontend-generated final report. It does not include
+authentication, a database, saved interviews, or interview history. Those
+capabilities belong to later phases and should be added without allowing the
+frontend to access provider credentials directly.

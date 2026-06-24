@@ -2,15 +2,16 @@
 
 InterviewPilot AI is a technical interview simulator. The current implementation
 covers the Phase 1 flow through interview setup, AI question generation,
-question-by-question navigation, and local answer capture. Answer evaluation,
-the final report, deployment, authentication, and persistence are still pending.
+question-by-question navigation, AI answer evaluation, and a final report.
+Deployment configuration is included for Vercel and Render. Authentication and
+persistence are still pending.
 
 ## Project Structure
 
 ```text
 interviewpilot-ai/
-  frontend/   React + Vite + TypeScript
-  backend/    Node.js + Express + TypeScript
+  client/   React + Vite + TypeScript
+  server/    Node.js + Express + TypeScript
   docs/       Product and technical notes
   README.md
   .gitignore
@@ -25,11 +26,30 @@ interviewpilot-ai/
 4. The AI service tries Gemini first and Groq as a fallback.
 5. The service validates the generated JSON, assigns question IDs, and returns a
    predictable response to the frontend.
-6. The frontend shows one question at a time and lets the user save a local
-   answer for each generated question.
+6. The frontend shows one question at a time and sends each submitted answer to
+   `POST /api/interview/evaluate`.
+7. The backend validates the AI feedback JSON before returning scores,
+   strengths, weaknesses, gaps, and an improved answer.
+8. The frontend stores evaluated answers in local state and builds a final
+   report with an overall score, summaries, recommended topics, and a learning
+   roadmap.
 
 Provider SDKs and API keys remain in the backend. The frontend only knows the
 JSON API contract.
+
+Supported roles are Frontend Developer, Backend Developer, Full Stack
+Developer, AI Engineer, and Generative AI Engineer. The stored API values are
+`frontend-developer`, `backend-developer`, `full-stack-developer`,
+`ai-engineer`, and `generative-ai-engineer`.
+
+Supported experience levels are Intern, Junior, Mid-Level, and Senior. The
+stored API values are `intern`, `junior`, `mid-level`, and `senior`.
+
+AI Engineer remains the broader role for ML systems, data pipelines, model
+training or inference, deployment, feature engineering, and MLOps. Generative AI
+Engineer focuses on LLM application engineering, prompt design, structured
+outputs, RAG, evaluations, provider fallback, safety, cost, latency, and
+production reliability.
 
 ## Install Dependencies
 
@@ -40,18 +60,28 @@ cd C:\Users\Daniel\Desktop\InterviewPilot-AI
 npm install
 ```
 
+## Start The Project
+
+From the project root:
+
+```powershell
+.\runproject
+```
+
+This starts the client and server together.
+
 ## Run The Frontend
 
 From the project root:
 
 ```powershell
-npm run dev:frontend
+npm run dev:client
 ```
 
-Or from the frontend folder:
+Or from the client folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run dev
 ```
 
@@ -64,13 +94,13 @@ Open a second terminal:
 From the project root:
 
 ```powershell
-npm run dev:backend
+npm run dev:server
 ```
 
-Or from the backend folder:
+Or from the server folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run dev
 ```
 
@@ -101,14 +131,14 @@ Expected response:
 
 ## Create An Interview
 
-Set at least one backend API key in `backend/.env`, using
-`backend/.env.example` as the template. Gemini is attempted first and Groq is
+Set at least one server API key in `server/.env`, using
+`server/.env.example` as the template. Gemini is attempted first and Groq is
 used as the fallback.
 
 ```powershell
 $body = @{
-  role = "Frontend Developer"
-  level = "Junior"
+  role = "generative-ai-engineer"
+  level = "intern"
   interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
@@ -121,42 +151,96 @@ Invoke-RestMethod `
 ```
 
 The response contains a temporary `interviewId` and the generated questions.
-Answer evaluation, summaries, authentication, and persistence are not included
-yet.
+
+## Evaluate An Answer
+
+With the backend running:
+
+```powershell
+$body = @{
+  question = @{
+    id = "question-1"
+    topic = "React"
+    difficulty = "junior"
+    question = "How does React state differ from props?"
+    expectedConcepts = @("Props are passed in", "State is owned by a component")
+  }
+  answer = "Props come from parents. State is managed inside a component and can change."
+} | ConvertTo-Json -Depth 5
+
+Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:3001/api/interview/evaluate `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+The response contains structured feedback used by the interview screen and final
+report. Authentication and persistence are not included yet.
+
+## Screenshots
+
+### Interview Setup
+
+![Interview setup screen](docs/screenshots/01-interview-setup.png)
+
+### Answer Feedback
+
+![Answer feedback screen](docs/screenshots/02-answer-feedback.png)
+
+### Final Report
+
+![Final report screen](docs/screenshots/03-final-report.png)
 
 ## Root Development Scripts
 
 ```powershell
 npm run dev
-npm run dev:frontend
-npm run dev:backend
+npm run dev:client
+npm run dev:server
 npm run typecheck
 npm run build
 npm run check
+npm run eval
 ```
 
 - `npm run typecheck` checks frontend and backend TypeScript without building.
 - `npm run build` creates production builds for frontend and backend.
 - `npm run check` runs frontend linting, all typechecks, existing backend tests,
   and production builds.
+- `npm run eval` runs the offline mocked evaluation dataset for answer-feedback
+  prompt and schema behavior.
 
 To run scripts from an individual workspace:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run typecheck
 npm run lint
 npm run build
 npm run preview
 
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run typecheck
 npm run build
 npm run start
 ```
 
 Run `npm run build` before `npm run start` in the backend because `start` runs
-the compiled `backend/dist/server.js` file.
+the compiled `server/dist/server.js` file.
+
+## Deployment
+
+Deployment config is included:
+
+- `vercel.json` builds the `client` workspace for Vercel.
+- `render.yaml` builds and starts the `server` service on Render.
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) lists the required production
+  environment variables and verification checklist.
+
+Production deploy still requires your Vercel and Render accounts, a GitHub repo,
+and server AI provider keys configured as provider secrets. Never put Gemini or
+Groq keys in client environment variables.
 
 See [docs/manual-testing.md](docs/manual-testing.md) for browser and PowerShell
 testing steps.

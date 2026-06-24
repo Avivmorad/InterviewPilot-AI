@@ -9,8 +9,16 @@ As a software engineering candidate, I can configure and complete a short mock t
 - Select target role, experience level, interview type, and interview length
 - Generate English interview questions for technical, behavioral, or mixed sessions
 - Move through one generated question at a time
-- Write and locally save an answer for each generated question
+- Write and submit an answer for each generated question
+- Receive structured AI feedback for each submitted answer
+- Complete the interview after every answer has feedback
+- View a local final report with overall score, summaries, gaps, recommended
+  topics, and a learning roadmap
 - Handle missing configuration, AI loading, provider failure, and invalid input
+
+Current role options are Frontend Developer, Backend Developer, Full Stack
+Developer, AI Engineer, and Generative AI Engineer. Current experience levels
+are Intern, Junior, Mid-Level, and Senior.
 
 ## Excluded
 
@@ -20,10 +28,9 @@ As a software engineering candidate, I can configure and complete a short mock t
 - Resume upload or parsing
 - Analytics
 - Collaborative interviews
-- Deployment configuration
+- Hosted deployment and production verification
 - Real-time coding sandbox
-- Answer evaluation until Phase 8 is implemented
-- Final interview report and summaries
+- AI-generated final report narratives
 
 ## MVP Success Criteria
 

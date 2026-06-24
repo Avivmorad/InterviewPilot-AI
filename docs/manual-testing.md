@@ -5,7 +5,8 @@ This guide covers manual testing for the current local InterviewPilot AI MVP flo
 - Start the frontend and backend.
 - Check that the backend is healthy.
 - Generate interview questions with role, level, interview type, and count.
-- Move through questions and locally save user answers.
+- Move through questions, submit answers, and review AI feedback.
+- Complete the interview and review the final report.
 - Understand common development errors.
 
 Run commands from PowerShell. Keep the frontend and backend running in separate
@@ -20,14 +21,14 @@ cd C:\Users\Daniel\Desktop\InterviewPilot-AI
 npm install
 ```
 
-Create the backend environment file:
+Create the server environment file:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 Copy-Item .env.example .env
 ```
 
-Open `backend/.env` and set at least one API key:
+Open `server/.env` and set at least one API key:
 
 ```dotenv
 GEMINI_API_KEY=your_gemini_api_key
@@ -35,14 +36,14 @@ GROQ_API_KEY=
 ```
 
 Gemini is the primary provider. Groq is used as a fallback when it is
-configured. Never put an API key in frontend files.
+configured. Never put an API key in client files.
 
 ## 1. Start the Frontend
 
 In the first PowerShell window:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\frontend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
 npm run dev
 ```
 
@@ -60,7 +61,7 @@ should display role, level, interview-type, and question-count options.
 In a second PowerShell window:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\backend
+cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
 npm run dev
 ```
 
@@ -97,8 +98,8 @@ With the backend running and at least one API key configured, run:
 
 ```powershell
 $body = @{
-  role = "Frontend Developer"
-  level = "Junior"
+  role = "generative-ai-engineer"
+  level = "intern"
   interviewType = "Technical"
   questionCount = 3
 } | ConvertTo-Json
@@ -114,16 +115,24 @@ $response | ConvertTo-Json -Depth 10
 
 Valid roles:
 
-- `Frontend Developer`
-- `Backend Developer`
-- `Full Stack Developer`
-- `AI Engineer`
+- `frontend-developer` - Frontend Developer
+- `backend-developer` - Backend Developer
+- `full-stack-developer` - Full Stack Developer
+- `ai-engineer` - AI Engineer
+- `generative-ai-engineer` - Generative AI Engineer
 
 Valid levels:
 
-- `Junior`
-- `Mid-Level`
-- `Senior`
+- `intern` - Intern
+- `junior` - Junior
+- `mid-level` - Mid-Level
+- `senior` - Senior
+
+AI Engineer is the broader role for ML systems, data pipelines, model training
+or inference, deployment, feature engineering, and MLOps. Generative AI
+Engineer focuses on LLM applications, prompt engineering, structured outputs,
+RAG, evaluations, provider fallback, safety, cost, latency, and production
+reliability.
 
 Valid interview types:
 
@@ -164,8 +173,39 @@ The generated wording will vary. Verify that:
   `expectedConcepts`.
 - The frontend displays a loading state and then shows one generated question at
   a time.
-- The answer textarea accepts text, blocks empty submissions, and shows
-  `Answer saved` after the current answer is submitted.
+- The answer textarea accepts text, blocks empty submissions, shows an
+  evaluation loading state, and displays structured feedback after submission.
+- The interview can be completed only after every question has feedback.
+- The final report shows the overall score, strengths, weaknesses, knowledge
+  gaps, recommended topics, learning roadmap, and per-question breakdown.
+
+## 6. Test `POST /api/interview/evaluate` with PowerShell
+
+With the backend running and at least one API key configured, run:
+
+```powershell
+$body = @{
+  question = @{
+    id = "q1"
+    topic = "React"
+    difficulty = "junior"
+    question = "How does React state differ from props?"
+    expectedConcepts = @("Props are passed in", "State is owned by a component")
+  }
+  answer = "Props come from parent components. State is owned by the component and can change over time."
+} | ConvertTo-Json -Depth 5
+
+$response = Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:3001/api/interview/evaluate `
+  -ContentType "application/json" `
+  -Body $body
+
+$response | ConvertTo-Json -Depth 10
+```
+
+Verify that the response contains `score`, `strengths`, `weaknesses`,
+`missingConcepts`, `improvedAnswer`, and `confidenceLevel`.
 
 ## Common Errors
 
@@ -195,8 +235,8 @@ Typical response:
 
 Meaning: the backend is running, but neither AI provider has an API key.
 
-Fix: add `GEMINI_API_KEY` or `GROQ_API_KEY` to `backend/.env`, then restart the
-backend. Do not place API keys in `frontend/.env` or frontend source files.
+Fix: add `GEMINI_API_KEY` or `GROQ_API_KEY` to `server/.env`, then restart the
+backend. Do not place API keys in `client/.env` or client source files.
 
 ### Invalid JSON
 
@@ -234,14 +274,21 @@ allow. By default, the backend allows `http://localhost:5173`.
 Fix:
 
 1. Check the frontend URL printed by Vite.
-2. Set `CLIENT_ORIGIN` in `backend/.env` to that exact URL without a trailing
-   slash.
+2. Set `CLIENT_ORIGIN` in `server/.env` to that exact URL without a trailing
+   slash. Use comma-separated values when you need to allow both local and
+   production frontend origins.
 3. Restart the backend.
 
 Example:
 
 ```dotenv
 CLIENT_ORIGIN=http://localhost:5174
+```
+
+Production example:
+
+```dotenv
+CLIENT_ORIGIN=http://localhost:5173,https://your-vercel-domain.vercel.app
 ```
 
 A CORS error only applies to browser requests. PowerShell requests are not
@@ -262,19 +309,19 @@ First, check whether InterviewPilot is already running in another terminal. If
 it is, use that existing server or stop it with `Ctrl+C`.
 
 If the frontend starts on a different port, update `CLIENT_ORIGIN` in
-`backend/.env` to match it. If the backend port must change, update both
-`PORT` in `backend/.env` and `VITE_API_URL` in `frontend/.env`, then restart
+`server/.env` to match it. If the backend port must change, update both
+`PORT` in `server/.env` and `VITE_API_URL` in `client/.env`, then restart
 both servers.
 
 Example alternate-port configuration:
 
 ```dotenv
-# backend/.env
+# server/.env
 PORT=3002
 CLIENT_ORIGIN=http://localhost:5174
 ```
 
 ```dotenv
-# frontend/.env
+# client/.env
 VITE_API_URL=http://localhost:3002
 ```
