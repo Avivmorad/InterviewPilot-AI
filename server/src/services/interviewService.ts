@@ -382,6 +382,22 @@ export function parseAnswerEvaluation(text: string): AnswerEvaluation {
   }
 }
 
+function createFallbackEvaluation(request: EvaluateAnswerRequest): AnswerEvaluation {
+  const missingConcepts = request.question.expectedConcepts.slice(0, 5)
+
+  return {
+    score: 1,
+    strengths: ['Your answer was saved and included enough detail to review.'],
+    weaknesses: [
+      'AI feedback fallback was used because the provider response could not be validated.',
+      'Revise the answer to explicitly cover the expected concepts.',
+    ],
+    missingConcepts,
+    improvedAnswer: `A stronger answer should directly address: ${missingConcepts.join(', ')}.`,
+    confidenceLevel: 'low',
+  }
+}
+
 export async function createInterview(
   input: unknown,
   textGenerator: TextGenerator = generateText,
@@ -428,6 +444,14 @@ export async function evaluateAnswer(
 
 Your previous response was invalid. Return only the JSON object that matches the requested shape. Do not include markdown, code fences, prose, or extra keys.`
 
-    return parseAnswerEvaluation(await textGenerator(retryPrompt))
+    try {
+      return parseAnswerEvaluation(await textGenerator(retryPrompt))
+    } catch (retryError) {
+      if (!(retryError instanceof InterviewGenerationError)) {
+        throw retryError
+      }
+
+      return createFallbackEvaluation(request)
+    }
   }
 }

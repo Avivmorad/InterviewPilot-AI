@@ -370,24 +370,25 @@ test('retries answer evaluation once after invalid AI output', async () => {
   assert.match(prompts[1] ?? '', /previous response was invalid/)
 })
 
-test('rejects answer evaluation after retry output is still invalid', async () => {
+test('returns transparent fallback feedback after retry output is still invalid', async () => {
   let calls = 0
 
-  await assert.rejects(
-    evaluateAnswer(
-      {
-        question: JSON.parse(validGeneratedText).questions[0],
-        answer: 'State stores values and updates the UI.',
-      },
-      async () => {
-        calls += 1
-        return '{"score": 6}'
-      },
-    ),
-    InterviewGenerationError,
+  const result = await evaluateAnswer(
+    {
+      question: JSON.parse(validGeneratedText).questions[0],
+      answer: 'State stores values and updates the UI.',
+    },
+    async () => {
+      calls += 1
+      return '{"score": 6}'
+    },
   )
 
   assert.equal(calls, 2)
+  assert.equal(result.score, 1)
+  assert.equal(result.confidenceLevel, 'low')
+  assert.match(result.weaknesses.join(' '), /fallback/)
+  assert.deepEqual(result.missingConcepts, ['State', 'Rendering'])
 })
 
 test('rejects an empty answer before calling AI', async () => {
