@@ -73,6 +73,20 @@ test('creates an interview from valid generated JSON', async () => {
   assert.match(receivedPrompt, /strict JSON only/)
 })
 
+test('retries interview generation once after invalid AI output', async () => {
+  const prompts: string[] = []
+
+  const result = await createInterview(request, async (prompt) => {
+    prompts.push(prompt)
+    return prompts.length === 1 ? '{"questions":[]}' : validGeneratedText
+  })
+
+  assert.equal(result.questions.length, 3)
+  assert.equal(prompts.length, 2)
+  assert.match(prompts[1] ?? '', /previous response was invalid/)
+  assert.match(prompts[1] ?? '', /exactly 3 items/)
+})
+
 test('rejects malformed generated JSON', () => {
   assert.throws(
     () => parseGeneratedInterview('not json', request),

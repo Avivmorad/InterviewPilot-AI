@@ -390,8 +390,21 @@ export async function createInterview(
 ): Promise<CreateInterviewResponse> {
   const request = validateCreateInterviewRequest(input)
   const prompt = buildInterviewGeneratorPrompt(request)
-  const generatedText = await textGenerator(prompt)
-  const questions = parseGeneratedInterview(generatedText, request)
+  let questions: InterviewQuestion[]
+
+  try {
+    questions = parseGeneratedInterview(await textGenerator(prompt), request)
+  } catch (error) {
+    if (!(error instanceof InterviewGenerationError)) {
+      throw error
+    }
+
+    const retryPrompt = `${prompt}
+
+Your previous response was invalid. Return only the JSON object that matches the requested shape. The questions array must contain exactly ${request.questionCount} items. Do not include markdown, code fences, prose, or extra keys.`
+
+    questions = parseGeneratedInterview(await textGenerator(retryPrompt), request)
+  }
 
   return {
     interviewId: `interview-${randomUUID()}`,
