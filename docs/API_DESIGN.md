@@ -57,7 +57,7 @@ Request:
   "role": "generative-ai-engineer",
   "level": "intern",
   "interviewType": "Mixed",
-  "questionCount": 5
+  "questionCount": 3
 }
 ```
 

@@ -6,7 +6,8 @@ As a software engineering candidate, I can configure and complete a short mock t
 
 ## Current Implemented Flow
 
-- Select target role, experience level, interview type, and interview length
+- Select target role, experience level, interview type, and the stable
+  3-question MVP length
 - Generate English interview questions for technical, behavioral, or mixed sessions
 - Move through one generated question at a time
 - Write and submit an answer for each generated question

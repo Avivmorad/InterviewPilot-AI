@@ -13,7 +13,7 @@ export const INTERVIEW_LEVELS = [
   { value: 'senior', label: 'Senior' },
 ] as const
 export const INTERVIEW_TYPES = ['Technical', 'Behavioral', 'Mixed'] as const
-export const QUESTION_COUNTS = [3, 5, 10] as const
+export const QUESTION_COUNTS = [3] as const
 
 export type Role = (typeof INTERVIEW_ROLES)[number]['value']
 export type Level = (typeof INTERVIEW_LEVELS)[number]['value']

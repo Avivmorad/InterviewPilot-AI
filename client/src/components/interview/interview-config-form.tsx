@@ -62,7 +62,7 @@ export function InterviewConfigForm({
   const [role, setRole] = useState<Role>('frontend-developer')
   const [level, setLevel] = useState<Level>('mid-level')
   const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
-  const [questionCount, setQuestionCount] = useState<QuestionCount>(5)
+  const [questionCount, setQuestionCount] = useState<QuestionCount>(3)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -151,7 +151,7 @@ export function InterviewConfigForm({
         />
 
         <OptionGroup
-          description="Choose how many questions to include."
+          description="Use the stable MVP-length interview."
           disabled={isLoading}
           name="questionCount"
           onChange={setQuestionCount}

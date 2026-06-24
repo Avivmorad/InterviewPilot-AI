@@ -79,7 +79,7 @@ function validateCreateInterviewRequest(
   }
 
   if (!isQuestionCount(input.questionCount)) {
-    throw new InterviewValidationError('Question count must be 3, 5, or 10.')
+    throw new InterviewValidationError('Question count must be 3 for the MVP.')
   }
 
   return {

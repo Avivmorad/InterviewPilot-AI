@@ -140,7 +140,7 @@ Valid interview types:
 - `Behavioral`
 - `Mixed`
 
-Valid question counts are `3`, `5`, and `10`.
+Valid question count for the MVP is `3`.
 
 ## 5. Successful Output
 
@@ -256,9 +256,9 @@ Fix: use the PowerShell hashtable and `ConvertTo-Json` example above instead of
 writing the JSON string manually.
 
 Valid JSON can still be rejected when its values are unsupported. For example,
-`questionCount = 4` returns an `INVALID_REQUEST` error because only `3`, `5`,
-and `10` are allowed. An unsupported `interviewType` also returns an
-`INVALID_REQUEST` error.
+`questionCount = 4` returns an `INVALID_REQUEST` error because the MVP supports
+`3` questions. An unsupported `interviewType` also returns an `INVALID_REQUEST`
+error.
 
 ### CORS Error
 
