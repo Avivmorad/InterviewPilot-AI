@@ -25,7 +25,7 @@ Rules:
 
 # Current Progress
 
-TODO Progress: Tasks Done: 272/324 (84%)
+TODO Progress: Tasks Done: 274/324 (85%)
 
 ## Active Phase
 
@@ -106,16 +106,15 @@ explicitly asks for that work.
   still requires configured provider credentials in `server/.env`.
 
 15. [x] Re-run all existing local checks.
-16. [ ] Review and resolve uncommitted files before publishing.
+16. [x] DONE: Review and resolve uncommitted files before publishing.
 
-- Why not implemented: The role/level expansion changes are still
-  uncommitted. The intended publish package has been reviewed, but untracked
-  `AGENTS.md` needs Daniel's decision before any publish step.
+- Evidence: The publish scope was reviewed, only local `AGENTS.md` remained
+  intentionally untracked, and the MVP batch was committed cleanly.
 
-17. [ ] Push the reviewed repository changes to GitHub.
+17. [x] DONE: Push the reviewed repository changes to GitHub.
 
-- Why not implemented: Codex was not explicitly asked to commit or push, and
-  `gh auth status` currently shows no logged-in GitHub host.
+- Evidence: The `final-report-mvp-flow` branch was pushed to GitHub after the
+  commit `1cc2d40`.
 
 18. [ ] Create the backend service on Render from `render.yaml`.
 
