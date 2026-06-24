@@ -177,6 +177,21 @@ test('evaluates an answer from valid generated JSON', async () => {
   assert.match(receivedPrompt, /strict JSON only/)
 })
 
+test('normalizes common numeric and list-length evaluation drift', () => {
+  const result = parseAnswerEvaluation(JSON.stringify({
+    ...JSON.parse(validEvaluationText),
+    score: '3.5',
+    strengths: ['Clear', 'Specific', 'Relevant', 'Practical', 'Concise'],
+    weaknesses: ['Missing tradeoffs', 'Could add examples', 'Needs depth', 'No risks', 'No testing'],
+    missingConcepts: ['Tradeoffs', 'Testing', 'Risks', 'Edge cases', 'Metrics', 'Monitoring'],
+  }))
+
+  assert.equal(result.score, 3.5)
+  assert.deepEqual(result.strengths, ['Clear', 'Specific', 'Relevant', 'Practical'])
+  assert.deepEqual(result.weaknesses, ['Missing tradeoffs', 'Could add examples', 'Needs depth', 'No risks'])
+  assert.deepEqual(result.missingConcepts, ['Tradeoffs', 'Testing', 'Risks', 'Edge cases', 'Metrics'])
+})
+
 test('evaluates intern answers with intern-appropriate expectations', async () => {
   let receivedPrompt = ''
 

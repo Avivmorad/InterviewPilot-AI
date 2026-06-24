@@ -165,7 +165,6 @@ function parseQuestion(
     question.trim().length === 0 ||
     !Array.isArray(expectedConcepts) ||
     expectedConcepts.length < 2 ||
-    expectedConcepts.length > 5 ||
     !expectedConcepts.every(
       (concept) => typeof concept === 'string' && concept.trim().length > 0,
     )
@@ -178,7 +177,7 @@ function parseQuestion(
     topic: topic.trim(),
     difficulty: expectedDifficulty,
     question: question.trim(),
-    expectedConcepts: expectedConcepts.map((concept) => concept.trim()),
+    expectedConcepts: expectedConcepts.map((concept) => concept.trim()).slice(0, 5),
   }
 }
 
@@ -190,13 +189,12 @@ function parseStringList(
   if (
     !Array.isArray(value) ||
     value.length < minLength ||
-    value.length > maxLength ||
     !value.every((item) => typeof item === 'string' && item.trim().length > 0)
   ) {
     throw new InterviewGenerationError()
   }
 
-  return value.map((item) => item.trim())
+  return value.map((item) => item.trim()).slice(0, maxLength)
 }
 
 function parseScore(value: unknown): number {
@@ -207,7 +205,7 @@ function parseScore(value: unknown): number {
 
   if (
     typeof score !== 'number' ||
-    !Number.isInteger(score) ||
+    !Number.isFinite(score) ||
     score < 1 ||
     score > 5
   ) {
