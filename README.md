@@ -205,13 +205,14 @@ report. Authentication and persistence are not included yet.
 
 - `npm run eval` runs the offline answer-evaluation dataset from the project root.
 - The eval runner checks schema validity, score agreement, missing-concept coverage, and failure cases.
-- The current pipeline is intentionally offline; real provider evaluation remains a later release task.
+- `npm run eval:real` compares Gemini and Groq on the same dataset when both server-side API keys are configured.
+- The real-provider runner records provider name, model name, latency, schema success, and score results, and can write a JSON report to disk.
 
 ## Known Limitations
 
 - Authentication and persistence are not included in Phase 1.
 - Production verification still depends on the live browser flow and deployment accounts.
-- Real-provider evaluation is not yet wired into the main release flow.
+- Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
 
 ## Screenshots
 
@@ -237,6 +238,7 @@ npm run typecheck
 npm run build
 npm run check
 npm run eval
+npm run eval:real
 ```
 
 - `npm run typecheck` checks frontend and backend TypeScript without building.
@@ -245,6 +247,8 @@ npm run eval
   and production builds.
 - `npm run eval` runs the offline mocked evaluation dataset for answer-feedback
   prompt and schema behavior.
+- `npm run eval:real` compares Gemini and Groq when both server-side API keys
+  are configured and can write a JSON report to disk.
 
 To run scripts from an individual workspace:
 

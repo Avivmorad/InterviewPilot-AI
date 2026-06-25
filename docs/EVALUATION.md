@@ -20,6 +20,16 @@ The current runner:
 - reports schema pass rate, score agreement, missing-concept accuracy, and
   failed cases
 
-This first version does not call Gemini or Groq. Real provider evaluation will
-need `GEMINI_API_KEY` or `GROQ_API_KEY` configured in the server environment and
-should never put provider keys in the client or Vercel.
+For real model comparisons, run:
+
+```powershell
+npm run eval:real
+```
+
+The real-provider runner:
+
+- calls Gemini and Groq on the same dataset
+- stores provider name, model name, latency, schema success, and score results
+- can write a JSON report with `--output <path>` or `EVAL_RESULTS_PATH`
+- requires `GEMINI_API_KEY` and `GROQ_API_KEY` in the server environment
+- keeps provider keys out of the client and out of Vercel runtime code

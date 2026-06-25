@@ -10,11 +10,11 @@
 
 ## Current Status
 
-Tasks Done: 44/74 (59%)
+Tasks Done: 52/74 (70%)
 
 - Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- The remaining work is release packaging and Phase 2 planning.
+- The remaining work is branch protection cleanup and Phase 2 planning.
 
 ## Current Sprint
 
@@ -22,8 +22,8 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Close out the remaining portfolio packaging work.
-- Verify the remaining release artifacts (README, LinkedIn copy, and real-provider matrix) after the live flow is already proven.
+- Close out the remaining branch-protection item if GitHub admin access becomes available.
+- Start the locked Phase 2 work now that the Phase 1 release branch is complete.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
 ## Phase 1 - Remaining Tasks
@@ -118,11 +118,12 @@ Production Verification And Portfolio Release
 
 ### Real Provider Evaluations
 
-- [ ] Add an optional real-provider evaluation runner.
-- [ ] Store model name, provider, latency, schema success, and score results.
-- [ ] Compare Gemini and Groq behavior on the same dataset.
-- [ ] Keep provider secrets server-side only.
-- Why not implemented: Real-provider evaluation still depends on server-side API keys and an explicit evaluation workflow.
+- [x] Add an optional real-provider evaluation runner.
+- [x] Store model name, provider, latency, schema success, and score results.
+- [x] Compare Gemini and Groq behavior on the same dataset.
+- [x] Keep provider secrets server-side only.
+- Evidence: `npm run eval:real` now runs a server-side comparison workflow that records provider name, model name, latency, schema success, score results, and a Gemini-vs-Groq comparison summary; `server/src/evals/realProviderEvaluation.test.ts` covers the report shape with injected providers, and the smoke run cleanly reports missing API keys when real keys are not configured.
+- Why not implemented: N/A; the optional real-provider runner is now implemented and documented.
 
 ### Backend Protection
 
@@ -136,11 +137,12 @@ Production Verification And Portfolio Release
 
 ### Observability
 
-- [ ] Track request latency.
-- [ ] Track provider failures.
-- [ ] Track fallback usage.
-- [ ] Track schema-validation failures.
-- Why not implemented: Observability is still an enhancement layer, not a blocker for the Phase 1 release.
+- [x] Track request latency.
+- [x] Track provider failures.
+- [x] Track fallback usage.
+- [x] Track schema-validation failures.
+- Evidence: `server/src/middleware/requestSecurity.ts` logs HTTP request durations, `server/src/ai/aiService.ts` logs provider failures and fallback outcomes with latency, and `server/src/services/interviewService.ts` logs schema-validation failures and retries.
+- Why not implemented: N/A; the observability hooks are now implemented.
 
 ## Phase 2 - User Accounts And History
 
