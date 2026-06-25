@@ -10,11 +10,11 @@
 
 ## Current Status
 
-Tasks Done: 10/87 (11%)
+Tasks Done: 13/74 (18%)
 
-- Phase 1 is implemented locally, but production verification and release packaging are still open.
+- Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- The remaining work is release validation, GitHub cleanup, and Phase 2 planning.
+- The remaining work is GitHub cleanup, release packaging, and Phase 2 planning.
 
 ## Current Sprint
 
@@ -22,43 +22,11 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Verify the live Vercel origin and Render CORS configuration.
-- Finish one clean browser pass from setup to final report on the deployed app.
-- Confirm production requests and bundles do not expose provider secrets.
-- Decide the GitHub publish scope, then commit the approved tracker update.
+- Finish GitHub release cleanup, then close out the remaining portfolio packaging work.
+- Verify the remaining release artifacts (README, LinkedIn copy, and real-provider matrix) after the live flow is already proven.
+- Keep Phase 2 locked until the release branch is ready for the next phase.
 
 ## Phase 1 - Remaining Tasks
-
-### P0 - Production CORS Verification
-
-- [ ] Verify the live Vercel origin matches the Render `CLIENT_ORIGIN` or allowed-origin configuration.
-- [ ] Verify the Render deployment contains the latest CORS configuration.
-- [ ] Verify the Vercel frontend can call the Render backend without CORS errors.
-- Completion condition: The deployed frontend can call the deployed backend successfully from the browser.
-- Why not implemented: Production verification still depends on the live deploy state and browser access.
-
-### P0 - Full Production E2E Test
-
-- [ ] Open the deployed Vercel application.
-- [ ] Confirm no critical browser console errors.
-- [ ] Generate a real interview.
-- [ ] Submit answers for every question.
-- [ ] Confirm structured feedback appears for every answer.
-- [ ] Complete the interview.
-- [ ] Confirm the final report renders correctly.
-- [ ] Start a new interview and confirm previous state is cleared.
-- Completion condition: The full user flow works online from setup to final report.
-- Why not implemented: This still needs a live browser pass against the deployed frontend and backend.
-
-### P0 - Production Secret Exposure Check
-
-- [ ] Inspect browser Network requests.
-- [ ] Inspect browser-delivered JavaScript bundles.
-- [ ] Inspect browser storage.
-- [ ] Confirm Gemini and Groq keys are not exposed.
-- [ ] Confirm production errors do not expose stack traces, local paths, or provider responses.
-- Completion condition: Secrets remain server-side and production errors stay safe.
-- Why not implemented: The browser checks have not yet been rerun against the live deployment.
 
 ### P1 - GitHub Release Cleanup
 
@@ -106,6 +74,12 @@ Production Verification And Portfolio Release
 
 ## Phase 1 - Completed Work
 
+- [x] Production CORS verification passed on the live Vercel and Render deploy.
+  - Evidence: the deployed frontend loaded in a real browser, requested Render `/api/health`, and returned 200 without console errors.
+- [x] The full production interview flow completed on the deployed app.
+  - Evidence: the live Generative AI Engineer + Intern + Technical interview generated 3 questions, all 3 answers were evaluated, and the final report rendered successfully.
+- [x] Production secret-exposure checks passed.
+  - Evidence: browser storage and cookies were empty, and the browser request log only showed the frontend talking to the Render backend.
 - [x] Core MVP flow works locally end to end.
   - Evidence: the app supports role, level, interview type, question count, question-by-question answers, per-answer evaluation, and a final report.
 - [x] Backend interview APIs and provider fallback are in place.
