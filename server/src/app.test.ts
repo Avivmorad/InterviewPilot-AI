@@ -328,7 +328,7 @@ test('adds request IDs and rate limits interview routes', async (context) => {
     questionCount: 3,
   })
 
-  const firstResponse = await fetch(`http://127.0.0.1:${port}/api/interview/create`, {
+  const firstResponse = await fetch(`${baseUrlFromPort(port)}/api/interview/create`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: requestBody,
@@ -336,7 +336,7 @@ test('adds request IDs and rate limits interview routes', async (context) => {
   assert.equal(firstResponse.status, 201)
   assert.match(firstResponse.headers.get('x-request-id') ?? '', /.+/)
 
-  const secondResponse = await fetch(`http://127.0.0.1:${port}/api/interview/create`, {
+  const secondResponse = await fetch(`${baseUrlFromPort(port)}/api/interview/create`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: requestBody,
