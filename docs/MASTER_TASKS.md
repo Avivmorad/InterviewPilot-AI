@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 34/74 (46%)
+Tasks Done: 35/74 (47%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -33,11 +33,11 @@ Production Verification And Portfolio Release
 - [x] Inspect `git status --short`.
 - [x] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
 - [x] Confirm the repository contains only intentional files.
-- [ ] Confirm the deployed code matches the repository branch intended for release.
+- [x] Confirm the deployed code matches the repository branch intended for release.
 - [ ] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
-- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, and `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked.
+- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked, and Vercel deployment metadata shows the deployed frontend was built from `codex/master-tasks-update` at commit `90c485f58fb6d15948a99bf1611c25bc112b44c8`.
 - Completion condition: The repository is clean, intentional, and ready for an approved release action.
-- Why not implemented: The publish scope still needs the final approval decision.
+- Why not implemented: The remaining prep step is blocked by the local `.git` index-lock permission issue in this environment, so staging and local commit preparation cannot complete here.
 
 ### P1 - Role And Level Real-AI Matrix
 
