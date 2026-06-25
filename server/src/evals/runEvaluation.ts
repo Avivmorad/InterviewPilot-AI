@@ -1,9 +1,12 @@
 import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
 import { parseAnswerEvaluation } from '../services/interviewService.js'
 import { evaluationCases, type EvaluationCase } from './evaluationCases.js'
+import {
+  evaluationDatasetVersion,
+  evaluationPromptVersion,
+  evaluationSchemaVersion,
+} from './evaluationMetadata.js'
 
-const promptVersion = 'answer-evaluation-v1'
-const schemaVersion = 'answer-evaluation-schema-v1'
 const provider = 'offline-mocked'
 
 type CaseResult = {
@@ -97,8 +100,9 @@ const report = {
   metadata: {
     startedAt,
     provider,
-    promptVersion,
-    schemaVersion,
+    promptVersion: evaluationPromptVersion,
+    schemaVersion: evaluationSchemaVersion,
+    datasetVersion: evaluationDatasetVersion,
     caseCount: results.length,
   },
   metrics: {
