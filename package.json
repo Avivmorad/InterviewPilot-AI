@@ -14,6 +14,7 @@
     "build": "npm run build --workspace client && npm run build --workspace server",
     "check": "npm run lint --workspace client && npm run typecheck && npm run test --workspace client && npm run test --workspace server && npm run build",
     "eval": "npm run eval --workspace server",
+    "eval:real": "npm run eval:real --workspace server",
     "start": "npm run start --workspace server"
   },
   "devDependencies": {
