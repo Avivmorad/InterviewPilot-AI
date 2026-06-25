@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
+import { logStructuredEvent } from '../observability/structuredLog.js'
+
 type RateLimitEntry = {
   count: number
   resetAt: number
@@ -36,17 +38,15 @@ export function createRequestContextMiddleware(): RequestHandler {
     response.setHeader('x-request-id', requestId)
 
     response.on('finish', () => {
-      console.info(
-        JSON.stringify({
-          event: 'http_request',
-          requestId,
-          method: request.method,
-          path: request.originalUrl,
-          statusCode: response.statusCode,
-          durationMs: Date.now() - startedAt,
-          ip: getClientKey(request),
-        }),
-      )
+      logStructuredEvent({
+        event: 'http_request',
+        requestId,
+        method: request.method,
+        path: request.originalUrl,
+        statusCode: response.statusCode,
+        durationMs: Date.now() - startedAt,
+        ip: getClientKey(request),
+      })
     })
 
     next()

@@ -12,6 +12,7 @@ type GroqProviderOptions = {
 
 export class GroqProvider implements AIProvider {
   readonly name = 'groq'
+  readonly modelName: string
 
   private readonly apiKey: string | undefined
   private readonly model: string
@@ -19,6 +20,7 @@ export class GroqProvider implements AIProvider {
   constructor(options: GroqProviderOptions = {}) {
     this.apiKey = options.apiKey ?? process.env.GROQ_API_KEY
     this.model = options.model ?? process.env.GROQ_MODEL ?? 'openai/gpt-oss-20b'
+    this.modelName = this.model
   }
 
   async generateText(prompt: string): Promise<string> {

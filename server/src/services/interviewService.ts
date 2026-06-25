@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { generateText } from '../ai/aiService.js'
 import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
 import { buildInterviewGeneratorPrompt } from '../ai/prompts/interviewGenerator.js'
+import { logStructuredEvent } from '../observability/structuredLog.js'
 import {
   INTERVIEW_LEVELS,
   INTERVIEW_ROLES,
@@ -413,11 +414,41 @@ export async function createInterview(
       throw error
     }
 
+    logStructuredEvent({
+      event: 'ai_schema_validation_failure',
+      operation: 'createInterview',
+      stage: 'initial',
+      role: request.role,
+      level: request.level,
+      interviewType: request.interviewType,
+      questionCount: request.questionCount,
+      errorMessage: error.message,
+    })
+
     const retryPrompt = `${prompt}
 
 Your previous response was invalid. Return only the JSON object that matches the requested shape. The questions array must contain exactly ${request.questionCount} items. Do not include markdown, code fences, prose, or extra keys.`
 
-    questions = parseGeneratedInterview(await textGenerator(retryPrompt), request)
+    try {
+      questions = parseGeneratedInterview(await textGenerator(retryPrompt), request)
+    } catch (retryError) {
+      if (!(retryError instanceof InterviewGenerationError)) {
+        throw retryError
+      }
+
+      logStructuredEvent({
+        event: 'ai_schema_validation_failure',
+        operation: 'createInterview',
+        stage: 'retry',
+        role: request.role,
+        level: request.level,
+        interviewType: request.interviewType,
+        questionCount: request.questionCount,
+        errorMessage: retryError.message,
+      })
+
+      throw retryError
+    }
   }
 
   return {
@@ -440,6 +471,16 @@ export async function evaluateAnswer(
       throw error
     }
 
+    logStructuredEvent({
+      event: 'ai_schema_validation_failure',
+      operation: 'evaluateAnswer',
+      stage: 'initial',
+      role: request.question.difficulty,
+      topic: request.question.topic,
+      questionId: request.question.id,
+      errorMessage: error.message,
+    })
+
     const retryPrompt = `${prompt}
 
 Your previous response was invalid. Return only the JSON object that matches the requested shape. Do not include markdown, code fences, prose, or extra keys.`
@@ -450,6 +491,16 @@ Your previous response was invalid. Return only the JSON object that matches the
       if (!(retryError instanceof InterviewGenerationError)) {
         throw retryError
       }
+
+      logStructuredEvent({
+        event: 'ai_schema_validation_failure',
+        operation: 'evaluateAnswer',
+        stage: 'retry',
+        role: request.question.difficulty,
+        topic: request.question.topic,
+        questionId: request.question.id,
+        errorMessage: retryError.message,
+      })
 
       return createFallbackEvaluation(request)
     }

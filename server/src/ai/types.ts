@@ -12,6 +12,7 @@ export type AIServiceErrorCode =
 
 export interface AIProvider {
   readonly name: AIProviderName
+  readonly modelName?: string
   generateText(prompt: string): Promise<string>
 }
 
