@@ -6,6 +6,22 @@ question-by-question navigation, AI answer evaluation, and a final report.
 Deployment configuration is included for Vercel and Render. Authentication and
 persistence are still pending.
 
+## Live Demo
+
+- Frontend: https://interviewpilot-ai-bice.vercel.app
+- Backend health: https://interviewpilot-ai-server.onrender.com/api/health
+- Repository: https://github.com/Avivmorad/InterviewPilot-AI
+
+## Architecture At A Glance
+
+```text
+Browser
+  -> React + Vite client
+  -> Express API
+  -> Gemini (primary)
+  -> Groq (fallback)
+```
+
 ## Project Structure
 
 ```text
@@ -177,6 +193,25 @@ Invoke-RestMethod `
 
 The response contains structured feedback used by the interview screen and final
 report. Authentication and persistence are not included yet.
+
+## Engineering Decisions
+
+- Gemini is the primary provider and Groq is the fallback so the app can keep working when the primary provider is unavailable.
+- The backend validates structured AI output before the client sees it, which keeps malformed responses from breaking the UI.
+- The final report is generated in the frontend from already validated evaluations so the release stays deterministic and easy to reason about.
+- The MVP stores the current interview session in memory instead of adding accounts or persistence too early.
+
+## Evaluation Pipeline
+
+- `npm run eval` runs the offline answer-evaluation dataset from the project root.
+- The eval runner checks schema validity, score agreement, missing-concept coverage, and failure cases.
+- The current pipeline is intentionally offline; real provider evaluation remains a later release task.
+
+## Known Limitations
+
+- Authentication and persistence are not included in Phase 1.
+- Production verification still depends on the live browser flow and deployment accounts.
+- Real-provider evaluation is not yet wired into the main release flow.
 
 ## Screenshots
 
