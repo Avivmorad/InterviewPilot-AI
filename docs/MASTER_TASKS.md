@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 35/74 (47%)
+Tasks Done: 38/74 (51%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -109,10 +109,11 @@ Production Verification And Portfolio Release
 
 ### CI/CD
 
-- [ ] Add GitHub Actions for pull requests.
-- [ ] Run client typecheck, test, lint, and build.
-- [ ] Run server typecheck, test, eval, and build.
+- [x] Add GitHub Actions for pull requests.
+- [x] Run client typecheck, test, lint, and build.
+- [x] Run server typecheck, test, eval, and build.
 - [ ] Block merge when required checks fail.
+- Evidence: `.github/workflows/pr-ci.yml` now runs the client lint, typecheck, test, and build jobs plus the server typecheck, test, eval, and build jobs, and the matching local `npm run check` and `npm run eval` commands both passed.
 - Why not implemented: Release automation is still pending and should be added after the Phase 1 public release is stable.
 
 ### Real Provider Evaluations

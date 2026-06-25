@@ -1,0 +1,66 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  client:
+    name: Client checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Client lint
+        run: npm run lint --workspace client
+
+      - name: Client typecheck
+        run: npm run typecheck --workspace client
+
+      - name: Client test
+        run: npm run test --workspace client
+
+      - name: Client build
+        run: npm run build --workspace client
+
+  server:
+    name: Server checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Server typecheck
+        run: npm run typecheck --workspace server
+
+      - name: Server test
+        run: npm run test --workspace server
+
+      - name: Server eval
+        run: npm run eval --workspace server
+
+      - name: Server build
+        run: npm run build --workspace server
