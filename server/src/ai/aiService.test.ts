@@ -14,7 +14,7 @@ class FakeProvider implements AIProvider {
 
   constructor(
     readonly name: AIProviderName,
-    private readonly result: string | Error,
+    private readonly result: string | Error | Promise<string>,
   ) {}
 
   async generateText(): Promise<string> {
@@ -101,4 +101,25 @@ test('rejects empty prompts before calling a provider', async () => {
   await assert.rejects(service.generateText('   '), TypeError)
   assert.equal(gemini.calls, 0)
   assert.equal(groq.calls, 0)
+})
+
+test('times out slow providers before falling back to the next provider', async () => {
+  const pending = new Promise<string>(() => {})
+  const gemini = new FakeProvider('gemini', pending)
+  const groq = new FakeProvider('groq', pending)
+  const service = new AIService(gemini, groq, 5)
+
+  await assert.rejects(
+    service.generateText('Prompt'),
+    (error: unknown) =>
+      error instanceof AIServiceError &&
+      error.code === 'AI_GENERATION_FAILED' &&
+      error.providerErrors.length === 2 &&
+      error.providerErrors.every((providerError) =>
+        providerError.code === 'REQUEST_TIMEOUT',
+      ),
+  )
+
+  assert.equal(gemini.calls, 1)
+  assert.equal(groq.calls, 1)
 })

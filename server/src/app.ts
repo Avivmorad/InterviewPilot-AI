@@ -5,14 +5,28 @@ import { AIServiceError } from './ai/types.js'
 import { isAllowedClientOrigin } from './config.js'
 import { interviewRoutes } from './routes/interviewRoutes.js'
 import {
+  createInterviewRateLimitMiddleware,
+  createRequestContextMiddleware,
+  type RateLimitOptions,
+} from './middleware/requestSecurity.js'
+import {
   InterviewGenerationError,
   InterviewValidationError,
 } from './services/interviewService.js'
 
-export function createApp(interviewRouter: Router = interviewRoutes) {
+export type AppOptions = {
+  interviewRateLimit?: RateLimitOptions
+}
+
+export function createApp(
+  interviewRouter: Router = interviewRoutes,
+  options: AppOptions = {},
+) {
   const app = express()
 
   app.disable('x-powered-by')
+  app.set('trust proxy', 1)
+  app.use(createRequestContextMiddleware())
   app.use(
     cors({
       origin(origin, callback) {
@@ -29,7 +43,11 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
     })
   })
 
-  app.use('/api/interview', interviewRouter)
+  app.use(
+    '/api/interview',
+    createInterviewRateLimitMiddleware(options.interviewRateLimit),
+    interviewRouter,
+  )
 
   app.use((request, response) => {
     response.status(404).json({
