@@ -21,3 +21,11 @@ test('reads and trims Supabase environment variables', () => {
 test('rejects missing Supabase URL before auth is enabled', () => {
   assert.throws(() => readSupabaseEnvironment({}), /SUPABASE_URL must be set/)
 })
+
+test('allows localhost development URLs for Supabase', () => {
+  const environment = readSupabaseEnvironment({
+    SUPABASE_URL: 'http://127.0.0.1:54321',
+  })
+
+  assert.equal(environment.url, 'http://127.0.0.1:54321')
+})

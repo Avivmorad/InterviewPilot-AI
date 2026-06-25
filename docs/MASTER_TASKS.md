@@ -10,12 +10,12 @@
 
 ## Current Status
 
-Tasks Done: 58/74 (78%)
+Tasks Done: 60/75 (80%)
 
 - Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- Phase 2 database foundation is now started with Supabase schema and deployment docs.
-- The remaining work is Supabase auth wiring, database types, and Phase 2 planning.
+- Phase 2 database foundation is now started with Supabase schema, typed rows, a server-side client wrapper, and deployment docs.
+- The remaining work is Supabase auth wiring, client integration, and Phase 2 planning.
 
 ## Current Sprint
 
@@ -23,7 +23,7 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Continue the Phase 2 Supabase foundation by wiring auth and database types.
+- Continue the Phase 2 Supabase foundation by wiring auth and the client-side Supabase integration.
 - Keep the branch-protection item in view if GitHub admin access becomes available.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
@@ -152,6 +152,9 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 ### Authentication
 
 - [ ] Configure Supabase project.
+- [x] Build the server-side Supabase client wrapper.
+- Evidence: `server/src/supabase/client.ts` now creates a service-role Supabase client with auth persistence disabled, and `server/src/supabase/client.test.ts` covers the config and creation path.
+- Why not implemented: N/A; the server-side client wrapper is now in place for future auth routes and data access.
 - [ ] Add Supabase Auth.
 - [ ] Add sign up.
 - [ ] Add sign in.
@@ -167,9 +170,9 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 - [x] Create answer table.
 - [x] Create evaluation table.
 - [x] Create final report table.
-- [ ] Generate TypeScript database types.
-- Evidence: `supabase/migrations/20260625_01_phase2_core.sql` now defines the Phase 2 tables, indexes, triggers, and row-level security policies; `docs/PHASE2_SUPABASE.md` documents the schema and next steps.
-- Why not implemented: Type generation still needs a real Supabase project connection before the TypeScript database layer can be produced.
+- [x] Generate TypeScript database types.
+- Evidence: `supabase/migrations/20260625_01_phase2_core.sql` now defines the Phase 2 tables, indexes, triggers, and row-level security policies; `server/src/supabase/database.ts` mirrors that schema with typed table rows and insert/update shapes; `docs/PHASE2_SUPABASE.md` documents the schema and next steps.
+- Why not implemented: N/A; the first pass of TypeScript database types is now in place for the future Supabase client.
 
 ### Security
 

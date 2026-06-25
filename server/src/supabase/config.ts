@@ -13,8 +13,9 @@ function readRequiredUrl(value: string | undefined): string {
 
   try {
     const parsed = new URL(url)
+    const isLocalHost = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'
 
-    if (parsed.protocol !== 'https:' && parsed.hostname !== 'localhost') {
+    if (parsed.protocol !== 'https:' && !isLocalHost) {
       throw new Error('Supabase URL must use https or localhost during local development.')
     }
   } catch (error) {
