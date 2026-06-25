@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 38/74 (51%)
+Tasks Done: 43/74 (58%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -114,7 +114,7 @@ Production Verification And Portfolio Release
 - [x] Run server typecheck, test, eval, and build.
 - [ ] Block merge when required checks fail.
 - Evidence: `.github/workflows/pr-ci.yml` now runs the client lint, typecheck, test, and build jobs plus the server typecheck, test, eval, and build jobs, and the matching local `npm run check` and `npm run eval` commands both passed.
-- Why not implemented: Release automation is still pending and should be added after the Phase 1 public release is stable.
+- BLOCKED: Requires repository branch-protection settings or equivalent GitHub admin access to make the checks required before merges.
 
 ### Real Provider Evaluations
 
@@ -126,12 +126,13 @@ Production Verification And Portfolio Release
 
 ### Backend Protection
 
-- [ ] Add rate limiting.
-- [ ] Add request-size limits.
-- [ ] Add provider request timeouts.
-- [ ] Add safe structured logging.
-- [ ] Add request or correlation IDs.
-- Why not implemented: The current MVP is functional, but these hardening items are still future release work.
+- [x] Add rate limiting.
+- [x] Add request-size limits.
+- [x] Add provider request timeouts.
+- [x] Add safe structured logging.
+- [x] Add request or correlation IDs.
+- Evidence: `server/src/app.ts` now adds request IDs, trust proxy support, structured request logging, a rate limiter on `/api/interview`, and JSON body size limits; `server/src/ai/aiService.ts` adds provider timeouts; `npm run check` and `npm run eval` both passed after the change.
+- Why not implemented: N/A; the backend hardening items are now implemented.
 
 ### Observability
 

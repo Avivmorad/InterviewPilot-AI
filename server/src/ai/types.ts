@@ -3,6 +3,7 @@ export type AIProviderName = 'gemini' | 'groq'
 export type AIProviderErrorCode =
   | 'MISSING_API_KEY'
   | 'EMPTY_RESPONSE'
+  | 'REQUEST_TIMEOUT'
   | 'REQUEST_FAILED'
 
 export type AIServiceErrorCode =

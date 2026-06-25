@@ -10,6 +10,7 @@ export class AIService {
   constructor(
     private readonly primaryProvider: AIProvider,
     private readonly fallbackProvider: AIProvider,
+    private readonly timeoutMs = 30_000,
   ) {}
 
   async generateText(prompt: string): Promise<string> {
@@ -21,7 +22,7 @@ export class AIService {
 
     for (const provider of [this.primaryProvider, this.fallbackProvider]) {
       try {
-        return await provider.generateText(prompt)
+        return await this.generateTextWithTimeout(provider, prompt)
       } catch (error) {
         providerErrors.push(
           error instanceof AIProviderError
@@ -37,6 +38,32 @@ export class AIService {
     }
 
     throw new AIServiceError(providerErrors)
+  }
+
+  private async generateTextWithTimeout(
+    provider: AIProvider,
+    prompt: string,
+  ): Promise<string> {
+    const timeoutError = new AIProviderError(
+      provider.name,
+      'REQUEST_TIMEOUT',
+      `${provider.name} request timed out.`,
+    )
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    try {
+      return await Promise.race([
+        provider.generateText(prompt),
+        new Promise<string>((_resolve, reject) => {
+          timeoutId = setTimeout(() => reject(timeoutError), this.timeoutMs)
+        }),
+      ])
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   }
 }
 
