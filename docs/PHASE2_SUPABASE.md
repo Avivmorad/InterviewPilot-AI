@@ -8,12 +8,12 @@ This document captures the first database/auth foundation for Phase 2.
 - Tables for `profiles`, `interviews`, `interview_questions`, `answers`, `evaluations`, and `final_reports`.
 - Row Level Security policies that scope each table to the signed-in user.
 - A server-side Supabase client wrapper in `server/src/supabase/client.ts`.
+- A browser-side Supabase client wrapper in `client/src/supabase/client.ts`.
 
 ## Intended Next Steps
 
 - Connect the migration to a real Supabase project.
 - Wire sign-in and sign-up flows through a dedicated auth surface.
-- Add the client-side Supabase auth integration.
 - Generate TypeScript database types after the schema is live.
 
 ## Notes

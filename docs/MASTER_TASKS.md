@@ -10,11 +10,11 @@
 
 ## Current Status
 
-Tasks Done: 60/75 (80%)
+Tasks Done: 61/76 (80%)
 
 - Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- Phase 2 database foundation is now started with Supabase schema, typed rows, a server-side client wrapper, and deployment docs.
+- Phase 2 database foundation is now started with Supabase schema, typed rows, server-side and browser-side client wrappers, and deployment docs.
 - The remaining work is Supabase auth wiring, client integration, and Phase 2 planning.
 
 ## Current Sprint
@@ -23,7 +23,7 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Continue the Phase 2 Supabase foundation by wiring auth and the client-side Supabase integration.
+- Continue the Phase 2 Supabase foundation by wiring auth and the remaining sign-in surfaces.
 - Keep the branch-protection item in view if GitHub admin access becomes available.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
@@ -155,6 +155,9 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 - [x] Build the server-side Supabase client wrapper.
 - Evidence: `server/src/supabase/client.ts` now creates a service-role Supabase client with auth persistence disabled, and `server/src/supabase/client.test.ts` covers the config and creation path.
 - Why not implemented: N/A; the server-side client wrapper is now in place for future auth routes and data access.
+- [x] Build the client-side Supabase integration scaffold.
+- Evidence: `client/src/supabase/client.ts` now creates a browser Supabase client with Vite env validation, and `client/src/supabase/config.test.ts` covers the browser config and creation path.
+- Why not implemented: N/A; the browser client wrapper is now in place for future auth UI.
 - [ ] Add Supabase Auth.
 - [ ] Add sign up.
 - [ ] Add sign in.

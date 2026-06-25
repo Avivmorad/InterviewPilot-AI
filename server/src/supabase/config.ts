@@ -19,11 +19,13 @@ function readRequiredUrl(value: string | undefined): string {
       throw new Error('Supabase URL must use https or localhost during local development.')
     }
   } catch (error) {
-    throw new Error(
-      error instanceof Error
-        ? `SUPABASE_URL is invalid: ${error.message}`
-        : 'SUPABASE_URL is invalid.',
-    )
+    if (error instanceof Error) {
+      throw new Error(`SUPABASE_URL is invalid: ${error.message}`, {
+        cause: error,
+      })
+    }
+
+    throw new Error('SUPABASE_URL is invalid.', { cause: error })
   }
 
   return url
