@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 26/74 (35%)
+Tasks Done: 29/74 (39%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -42,13 +42,13 @@ Production Verification And Portfolio Release
 ### P1 - Role And Level Real-AI Matrix
 
 - [x] Verify `Generative AI Engineer + Intern + Technical`.
-- [ ] Verify `AI Engineer + Junior + Mixed`.
-- [ ] Verify `Frontend Developer + Mid-Level + Technical`.
-- [ ] Verify `Backend Developer + Senior + Behavioral`.
-- Evidence: the live browser completed the Generative AI Engineer + Intern + Technical flow with 3 generated questions and structured answer feedback.
+- [x] Verify `AI Engineer + Junior + Mixed`.
+- [x] Verify `Frontend Developer + Mid-Level + Technical`.
+- [x] Verify `Backend Developer + Senior + Behavioral`.
+- Evidence: the live browser completed all four representative combinations; the AI Engineer + Junior + Mixed session used provider fallback but still returned structured feedback, and the other three sessions generated questions and feedback successfully.
 - For each case confirm question generation succeeds, difficulty matches the selected level, question style matches the interview type, and answer evaluation returns valid structured output.
 - Completion condition: The expanded role and level configuration works with real AI responses.
-- Why not implemented: Real-provider runs still depend on live provider credentials and browser/manual testing time.
+- Why not implemented: The matrix verification is now complete; the remaining release work is focused on final cleanup and portfolio packaging.
 
 ### P1 - README And Portfolio Package
 
