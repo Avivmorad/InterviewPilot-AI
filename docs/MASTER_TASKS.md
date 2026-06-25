@@ -10,11 +10,11 @@
 
 ## Current Status
 
-Tasks Done: 43/74 (58%)
+Tasks Done: 44/74 (59%)
 
-- Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
+- Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- The remaining work is GitHub cleanup, release packaging, and Phase 2 planning.
+- The remaining work is release packaging and Phase 2 planning.
 
 ## Current Sprint
 
@@ -22,7 +22,7 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Finish GitHub release cleanup, then close out the remaining portfolio packaging work.
+- Close out the remaining portfolio packaging work.
 - Verify the remaining release artifacts (README, LinkedIn copy, and real-provider matrix) after the live flow is already proven.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
@@ -34,10 +34,10 @@ Production Verification And Portfolio Release
 - [x] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
 - [x] Confirm the repository contains only intentional files.
 - [x] Confirm the deployed code matches the repository branch intended for release.
-- [ ] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
-- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked, and Vercel deployment metadata shows the deployed frontend was built from `codex/master-tasks-update` at commit `90c485f58fb6d15948a99bf1611c25bc112b44c8`.
+- [x] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
+- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked, Vercel deployment metadata shows the deployed frontend was built from `codex/master-tasks-update` at commit `90c485f58fb6d15948a99bf1611c25bc112b44c8`, and the release branch was then published through the GitHub connector.
 - Completion condition: The repository is clean, intentional, and ready for an approved release action.
-- Why not implemented: The remaining prep step is blocked by the local `.git` index-lock permission issue in this environment, so staging and local commit preparation cannot complete here.
+- Why not implemented: N/A; the local `.git` index-lock issue still blocks staging in this workspace, but the release branch update was published remotely.
 
 ### P1 - Role And Level Real-AI Matrix
 
