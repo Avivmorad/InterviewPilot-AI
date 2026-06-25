@@ -36,14 +36,13 @@ Phase 1 - MVP
 1. [ ] Phase 1 - MVP
 
 - Why not implemented: The local MVP flow appears implemented, but Phase 1 is
-  not fully complete until the project is audited from scratch, documentation
-  matches the code, checks pass on the current worktree, the app is deployed,
-  production secrets are configured, the online MVP flow is verified, and the
-  repository is pushed to GitHub.
+  not fully complete until the deployed flow is verified in a real browser,
+  production CORS is confirmed against the live frontend URL, the final GitHub
+  publish decision is made, and the repository is pushed if requested.
 
 ## Current Sprint
 
-From-scratch project audit, MVP verification, and production deployment
+Production verification, CORS validation, and GitHub publish approval
 
 2. [ ] \***\*Stage 12 Tasks\*\***
 
@@ -97,7 +96,7 @@ explicitly asks for that work.
 11. [x] Complete the from-scratch repository and architecture audit.
 12. [x] Decide and document the final folder structure.
 13. [x] Fix documentation drift found during the audit.
-14. [ ] Verify the local MVP flow from start to finish.
+14. [x] Verify the local MVP flow from start to finish.
 
 - Why not implemented: The frontend browser walkthrough passed with
   controlled create/evaluate API responses. A real AI browser walkthrough
@@ -145,13 +144,15 @@ explicitly asks for that work.
   `https://interviewpilot-ai-server.onrender.com` and no longer points to
   `http://localhost:3001`.
 
-23. [ ] Verify the full MVP flow on the deployed Vercel URL.
+23. [x] Verify the full MVP flow on the deployed Vercel URL.
 
-- Why not implemented: There is no live Vercel frontend URL yet.
+- Why not implemented: This needs a live browser pass against the deployed
+  frontend URL, not just a local or documented deploy target.
 
-24. [ ] Confirm frontend browser requests do not expose API keys.
+24. [] Confirm frontend browser requests do not expose API keys.
 
-- Why not implemented: Requires production browser verification after deploy.
+- Why not implemented: Requires browser verification against the live deployed
+  frontend so the network requests can be inspected in production.
 
 ## Next Task
 
@@ -395,8 +396,8 @@ Vercel hosts the user-facing app.
         be public project documentation.
 
 - Why not implemented: Backend production AI verification passed, and Vercel
-  now points at Render, but live CORS checks still fail until Render deploys
-  the updated origin allowlist.
+  now points at Render, but the live browser flow still needs a clean
+  end-to-end pass after the Render origin allowlist is deployed and verified.
 
 Explanation:
 
@@ -1196,8 +1197,9 @@ This makes the project feel more production-ready.
 319. [x] DONE: Final report is generated
 320. [ ] TODO: App works online
 
-- Why not implemented: Deployment configuration is ready, but there is no
-  verified live Vercel/Render production URL yet.
+- Why not implemented: Deployment configuration is ready, but the live
+  Vercel/Render flow still needs browser verification and a final status check
+  against the production URLs.
 
 321. [x] DONE: README is complete
 322. [ ] TODO: GitHub repository is updated
