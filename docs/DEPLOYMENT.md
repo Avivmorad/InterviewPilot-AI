@@ -15,6 +15,8 @@ your Vercel and Render accounts plus production environment variables.
 CLIENT_ORIGIN=https://your-vercel-domain.vercel.app
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
 
 Render provides `PORT` automatically. Do not set API keys in the frontend.
@@ -43,10 +45,15 @@ Expected response:
 
 ```dotenv
 VITE_API_URL=https://your-render-service.onrender.com
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 ```
 
 Do not add `GEMINI_API_KEY` or `GROQ_API_KEY` to Vercel. Those keys belong in
 Render because the AI calls run in the backend only.
+
+Do not add `SUPABASE_SERVICE_ROLE_KEY` to Vercel. That key also belongs in
+Render because it must stay server-side.
 
 5. Deploy the frontend.
 

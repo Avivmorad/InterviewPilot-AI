@@ -10,11 +10,12 @@
 
 ## Current Status
 
-Tasks Done: 13/74 (18%)
+Tasks Done: 58/74 (78%)
 
-- Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
+- Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- The remaining work is GitHub cleanup, release packaging, and Phase 2 planning.
+- Phase 2 database foundation is now started with Supabase schema and deployment docs.
+- The remaining work is Supabase auth wiring, database types, and Phase 2 planning.
 
 ## Current Sprint
 
@@ -22,55 +23,59 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Finish GitHub release cleanup, then close out the remaining portfolio packaging work.
-- Verify the remaining release artifacts (README, LinkedIn copy, and real-provider matrix) after the live flow is already proven.
+- Continue the Phase 2 Supabase foundation by wiring auth and database types.
+- Keep the branch-protection item in view if GitHub admin access becomes available.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
 ## Phase 1 - Remaining Tasks
 
 ### P1 - GitHub Release Cleanup
 
-- [ ] Inspect `git status --short`.
-- [ ] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
-- [ ] Confirm the repository contains only intentional files.
-- [ ] Confirm the deployed code matches the repository branch intended for release.
-- [ ] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
+- [x] Inspect `git status --short`.
+- [x] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
+- [x] Confirm the repository contains only intentional files.
+- [x] Confirm the deployed code matches the repository branch intended for release.
+- [x] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
+- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked, Vercel deployment metadata shows the deployed frontend was built from `codex/master-tasks-update` at commit `90c485f58fb6d15948a99bf1611c25bc112b44c8`, and the release branch was then published through the GitHub connector.
 - Completion condition: The repository is clean, intentional, and ready for an approved release action.
-- Why not implemented: The publish scope still needs the final approval decision.
+- Why not implemented: N/A; the local `.git` index-lock issue still blocks staging in this workspace, but the release branch update was published remotely.
 
 ### P1 - Role And Level Real-AI Matrix
 
-- [ ] Verify `Generative AI Engineer + Intern + Technical`.
-- [ ] Verify `AI Engineer + Junior + Mixed`.
-- [ ] Verify `Frontend Developer + Mid-Level + Technical`.
-- [ ] Verify `Backend Developer + Senior + Behavioral`.
+- [x] Verify `Generative AI Engineer + Intern + Technical`.
+- [x] Verify `AI Engineer + Junior + Mixed`.
+- [x] Verify `Frontend Developer + Mid-Level + Technical`.
+- [x] Verify `Backend Developer + Senior + Behavioral`.
+- Evidence: the live browser completed all four representative combinations; the AI Engineer + Junior + Mixed session used provider fallback but still returned structured feedback, and the other three sessions generated questions and feedback successfully.
 - For each case confirm question generation succeeds, difficulty matches the selected level, question style matches the interview type, and answer evaluation returns valid structured output.
 - Completion condition: The expanded role and level configuration works with real AI responses.
-- Why not implemented: Real-provider runs still depend on live provider credentials and browser/manual testing time.
+- Why not implemented: The matrix verification is now complete; the remaining release work is focused on final cleanup and portfolio packaging.
 
 ### P1 - README And Portfolio Package
 
-- [ ] Add the live frontend link near the top of `README.md`.
-- [ ] Add the GitHub repository link if appropriate.
-- [ ] Add current screenshots.
-- [ ] Add a simple architecture diagram.
-- [ ] Explain Gemini primary and Groq fallback behavior.
-- [ ] Explain structured outputs and validation.
-- [ ] Explain the evaluation pipeline.
-- [ ] Add a short engineering decisions section.
-- [ ] Add a short known limitations section.
+- [x] Add the live frontend link near the top of `README.md`.
+- [x] Add the GitHub repository link if appropriate.
+- [x] Add current screenshots.
+- [x] Add a simple architecture diagram.
+- [x] Explain Gemini primary and Groq fallback behavior.
+- [x] Explain structured outputs and validation.
+- [x] Explain the evaluation pipeline.
+- [x] Add a short engineering decisions section.
+- [x] Add a short known limitations section.
+- Evidence: `README.md` now includes the live demo link, GitHub repo link, architecture diagram, screenshots, engineering decisions, evaluation pipeline, and known limitations.
 - Completion condition: A recruiter can understand the product and engineering value in under one minute.
-- Why not implemented: The release copy still needs the final production URLs and portfolio packaging decisions.
+- Why not implemented: The release copy now covers the requested portfolio details, but the remaining release tasks still need to be closed.
 
 ### P1 - LinkedIn Release Preparation
 
-- [ ] Prepare a short LinkedIn project description.
-- [ ] Prepare a Featured-section description.
-- [ ] Include the live app link.
-- [ ] Include the GitHub link.
-- [ ] Include 3-5 measurable engineering highlights.
+- [x] Prepare a short LinkedIn project description.
+- [x] Prepare a Featured-section description.
+- [x] Include the live app link.
+- [x] Include the GitHub link.
+- [x] Include 3-5 measurable engineering highlights.
+- Evidence: `docs/LINKEDIN_RELEASE.md` now contains a LinkedIn-ready project summary, featured-section copy, live app link, GitHub link, and measurable highlights.
 - Completion condition: The project is ready to publish as a portfolio centerpiece.
-- Why not implemented: The release copy should be written after the final production verification is complete.
+- Why not implemented: The draft is ready, but the remaining release-signoff item is the final repository clean-up and branch confirmation.
 
 ## Phase 1 - Completed Work
 
@@ -105,36 +110,40 @@ Production Verification And Portfolio Release
 
 ### CI/CD
 
-- [ ] Add GitHub Actions for pull requests.
-- [ ] Run client typecheck, test, lint, and build.
-- [ ] Run server typecheck, test, eval, and build.
+- [x] Add GitHub Actions for pull requests.
+- [x] Run client typecheck, test, lint, and build.
+- [x] Run server typecheck, test, eval, and build.
 - [ ] Block merge when required checks fail.
-- Why not implemented: Release automation is still pending and should be added after the Phase 1 public release is stable.
+- Evidence: `.github/workflows/pr-ci.yml` now runs the client lint, typecheck, test, and build jobs plus the server typecheck, test, eval, and build jobs, and the matching local `npm run check` and `npm run eval` commands both passed.
+- BLOCKED: Requires repository branch-protection settings or equivalent GitHub admin access to make the checks required before merges.
 
 ### Real Provider Evaluations
 
-- [ ] Add an optional real-provider evaluation runner.
-- [ ] Store model name, provider, latency, schema success, and score results.
-- [ ] Compare Gemini and Groq behavior on the same dataset.
-- [ ] Keep provider secrets server-side only.
-- Why not implemented: Real-provider evaluation still depends on server-side API keys and an explicit evaluation workflow.
+- [x] Add an optional real-provider evaluation runner.
+- [x] Store model name, provider, latency, schema success, and score results.
+- [x] Compare Gemini and Groq behavior on the same dataset.
+- [x] Keep provider secrets server-side only.
+- Evidence: `npm run eval:real` now runs a server-side comparison workflow that records provider name, model name, latency, schema success, score results, and a Gemini-vs-Groq comparison summary; `server/src/evals/realProviderEvaluation.test.ts` covers the report shape with injected providers, and the smoke run cleanly reports missing API keys when real keys are not configured.
+- Why not implemented: N/A; the optional real-provider runner is now implemented and documented.
 
 ### Backend Protection
 
-- [ ] Add rate limiting.
-- [ ] Add request-size limits.
-- [ ] Add provider request timeouts.
-- [ ] Add safe structured logging.
-- [ ] Add request or correlation IDs.
-- Why not implemented: The current MVP is functional, but these hardening items are still future release work.
+- [x] Add rate limiting.
+- [x] Add request-size limits.
+- [x] Add provider request timeouts.
+- [x] Add safe structured logging.
+- [x] Add request or correlation IDs.
+- Evidence: `server/src/app.ts` now adds request IDs, trust proxy support, structured request logging, a rate limiter on `/api/interview`, and JSON body size limits; `server/src/ai/aiService.ts` adds provider timeouts; `npm run check` and `npm run eval` both passed after the change.
+- Why not implemented: N/A; the backend hardening items are now implemented.
 
 ### Observability
 
-- [ ] Track request latency.
-- [ ] Track provider failures.
-- [ ] Track fallback usage.
-- [ ] Track schema-validation failures.
-- Why not implemented: Observability is still an enhancement layer, not a blocker for the Phase 1 release.
+- [x] Track request latency.
+- [x] Track provider failures.
+- [x] Track fallback usage.
+- [x] Track schema-validation failures.
+- Evidence: `server/src/middleware/requestSecurity.ts` logs HTTP request durations, `server/src/ai/aiService.ts` logs provider failures and fallback outcomes with latency, and `server/src/services/interviewService.ts` logs schema-validation failures and retries.
+- Why not implemented: N/A; the observability hooks are now implemented.
 
 ## Phase 2 - User Accounts And History
 
@@ -152,14 +161,15 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 
 ### Database
 
-- [ ] Create migrations.
-- [ ] Create profile table.
-- [ ] Create interview table.
-- [ ] Create answer table.
-- [ ] Create evaluation table.
-- [ ] Create final report table.
+- [x] Create migrations.
+- [x] Create profile table.
+- [x] Create interview table.
+- [x] Create answer table.
+- [x] Create evaluation table.
+- [x] Create final report table.
 - [ ] Generate TypeScript database types.
-- Why not implemented: There is still no Phase 2 database layer in the current repo.
+- Evidence: `supabase/migrations/20260625_01_phase2_core.sql` now defines the Phase 2 tables, indexes, triggers, and row-level security policies; `docs/PHASE2_SUPABASE.md` documents the schema and next steps.
+- Why not implemented: Type generation still needs a real Supabase project connection before the TypeScript database layer can be produced.
 
 ### Security
 

@@ -12,6 +12,7 @@ type GeminiProviderOptions = {
 
 export class GeminiProvider implements AIProvider {
   readonly name = 'gemini'
+  readonly modelName: string
 
   private readonly apiKey: string | undefined
   private readonly model: string
@@ -19,6 +20,7 @@ export class GeminiProvider implements AIProvider {
   constructor(options: GeminiProviderOptions = {}) {
     this.apiKey = options.apiKey ?? process.env.GEMINI_API_KEY
     this.model = options.model ?? process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+    this.modelName = this.model
   }
 
   async generateText(prompt: string): Promise<string> {
