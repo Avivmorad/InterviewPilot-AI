@@ -10,12 +10,12 @@
 
 ## Current Status
 
-Tasks Done: 66/76 (87%)
+Tasks Done: 68/76 (89%)
 
 - Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- Phase 2 database foundation is now started with Supabase schema, typed rows, server-side and browser-side client wrappers, browser auth surface, and deployment docs.
-- The remaining work is the real Supabase project configuration and Phase 2 planning.
+ - Phase 2 database foundation is now started with Supabase schema, typed rows, server-side and browser-side client wrappers, browser auth surface, and deployment docs.
+ - The remaining work is the real Supabase project configuration, live security verification, and Phase 2 planning.
 
 ## Current Sprint
 
@@ -23,7 +23,7 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Continue the Phase 2 Supabase foundation by wiring the real Supabase project configuration and any remaining phase 2 setup.
+- Continue the Phase 2 Supabase foundation by wiring the real Supabase project configuration and any remaining live verification.
 - Keep the branch-protection item in view if GitHub admin access becomes available.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
@@ -180,10 +180,14 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 
 ### Security
 
-- [ ] Add Row Level Security policies.
+- [x] Add Row Level Security policies.
+- Evidence: `supabase/migrations/20260625_01_phase2_core.sql` enables row level security on all Phase 2 tables and defines owner-scoped select/insert/update policies.
+- Why not implemented: N/A; the policies are already in the migration.
 - [ ] Test that users can access only their own records.
-- [ ] Keep service-role keys out of the client.
-- Why not implemented: Supabase is still planned, so these controls do not exist yet.
+- [x] Keep service-role keys out of the client.
+- Evidence: the client only reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, while the service-role client lives only in `server/src/supabase/client.ts`.
+- Why not implemented: N/A; the client has no service-role credential path.
+- Why not implemented: This still needs a real Supabase project and live auth session to verify actual row ownership behavior.
 
 ### Dashboard
 
