@@ -89,7 +89,7 @@ test('health and interview routes enforce the current create API contract', asyn
   })
   assert.equal(invalidLevelResponse.status, 400)
   assert.deepEqual(await invalidLevelResponse.json(), {
-    error: 'Select a valid level.`,
+    error: 'Select a valid level.',
     code: 'INVALID_REQUEST',
   })
 
