@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 16/74 (22%)
+Tasks Done: 26/74 (35%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -41,27 +41,29 @@ Production Verification And Portfolio Release
 
 ### P1 - Role And Level Real-AI Matrix
 
-- [ ] Verify `Generative AI Engineer + Intern + Technical`.
+- [x] Verify `Generative AI Engineer + Intern + Technical`.
 - [ ] Verify `AI Engineer + Junior + Mixed`.
 - [ ] Verify `Frontend Developer + Mid-Level + Technical`.
 - [ ] Verify `Backend Developer + Senior + Behavioral`.
+- Evidence: the live browser completed the Generative AI Engineer + Intern + Technical flow with 3 generated questions and structured answer feedback.
 - For each case confirm question generation succeeds, difficulty matches the selected level, question style matches the interview type, and answer evaluation returns valid structured output.
 - Completion condition: The expanded role and level configuration works with real AI responses.
 - Why not implemented: Real-provider runs still depend on live provider credentials and browser/manual testing time.
 
 ### P1 - README And Portfolio Package
 
-- [ ] Add the live frontend link near the top of `README.md`.
-- [ ] Add the GitHub repository link if appropriate.
-- [ ] Add current screenshots.
-- [ ] Add a simple architecture diagram.
-- [ ] Explain Gemini primary and Groq fallback behavior.
-- [ ] Explain structured outputs and validation.
-- [ ] Explain the evaluation pipeline.
-- [ ] Add a short engineering decisions section.
-- [ ] Add a short known limitations section.
+- [x] Add the live frontend link near the top of `README.md`.
+- [x] Add the GitHub repository link if appropriate.
+- [x] Add current screenshots.
+- [x] Add a simple architecture diagram.
+- [x] Explain Gemini primary and Groq fallback behavior.
+- [x] Explain structured outputs and validation.
+- [x] Explain the evaluation pipeline.
+- [x] Add a short engineering decisions section.
+- [x] Add a short known limitations section.
+- Evidence: `README.md` now includes the live demo link, GitHub repo link, architecture diagram, screenshots, engineering decisions, evaluation pipeline, and known limitations.
 - Completion condition: A recruiter can understand the product and engineering value in under one minute.
-- Why not implemented: The release copy still needs the final production URLs and portfolio packaging decisions.
+- Why not implemented: The release copy now covers the requested portfolio details, but the remaining release tasks still need to be closed.
 
 ### P1 - LinkedIn Release Preparation
 
