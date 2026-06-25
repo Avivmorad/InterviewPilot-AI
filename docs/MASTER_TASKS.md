@@ -10,7 +10,7 @@
 
 ## Current Status
 
-Tasks Done: 13/74 (18%)
+Tasks Done: 16/74 (22%)
 
 - Phase 1 is implemented locally, and the deployed browser flow now verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
@@ -30,11 +30,12 @@ Production Verification And Portfolio Release
 
 ### P1 - GitHub Release Cleanup
 
-- [ ] Inspect `git status --short`.
-- [ ] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
-- [ ] Confirm the repository contains only intentional files.
+- [x] Inspect `git status --short`.
+- [x] Decide whether `AGENTS.md` should be committed, ignored, or kept local-only.
+- [x] Confirm the repository contains only intentional files.
 - [ ] Confirm the deployed code matches the repository branch intended for release.
 - [ ] Prepare the repository for commit or PR, but do not commit or push without explicit approval.
+- Evidence: `git status --short` showed only the tracker file while the temporary publish clone was removed, and `git ls-files --stage AGENTS.md` confirmed `AGENTS.md` is already tracked.
 - Completion condition: The repository is clean, intentional, and ready for an approved release action.
 - Why not implemented: The publish scope still needs the final approval decision.
 
