@@ -5,7 +5,7 @@ import {
   MessageSquareText,
   Sparkles,
 } from "lucide-react";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 import { FinalReport } from "@/components/interview/final-report";
 import { InterviewConfigForm } from "@/components/interview/interview-config-form";
@@ -30,6 +30,7 @@ type HomePageProps = {
   onStartNewInterview: () => void;
   onStartInterview: (config: InterviewConfig) => void | Promise<void>;
   savedConfig: InterviewConfig | null;
+  supabaseAuth: ReactNode;
   sessionRef: RefObject<HTMLElement | null>;
   setupRef: RefObject<HTMLDivElement | null>;
 };
@@ -66,6 +67,7 @@ export function HomePage({
   onStartNewInterview,
   onStartInterview,
   savedConfig,
+  supabaseAuth,
   sessionRef,
   setupRef,
 }: HomePageProps) {
@@ -126,6 +128,7 @@ export function HomePage({
             onSubmit={onStartInterview}
           />
           {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
+          {supabaseAuth}
 
           {isLoading ? (
             <section

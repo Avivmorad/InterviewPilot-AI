@@ -10,12 +10,12 @@
 
 ## Current Status
 
-Tasks Done: 61/76 (80%)
+Tasks Done: 66/76 (87%)
 
 - Phase 1 is implemented locally, the release branch has been published to GitHub, and the deployed browser flow verifies cleanly against the live backend.
 - The repo uses `client/` and `server/`, AI calls stay server-side, and deployment manifests already exist.
-- Phase 2 database foundation is now started with Supabase schema, typed rows, server-side and browser-side client wrappers, and deployment docs.
-- The remaining work is Supabase auth wiring, client integration, and Phase 2 planning.
+- Phase 2 database foundation is now started with Supabase schema, typed rows, server-side and browser-side client wrappers, browser auth surface, and deployment docs.
+- The remaining work is the real Supabase project configuration and Phase 2 planning.
 
 ## Current Sprint
 
@@ -23,7 +23,7 @@ Production Verification And Portfolio Release
 
 ## Immediate Action Required
 
-- Continue the Phase 2 Supabase foundation by wiring auth and the remaining sign-in surfaces.
+- Continue the Phase 2 Supabase foundation by wiring the real Supabase project configuration and any remaining phase 2 setup.
 - Keep the branch-protection item in view if GitHub admin access becomes available.
 - Keep Phase 2 locked until the release branch is ready for the next phase.
 
@@ -158,12 +158,13 @@ Phase 2 is locked until the deployed Phase 1 flow is fully verified and the repo
 - [x] Build the client-side Supabase integration scaffold.
 - Evidence: `client/src/supabase/client.ts` now creates a browser Supabase client with Vite env validation, and `client/src/supabase/config.test.ts` covers the browser config and creation path.
 - Why not implemented: N/A; the browser client wrapper is now in place for future auth UI.
-- [ ] Add Supabase Auth.
-- [ ] Add sign up.
-- [ ] Add sign in.
-- [ ] Add sign out.
-- [ ] Add password recovery.
-- Why not implemented: Authentication is not part of the Phase 1 MVP release.
+- [x] Add Supabase Auth.
+- [x] Add sign up.
+- [x] Add sign in.
+- [x] Add sign out.
+- [x] Add password recovery.
+- Evidence: `client/src/components/auth/supabase-auth-panel.tsx` now exposes browser auth flows for sign in, sign up, sign out, and password recovery, backed by `client/src/services/supabase-auth.ts` and mounted in the main app shell.
+- Why not implemented: N/A; the auth surface is now wired locally, but it still needs a real Supabase project and env wiring before it can be used end to end.
 
 ### Database
 

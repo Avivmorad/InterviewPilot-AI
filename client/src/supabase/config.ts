@@ -53,3 +53,9 @@ export function readSupabaseClientEnvironment(
     anonKey: readRequiredKey(env.VITE_SUPABASE_ANON_KEY),
   }
 }
+
+export function hasSupabaseClientEnvironment(
+  env: SupabaseClientEnvironmentSource = import.meta.env as unknown as SupabaseClientEnvironmentSource,
+): boolean {
+  return Boolean(env.VITE_SUPABASE_URL?.trim() && env.VITE_SUPABASE_ANON_KEY?.trim())
+}

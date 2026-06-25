@@ -5,7 +5,10 @@ import {
   buildSupabaseBrowserClientConfig,
   createSupabaseBrowserClient,
 } from './client'
-import { readSupabaseClientEnvironment } from './config'
+import {
+  hasSupabaseClientEnvironment,
+  readSupabaseClientEnvironment,
+} from './config'
 
 test('reads and trims Supabase browser environment variables', () => {
   const environment = readSupabaseClientEnvironment({
@@ -54,5 +57,23 @@ test('rejects missing browser Supabase env values', () => {
         VITE_SUPABASE_URL: 'https://project.supabase.co',
       }),
     /VITE_SUPABASE_ANON_KEY must be set/,
+  )
+})
+
+test('detects whether browser Supabase env vars are configured', () => {
+  assert.equal(
+    hasSupabaseClientEnvironment({
+      VITE_SUPABASE_URL: 'https://project.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'anon-key',
+    }),
+    true,
+  )
+
+  assert.equal(
+    hasSupabaseClientEnvironment({
+      VITE_SUPABASE_URL: ' ',
+      VITE_SUPABASE_ANON_KEY: 'anon-key',
+    }),
+    false,
   )
 })

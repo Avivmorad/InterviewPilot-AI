@@ -8,7 +8,7 @@
     "typecheck": "tsc -b",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test": "node --import tsx --test src/types/interview.test.ts src/supabase/config.test.ts",
+    "test": "node --import tsx --test src/types/interview.test.ts src/supabase/config.test.ts src/services/supabase-auth.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
