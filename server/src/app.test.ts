@@ -13,7 +13,10 @@ import { createInterviewRoutes } from './routes/interviewRoutes.js'
 const app = createApp()
 
 test('health and interview routes enforce the current create API contract', async (context) => {
-  const server = app.listen(0)
+  const testApp = createApp(undefined, {
+    deploymentCommit: 'render-test-sha',
+  })
+  const server = testApp.listen(0)
   await new Promise<void>((resolve) => server.once('listening', resolve))
   context.after(() => server.close())
 
@@ -27,6 +30,10 @@ test('health and interview routes enforce the current create API contract', asyn
   assert.deepEqual(await healthResponse.json(), {
     status: 'ok',
     message: 'InterviewPilot AI backend is running',
+    deployment: {
+      provider: 'render',
+      gitCommit: 'render-test-sha',
+    },
   })
 
   const allowedOriginResponse = await fetch(`${baseUrl}/api/health`, {

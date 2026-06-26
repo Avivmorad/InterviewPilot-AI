@@ -32,7 +32,28 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "message": "InterviewPilot AI backend is running"
+  "message": "InterviewPilot AI backend is running",
+  "deployment": {
+    "provider": "render",
+    "gitCommit": "render-deployment-sha-or-null"
+  }
+}
+```
+
+If Render injects `RENDER_GIT_COMMIT`, the health response includes the exact
+deployed commit SHA. That makes release traceability easier to verify without
+relying only on the dashboard.
+
+Expected local response shape:
+
+```json
+{
+  "status": "ok",
+  "message": "InterviewPilot AI backend is running",
+  "deployment": {
+    "provider": "render",
+    "gitCommit": null
+  }
 }
 ```
 

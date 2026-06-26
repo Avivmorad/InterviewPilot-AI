@@ -16,6 +16,7 @@ import {
 
 export type AppOptions = {
   interviewRateLimit?: RateLimitOptions
+  deploymentCommit?: string | null
 }
 
 export function createApp(
@@ -40,6 +41,10 @@ export function createApp(
     response.json({
       status: 'ok',
       message: 'InterviewPilot AI backend is running',
+      deployment: {
+        provider: 'render',
+        gitCommit: options.deploymentCommit ?? process.env.RENDER_GIT_COMMIT ?? null,
+      },
     })
   })
 

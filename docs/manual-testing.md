@@ -85,9 +85,16 @@ The browser should show JSON similar to:
 ```json
 {
   "status": "ok",
-  "message": "InterviewPilot AI backend is running"
+  "message": "InterviewPilot AI backend is running",
+  "deployment": {
+    "provider": "render",
+    "gitCommit": null
+  }
 }
 ```
+
+On Render, `gitCommit` should be the deployed commit SHA when the platform
+injects `RENDER_GIT_COMMIT` into the service.
 
 This confirms that the backend server and health route are working. It does not
 test the AI provider.

@@ -542,7 +542,8 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 - Git status before edits had untracked `InterviewPilot-AI.code-workspace`.
 - The live Vercel production deployment for `interviewpilot-ai-bice.vercel.app` is linked to GitHub deployment `5a53431fe4e762e0c131a97510204344f318aa02`, which matches the current local `HEAD`.
 - `render.yaml` auto-deploys from `main`, and the current `main` head on GitHub is `7b6cb6eafbde0753e3899966204457a0a2b43a7b`.
-- The Render dashboard/API still needs direct inspection to confirm the exact deployed SHA instead of inferring it from the branch source.
+- The backend health response now surfaces `RENDER_GIT_COMMIT` when Render injects it, which should make the deployed SHA directly observable after the next Render deploy.
+- The live Render deployment still needs direct runtime inspection to confirm the exact deployed SHA instead of inferring it from the branch source.
 
 #### Required work
 
