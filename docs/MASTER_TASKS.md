@@ -1565,6 +1565,7 @@ Phase 2 work exists in the repository as foundation code, but new Phase 2 expans
 - `supabase/migrations/20260625_01_phase2_core.sql` exists.
 - Server Supabase client/config files exist.
 - Client Supabase client/config files and auth panel exist.
+- The browser Supabase client now uses the same typed database contract shape as the server client.
 - Client and server Supabase tests pass.
 - `docs/PHASE2_SUPABASE.md` says the real project still needs connection.
 
