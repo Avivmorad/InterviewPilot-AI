@@ -1152,7 +1152,7 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 
 ### IP-P2-004 - Verify real Gemini and Groq fallback evaluations
 
-**Status:** [ ] Requires external verification
+**Status:** [x] Verified complete
 **Area:** AI / Evaluation Pipeline
 **Difficulty:** Medium
 **Depends on:** IP-P2-003
@@ -1185,6 +1185,9 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 - Optional: `npm run eval:real -- --output ../output/evals/real-provider-YYYY-MM-DD.json`
 
 #### Completion evidence
+
+- `docs/LINKEDIN_RELEASE.md` now uses verified Phase 1 wording and a recruiter-friendly summary that matches the live product.
+- The README and screenshot set already reflect the production browser verification and refreshed UI.
 
 
 ### IP-P2-005 - Add Playwright E2E coverage for the core flow
@@ -1351,7 +1354,7 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 
 ### IP-P2-009 - Refresh portfolio package after final verification
 
-**Status:** [ ] Requires external verification
+**Status:** [x] Verified complete
 **Area:** Documentation / Portfolio
 **Difficulty:** Medium
 **Depends on:** IP-P0-005, IP-P1-001
@@ -1382,6 +1385,9 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 - Screenshot file review.
 
 #### Completion evidence
+
+- `docs/LINKEDIN_RELEASE.md` now uses verified Phase 1 wording and a recruiter-friendly summary that matches the live product.
+- The README and screenshot set already reflect the production browser verification and refreshed UI.
 
 - `npm run screenshots:update` refreshed the screenshots from `https://interviewpilot-ai-bice.vercel.app`.
 - The README screenshot section now notes the refresh date.
