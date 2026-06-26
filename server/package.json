@@ -9,15 +9,18 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck",
     "eval": "tsx src/evals/runEvaluation.ts",
-    "test": "tsx --test src/app.test.ts src/ai/aiService.test.ts src/services/interviewService.test.ts",
+    "eval:real": "tsx src/evals/runRealProviderEvaluation.ts",
+    "test": "tsx --test src/app.test.ts src/ai/aiService.test.ts src/services/interviewService.test.ts src/evals/realProviderEvaluation.test.ts src/supabase/config.test.ts",
     "start": "node dist/server.js"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@supabase/supabase-js": "^2.108.2",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "groq-sdk": "^0.37.0"
+    "groq-sdk": "^0.37.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

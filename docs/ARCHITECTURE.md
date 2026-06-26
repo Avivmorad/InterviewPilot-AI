@@ -113,7 +113,8 @@ returned to users.
 ## Current Boundaries
 
 The current architecture includes AI-generated questions, AI answer evaluation,
-and a deterministic frontend-generated final report. It does not include
-authentication, a database, saved interviews, or interview history. Those
-capabilities belong to later phases and should be added without allowing the
-frontend to access provider credentials directly.
+and a deterministic frontend-generated final report. The repository also
+contains Phase 2 Supabase/auth foundation files, but they are not part of the
+active Phase 1 runtime path. Authentication, a database, saved interviews, and
+interview history belong to later phases and should be added without allowing
+the frontend to access provider credentials directly.

@@ -29,7 +29,6 @@ are Intern, Junior, Mid-Level, and Senior.
 - Resume upload or parsing
 - Analytics
 - Collaborative interviews
-- Hosted deployment and production verification
 - Real-time coding sandbox
 - AI-generated final report narratives
 

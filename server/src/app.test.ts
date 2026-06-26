@@ -13,7 +13,10 @@ import { createInterviewRoutes } from './routes/interviewRoutes.js'
 const app = createApp()
 
 test('health and interview routes enforce the current create API contract', async (context) => {
-  const server = app.listen(0)
+  const testApp = createApp(undefined, {
+    deploymentCommit: 'render-test-sha',
+  })
+  const server = testApp.listen(0)
   await new Promise<void>((resolve) => server.once('listening', resolve))
   context.after(() => server.close())
 
@@ -23,9 +26,14 @@ test('health and interview routes enforce the current create API contract', asyn
   const healthResponse = await fetch(`${baseUrl}/api/health`)
   assert.equal(healthResponse.status, 200)
   assert.match(healthResponse.headers.get('content-type') ?? '', /^application\/json/)
+  assert.match(healthResponse.headers.get('x-request-id') ?? '', /.+/)
   assert.deepEqual(await healthResponse.json(), {
     status: 'ok',
     message: 'InterviewPilot AI backend is running',
+    deployment: {
+      provider: 'render',
+      gitCommit: 'render-test-sha',
+    },
   })
 
   const allowedOriginResponse = await fetch(`${baseUrl}/api/health`, {
@@ -141,6 +149,37 @@ test('malformed JSON returns a readable JSON error', async (context) => {
   assert.deepEqual(await response.json(), {
     error: 'Request body must contain valid JSON.',
     code: 'INVALID_JSON',
+  })
+})
+
+test('oversized JSON bodies return a readable JSON error', async (context) => {
+  const server = app.listen(0)
+  await new Promise<void>((resolve) => server.once('listening', resolve))
+  context.after(() => server.close())
+
+  const { port } = server.address() as AddressInfo
+  const response = await fetch(
+    `http://127.0.0.1:${port}/api/interview/evaluate`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        question: {
+          id: 'q1',
+          topic: 'React',
+          difficulty: 'junior',
+          question: 'What problem does React state solve?',
+          expectedConcepts: ['State', 'Rendering'],
+        },
+        answer: 'x'.repeat(150_000),
+      }),
+    },
+  )
+
+  assert.equal(response.status, 413)
+  assert.deepEqual(await response.json(), {
+    error: 'Request body is too large. Please shorten your answer and try again.',
+    code: 'PAYLOAD_TOO_LARGE',
   })
 })
 
@@ -291,3 +330,65 @@ test('create route returns a clear AI configuration error', async (context) => {
     code: 'AI_NOT_CONFIGURED',
   })
 })
+
+test('adds request IDs and rate limits interview routes', async (context) => {
+  let createCalls = 0
+  const createController = createCreateInterviewController(async () => {
+    createCalls += 1
+    return {
+      interviewId: 'interview-test',
+      questions: [
+        {
+          id: 'q1',
+          topic: 'Structured outputs',
+          difficulty: 'intern',
+          question: 'Why might an app ask an LLM to return JSON?',
+          expectedConcepts: ['Parsing', 'Validation'],
+        },
+      ],
+    }
+  })
+  const testApp = createApp(createInterviewRoutes(createController), {
+    interviewRateLimit: {
+      windowMs: 1_000,
+      maxRequests: 1,
+    },
+  })
+  const server = testApp.listen(0)
+  await new Promise<void>((resolve) => server.once('listening', resolve))
+  context.after(() => server.close())
+
+  const { port } = server.address() as AddressInfo
+  const requestBody = JSON.stringify({
+    role: 'generative-ai-engineer',
+    level: 'intern',
+    interviewType: 'Technical',
+    questionCount: 3,
+  })
+
+  const firstResponse = await fetch(`${baseUrlFromPort(port)}/api/interview/create`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: requestBody,
+  })
+  assert.equal(firstResponse.status, 201)
+  assert.match(firstResponse.headers.get('x-request-id') ?? '', /.+/)
+
+  const secondResponse = await fetch(`${baseUrlFromPort(port)}/api/interview/create`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: requestBody,
+  })
+  assert.equal(secondResponse.status, 429)
+  assert.match(secondResponse.headers.get('x-request-id') ?? '', /.+/)
+  assert.match(secondResponse.headers.get('retry-after') ?? '', /[1-9]/)
+  assert.deepEqual(await secondResponse.json(), {
+    error: 'Too many interview requests. Please try again later.',
+    code: 'RATE_LIMITED',
+  })
+  assert.equal(createCalls, 1)
+})
+
+function baseUrlFromPort(port: number): string {
+  return `http://127.0.0.1:${port}`
+}

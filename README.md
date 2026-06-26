@@ -6,6 +6,22 @@ question-by-question navigation, AI answer evaluation, and a final report.
 Deployment configuration is included for Vercel and Render. Authentication and
 persistence are still pending.
 
+## Live Demo
+
+- Frontend: https://interviewpilot-ai-bice.vercel.app
+- Backend health: https://interviewpilot-ai-server.onrender.com/api/health
+- Repository: https://github.com/Avivmorad/InterviewPilot-AI
+
+## Architecture At A Glance
+
+```text
+Browser
+  -> React + Vite client
+  -> Express API
+  -> Gemini (primary)
+  -> Groq (fallback)
+```
+
 ## Project Structure
 
 ```text
@@ -178,7 +194,30 @@ Invoke-RestMethod `
 The response contains structured feedback used by the interview screen and final
 report. Authentication and persistence are not included yet.
 
+## Engineering Decisions
+
+- Gemini is the primary provider and Groq is the fallback so the app can keep working when the primary provider is unavailable.
+- The backend validates structured AI output before the client sees it, which keeps malformed responses from breaking the UI.
+- The final report is generated in the frontend from already validated evaluations so the release stays deterministic and easy to reason about.
+- The MVP stores the current interview session in memory instead of adding accounts or persistence too early.
+
+## Evaluation Pipeline
+
+- `npm run eval` runs the offline answer-evaluation dataset from the project root.
+- The eval runner checks schema validity, score agreement, missing-concept coverage, and failure cases.
+- `npm run eval:real` compares Gemini and Groq on the same dataset when both server-side API keys are configured.
+- The real-provider runner records provider name, model name, latency, schema success, and score results, and can write a JSON report to disk.
+
+## Known Limitations
+
+- Authentication and persistence are not included in Phase 1.
+- Production browser verification was completed in this audit; ongoing release management still depends on the Vercel and Render accounts.
+- Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
+
 ## Screenshots
+
+These screenshots were refreshed from the verified production app on June 26,
+2026.
 
 ### Interview Setup
 
@@ -202,6 +241,7 @@ npm run typecheck
 npm run build
 npm run check
 npm run eval
+npm run eval:real
 ```
 
 - `npm run typecheck` checks frontend and backend TypeScript without building.
@@ -210,6 +250,8 @@ npm run eval
   and production builds.
 - `npm run eval` runs the offline mocked evaluation dataset for answer-feedback
   prompt and schema behavior.
+- `npm run eval:real` compares Gemini and Groq when both server-side API keys
+  are configured and can write a JSON report to disk.
 
 To run scripts from an individual workspace:
 

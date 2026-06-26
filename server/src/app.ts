@@ -5,14 +5,29 @@ import { AIServiceError } from './ai/types.js'
 import { isAllowedClientOrigin } from './config.js'
 import { interviewRoutes } from './routes/interviewRoutes.js'
 import {
+  createInterviewRateLimitMiddleware,
+  createRequestContextMiddleware,
+  type RateLimitOptions,
+} from './middleware/requestSecurity.js'
+import {
   InterviewGenerationError,
   InterviewValidationError,
 } from './services/interviewService.js'
 
-export function createApp(interviewRouter: Router = interviewRoutes) {
+export type AppOptions = {
+  interviewRateLimit?: RateLimitOptions
+  deploymentCommit?: string | null
+}
+
+export function createApp(
+  interviewRouter: Router = interviewRoutes,
+  options: AppOptions = {},
+) {
   const app = express()
 
   app.disable('x-powered-by')
+  app.set('trust proxy', 1)
+  app.use(createRequestContextMiddleware())
   app.use(
     cors({
       origin(origin, callback) {
@@ -26,10 +41,18 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
     response.json({
       status: 'ok',
       message: 'InterviewPilot AI backend is running',
+      deployment: {
+        provider: 'render',
+        gitCommit: options.deploymentCommit ?? process.env.RENDER_GIT_COMMIT ?? null,
+      },
     })
   })
 
-  app.use('/api/interview', interviewRouter)
+  app.use(
+    '/api/interview',
+    createInterviewRateLimitMiddleware(options.interviewRateLimit),
+    interviewRouter,
+  )
 
   app.use((request, response) => {
     response.status(404).json({
@@ -43,6 +66,14 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
       response.status(400).json({
         error: 'Request body must contain valid JSON.',
         code: 'INVALID_JSON',
+      })
+      return
+    }
+
+    if (isPayloadTooLargeError(error)) {
+      response.status(413).json({
+        error: 'Request body is too large. Please shorten your answer and try again.',
+        code: 'PAYLOAD_TOO_LARGE',
       })
       return
     }
@@ -77,6 +108,15 @@ export function createApp(interviewRouter: Router = interviewRoutes) {
 
   app.use(errorHandler)
   return app
+}
+
+function isPayloadTooLargeError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const errorWithStatus = error as Error & { status?: number; type?: string }
+  return errorWithStatus.status === 413 || errorWithStatus.type === 'entity.too.large'
 }
 
 export const app = createApp()

@@ -192,7 +192,7 @@ Build the first page:
 ```txt
 InterviewPilot AI
 Practice realistic AI-powered technical interviews
-Start Interview
+Start interview
 ```
 
 ### What this means

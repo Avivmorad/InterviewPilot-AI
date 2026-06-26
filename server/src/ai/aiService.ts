@@ -5,11 +5,13 @@ import {
   AIServiceError,
   type AIProvider,
 } from './types.js'
+import { logStructuredEvent } from '../observability/structuredLog.js'
 
 export class AIService {
   constructor(
     private readonly primaryProvider: AIProvider,
     private readonly fallbackProvider: AIProvider,
+    private readonly timeoutMs = 30_000,
   ) {}
 
   async generateText(prompt: string): Promise<string> {
@@ -18,12 +20,39 @@ export class AIService {
     }
 
     const providerErrors: AIProviderError[] = []
+    let firstProviderError: AIProviderError | null = null
 
     for (const provider of [this.primaryProvider, this.fallbackProvider]) {
+      const startedAt = Date.now()
+
       try {
-        return await provider.generateText(prompt)
+        const text = await this.generateTextWithTimeout(provider, prompt)
+        const durationMs = Date.now() - startedAt
+
+        logStructuredEvent({
+          event: 'ai_provider_request',
+          provider: provider.name,
+          modelName: provider.modelName ?? 'unknown-model',
+          outcome: 'success',
+          durationMs,
+        })
+
+        if (firstProviderError && provider !== this.primaryProvider) {
+          logStructuredEvent({
+            event: 'ai_provider_fallback',
+            primaryProvider: firstProviderError.provider,
+            primaryErrorCode: firstProviderError.code,
+            fallbackProvider: provider.name,
+            fallbackModelName: provider.modelName ?? 'unknown-model',
+            outcome: 'success',
+            durationMs,
+          })
+        }
+
+        return text
       } catch (error) {
-        providerErrors.push(
+        const durationMs = Date.now() - startedAt
+        const providerError =
           error instanceof AIProviderError
             ? error
             : new AIProviderError(
@@ -31,12 +60,64 @@ export class AIService {
                 'REQUEST_FAILED',
                 `${provider.name} request failed.`,
                 { cause: error },
-              ),
-        )
+              )
+
+        providerErrors.push(providerError)
+        firstProviderError ??= providerError
+
+        logStructuredEvent({
+          event: 'ai_provider_request',
+          provider: provider.name,
+          modelName: provider.modelName ?? 'unknown-model',
+          outcome: 'failure',
+          durationMs,
+          errorCode: providerError.code,
+          errorMessage: providerError.message,
+        })
+
+        if (provider !== this.primaryProvider && firstProviderError) {
+          logStructuredEvent({
+            event: 'ai_provider_fallback',
+            primaryProvider: firstProviderError.provider,
+            primaryErrorCode: firstProviderError.code,
+            fallbackProvider: provider.name,
+            fallbackModelName: provider.modelName ?? 'unknown-model',
+            outcome: 'failure',
+            errorCode: providerError.code,
+            errorMessage: providerError.message,
+            durationMs,
+          })
+        }
       }
     }
 
     throw new AIServiceError(providerErrors)
+  }
+
+  private async generateTextWithTimeout(
+    provider: AIProvider,
+    prompt: string,
+  ): Promise<string> {
+    const timeoutError = new AIProviderError(
+      provider.name,
+      'REQUEST_TIMEOUT',
+      `${provider.name} request timed out.`,
+    )
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    try {
+      return await Promise.race([
+        provider.generateText(prompt),
+        new Promise<string>((_resolve, reject) => {
+          timeoutId = setTimeout(() => reject(timeoutError), this.timeoutMs)
+        }),
+      ])
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   }
 }
 

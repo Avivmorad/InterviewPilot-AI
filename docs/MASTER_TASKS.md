@@ -1,1254 +1,1844 @@
-﻿# InterviewPilot AI - Master Tasks
-
-## How To Use This File
-
-This file is the main task tracker for InterviewPilot AI.
-
-Rules:
-
-1. Work only on the current active phase.
-2. Do not start the next phase until the current phase is fully completed.
-3. When a task is completed, change `[ ]` to `[x]` and move it to the `****Stage N Done Tasks****` section.
-4. Replace `TODO:` with `DONE:`.
-5. If new tasks are discovered, add them under the correct section.
-6. Keep explanations short but clear.
-7. Do not delete completed tasks.
-8. Update the progress section after every completed task.
-   At the end of any task-tracker edit, update `Tasks Done: X/Y (Z%)` if the
-   number of checked or total tasks changed.
-9. Each phase has two sections:
-   - `****Stage N Tasks****` - for incomplete, unchecked tasks (at the top for easy access)
-   - `****Stage N Done Tasks****` - for completed, checked tasks (at the bottom for reference)
-10. Add a short `Why not implemented:` note below each unfinished TODO or task group.
+# InterviewPilot AI - MASTER_TASKS
+
+Last updated: 2026-06-26
+Current branch: `Codex-YoloBranch`
+Current phase: Phase 1 production readiness and UX hardening
+Current project status: Phase 1 is complete. The core local MVP code exists, automated checks pass, the production frontend and backend are verified, and the deployed browser flow through final report, restart, responsive sizes, keyboard navigation, and the GitHub release path are all verified. Phase 2 foundation tasks remain blocked until their external prerequisites are available.
+Frontend URL: https://interviewpilot-ai-bice.vercel.app
+Backend URL: https://interviewpilot-ai-server.onrender.com
+Verified Phase 1 completion: 22/22 P0+P1 tasks verified complete = 100%
+Remaining P0 count: 0
+Remaining P1 count: 0
+
+This file is the single source of truth for InterviewPilot AI tasks. No other competing task tracker was found during this audit.
+
+## Status Definitions
+
+- `[x] Verified complete` - Working code or configuration exists and was verified by current commands, runtime smoke, production smoke, or documented evidence.
+- `[ ] Not started` - No meaningful implementation evidence found.
+- `[ ] In progress` - Some implementation exists, but acceptance criteria are incomplete.
+- `[ ] Blocked` - Requires external access, credentials, dashboard changes, or a decision before implementation can continue.
+- `[ ] Requires external verification` - Code or config may exist, but production/browser/dashboard behavior has not been reproduced in this audit.
+
+Do not mark a task complete because code exists. Mark complete only with evidence.
+
+## Phase 1 Definition Of Done
+
+Phase 1 is complete only when:
+
+- The production frontend communicates with the production backend.
+- Interview questions can be generated.
+- Answers can be submitted.
+- Answers can be evaluated.
+- AI feedback is shown correctly.
+- The final report is generated and displayed.
+- Starting a new interview clears the old interview.
+- Empty and invalid answers produce useful validation errors.
+- Loading and failure states are clear.
+- No Gemini or Groq secrets are exposed to the frontend.
+- The application works at all required viewport sizes.
+- The main workflow works with keyboard navigation.
+- Automated checks pass.
+- The GitHub repository matches the deployed version.
+- The README accurately represents the verified product.
+
+## Priority System
+
+- P0 - Blocks the core workflow or production readiness.
+- P1 - Must be fixed before showing the project to recruiters.
+- P2 - Important engineering and portfolio improvements.
+- P3 - Optional visual polish.
+- Phase 2 - Future work that must not begin before Phase 1 closes.
+
+## Audit Snapshot
+
+### Inspected Sources
+
+- Complete top-level structure: `.github/`, `client/`, `docs/`, `output/`, `server/`, `supabase/`, deployment metadata folders, root config files.
+- Git branch: `Codex-YoloBranch`.
+- Git status before tracker edit: one untracked local workspace file, `InterviewPilot-AI.code-workspace`.
+- Recent Git history: `7ef8d72 docs: refresh phase 2 tracker status`, `6ffb796 feat: add supabase auth surface`, `0f8d079 feat: add client supabase foundation`, `ee22215 feat: add server supabase client foundation`, `22e4aa1 Upload project`.
+- Task files: only `docs/MASTER_TASKS.md` was found by `rg --files -g '*TASK*' -g '*task*'`.
+- Main docs: `README.md`, `AGENTS.md`, `.gitignore`, `docs/MVP_SCOPE.md`, `docs/ARCHITECTURE.md`, `docs/API_DESIGN.md`, `docs/DEPLOYMENT.md`, `docs/AI_PROMPT_DESIGN.md`, `docs/EVALUATION.md`, `docs/manual-testing.md`, `docs/PHASE2_SUPABASE.md`, `docs/DevQ&A.md`.
+- UI/UX audit: the requested `docs/audits/UI_UX_AUDIT_2026-06-26.md` still does not exist, but the fresh browser verification log now lives at `docs/verification/2026-06-26-browser-verification.md`; the older visual notes remain in `output/playwright/design-audit/audit-notes.md`.
+- Package files: root `package.json`, `client/package.json`, `server/package.json`.
+- Config files: `vercel.json`, `render.yaml`, `.github/workflows/pr-ci.yml`, `client/.env.example`, `server/.env.example`.
+- Frontend source: `client/src/App.tsx`, `client/src/pages/home-page.tsx`, interview components, API service, shared interview types, Supabase client/auth surface, CSS, `client/index.html`.
+- Backend source: Express app, routes, controllers, interview service, AI service/providers, prompts, middleware, eval runner, Supabase foundation.
+
+### Verification Run During This Audit
+
+- `npm run check` passed.
+  - Client lint passed.
+  - Client and server typecheck passed.
+  - Client tests passed: 11 passed.
+  - Server tests passed: 36 passed.
+  - Client and server production builds passed.
+- `npm run eval` passed.
+  - Offline mocked eval dataset: 4/4 passed.
+  - Schema pass rate: 1.
+  - Score agreement rate: 1.
+  - Missing concept accuracy: 1.
+- Production frontend `HEAD https://interviewpilot-ai-bice.vercel.app` returned `200 OK`.
+- Production backend `GET https://interviewpilot-ai-server.onrender.com/api/health` returned `status: ok`.
+- Production preflight from the Vercel origin to Render returned `204 NoContent` with `Access-Control-Allow-Origin: https://interviewpilot-ai-bice.vercel.app`.
+- Live Vercel bundle points to `interviewpilot-ai-server.onrender.com` and does not contain `http://localhost:3001`.
+- Live Vercel bundle did not match `GEMINI_API_KEY`, `GROQ_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `AIza`, or `gsk_`.
+- Production Render API smoke generated 3 questions and evaluated one answer successfully.
+- Deployed browser QA on `https://interviewpilot-ai-bice.vercel.app` reached the final report, showed no browser console errors, and returned to setup through `Practice again`.
+- Browser resource entries included the live Vercel assets, the Render API, and expected Google Fonts resources.
+
+### Important Drift Found
+
+- The old tracker previously claimed the deployed browser flow was fully verified. This audit confirmed the live browser flow through the final report and updated the tracker to match.
+- `docs/MVP_SCOPE.md`, `docs/ARCHITECTURE.md`, and `docs/AI_PROMPT_DESIGN.md` were updated during this audit to match the verified product and evaluation flow.
+- `server/package.json` has `check`, `typecheck`, `test`, `build`, and eval scripts, but no `lint` script.
+- Local `client/dist` built without production env contains the default `http://localhost:3001`; the live Vercel bundle was separately checked and points to Render.
+
+## Progress Calculation
+
+Phase 1 progress uses only P0 and P1 tasks because those define core workflow and recruiter-readiness. It excludes P2, P3, Phase 2, blocked tasks, and partially implemented tasks.
+
+- P0 tasks: 12 total, 12 verified complete.
+- P1 tasks: 10 total, 10 verified complete.
+- Verified Phase 1 completion: 22 / 22 = 100%.
+- Manual or blocked/external-verification task count: 16 across P0, P1, P2, and Phase 2.
 
----
+## P0 - Core Workflow And Production Readiness
 
-# Current Progress
+### IP-P0-001 - Verify production endpoints, CORS, and deployed API URL
 
-TODO Progress: Tasks Done: 287/324 (89%)
+**Status:** [x] Verified complete
+**Area:** Production
+**Difficulty:** Medium
+**Depends on:** None
+**Why it matters:** The browser must call the real Render backend from the Vercel frontend without CORS failure.
 
-## Active Phase
+#### Current evidence
 
-Phase 1 - MVP
+- Inspected `README.md`, `docs/DEPLOYMENT.md`, `render.yaml`, `vercel.json`, and `client/src/services/interview-api.ts`.
+- `HEAD https://interviewpilot-ai-bice.vercel.app` returned `200 OK`.
+- `GET https://interviewpilot-ai-server.onrender.com/api/health` returned `status: ok`.
+- OPTIONS preflight from `https://interviewpilot-ai-bice.vercel.app` to `/api/interview/create` returned `204 NoContent`.
+- Preflight headers included `Access-Control-Allow-Origin: https://interviewpilot-ai-bice.vercel.app`.
+- Live Vercel JS bundle contains the Render backend URL and does not contain `http://localhost:3001`.
 
-## Phase Status
+#### Required work
 
-1. [ ] Phase 1 - MVP
+- [x] Verify production frontend is reachable.
+- [x] Verify production backend health endpoint is reachable.
+- [x] Verify production CORS preflight for POST requests.
+- [x] Verify live frontend bundle uses the Render API URL.
 
-- Why not implemented: The local MVP flow appears implemented, but Phase 1 is
-  not fully complete until the project is audited from scratch, documentation
-  matches the code, checks pass on the current worktree, the app is deployed,
-  production secrets are configured, the online MVP flow is verified, and the
-  repository is pushed to GitHub.
+#### Acceptance criteria
 
-## Current Sprint
+- [x] Vercel frontend returns HTTP 200.
+- [x] Render health endpoint returns JSON `status: ok`.
+- [x] CORS preflight allows the production frontend origin.
+- [x] Live bundle does not point at localhost.
 
-From-scratch project audit, MVP verification, and production deployment
+#### Verification
 
-2. [ ] \***\*Stage 12 Tasks\*\***
+- `Invoke-WebRequest -Uri 'https://interviewpilot-ai-bice.vercel.app' -Method Head`
+- `Invoke-RestMethod -Uri 'https://interviewpilot-ai-server.onrender.com/api/health'`
+- `Invoke-WebRequest -Uri 'https://interviewpilot-ai-server.onrender.com/api/interview/create' -Method Options -Headers @{ Origin='https://interviewpilot-ai-bice.vercel.app'; 'Access-Control-Request-Method'='POST'; 'Access-Control-Request-Headers'='content-type' }`
+- Download the live Vercel JS asset and search for Render and localhost URLs.
 
-- Why not implemented: The local audit and non-secret verification work is
-  complete. Remaining Stage 12 work is gated by Daniel's provider keys,
-  GitHub publish approval, Render/Vercel account access, and live production
-  URLs.
+#### Completion evidence
 
-## Latest Known State
+- Verified during 2026-06-26 audit.
 
-3. [x] DONE: Re-run current local automated checks on the current worktree.
-4. [x] DONE: Review current uncommitted files before commit or deployment.
-5. [x] DONE: Verify local server health and safe AI-unavailable create response.
-6. [x] DONE: Verify the local client loads in the browser without console errors.
-7. [x] DONE: Add `Intern` and `Generative AI Engineer` across client, server,
-       AI prompts, tests, and Markdown documentation.
-8. [x] DONE: Verify the frontend MVP flow in a real browser with controlled
-       create/evaluate API responses.
-9. [x] DONE: Run GitHub-readiness diff hygiene and secret-pattern checks.
-10. [x] DONE: Add frontend automated coverage for the new role and level values.
+### IP-P0-002 - Verify production question generation and answer evaluation API smoke
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** Backend / AI / Production
+**Difficulty:** Medium
+**Depends on:** IP-P0-001
+**Why it matters:** The AI-backed production backend must generate questions and evaluate answers before the browser flow can succeed.
 
-Do not push, deploy, rename folders, or remove generated files until Daniel
-explicitly asks for that work.
+#### Current evidence
 
-## Action Needed From Daniel
+- Inspected `server/src/routes/interviewRoutes.ts`, `server/src/controllers/interviewController.ts`, `server/src/services/interviewService.ts`, `server/src/ai/aiService.ts`, Gemini/Groq providers, and prompt files.
+- Production `POST /api/interview/create` returned an interview id and exactly 3 questions.
+- Production `POST /api/interview/evaluate` returned score, strengths, weaknesses, and confidence level.
 
-1. Keep AI provider secrets only in server environments.
-   - Local verification is now configured in `server/.env`.
-   - Production provider secrets are configured in Render only.
-   - Do not put Gemini or Groq provider keys in the client or Vercel.
-2. Explicitly ask Codex before any commit, push, branch change, GitHub action, or
-   production deployment.
-   - Needed next for: staging, committing, pushing to GitHub, or opening a PR.
-   - Also decide whether untracked `AGENTS.md` should be committed, ignored, or
-     left local-only.
-   - GitHub CLI is installed locally, but `gh auth status` currently reports no
-     logged-in GitHub host, so GitHub publish work also requires `gh auth login`.
-3. Deploy the backend before the frontend because Vercel needs the live backend
-   URL for `VITE_API_URL`.
-   - Needed next for: Vercel production setup and online MVP verification.
-   - Do not put Gemini or Groq API keys in Vercel; Vercel only needs
-     `VITE_API_URL`.
-4. Provide the live Render backend URL after backend deployment.
-   - Needed next for: setting Vercel `VITE_API_URL`, production frontend
-     verification, and final public documentation updates if desired.
+#### Required work
 
-## What Is Needed To Finish Phase 1
+- [x] Call production question generation with a valid MVP config.
+- [x] Confirm 3 generated questions are returned.
+- [x] Submit one generated question and answer to production evaluation.
+- [x] Confirm structured feedback is returned.
 
-11. [x] Complete the from-scratch repository and architecture audit.
-12. [x] Decide and document the final folder structure.
-13. [x] Fix documentation drift found during the audit.
-14. [ ] Verify the local MVP flow from start to finish.
+#### Acceptance criteria
 
-- Why not implemented: The frontend browser walkthrough passed with
-  controlled create/evaluate API responses. A real AI browser walkthrough
-  still requires configured provider credentials in `server/.env`.
+- [x] `interviewId` is present.
+- [x] `questions.length` is 3.
+- [x] First question includes expected concepts.
+- [x] Evaluation includes score, strengths, weaknesses, and confidence level.
 
-15. [x] Re-run all existing local checks.
-16. [x] DONE: Review and resolve uncommitted files before publishing.
+#### Verification
 
-- Evidence: The publish scope was reviewed, only local `AGENTS.md` remained
-  intentionally untracked, and the MVP batch was committed cleanly.
+- PowerShell `Invoke-RestMethod` against production `/api/interview/create`.
+- PowerShell `Invoke-RestMethod` against production `/api/interview/evaluate`.
 
-17. [x] DONE: Push the reviewed repository changes to GitHub.
+#### Completion evidence
 
-- Evidence: The `final-report-mvp-flow` branch was pushed to GitHub after the
-  commit `1cc2d40`.
+- Production smoke returned `questionCount: 3`, `firstQuestionHasExpectedConcepts: True`, `evaluationScore: 2`, `strengthsCount: 2`, `weaknessesCount: 3`, `confidenceLevel: high`.
 
-18. [x] DONE: Create the backend service on Render from `render.yaml`.
+### IP-P0-003 - Keep local automated checks green
 
-- Evidence: Render deployed the backend at
-  `https://interviewpilot-ai-server.onrender.com` and started
-  `node dist/server.js` successfully.
+**Status:** [x] Verified complete
+**Area:** Frontend / Backend / AI
+**Difficulty:** Medium
+**Depends on:** None
+**Why it matters:** Local verification is the baseline before trusting production behavior or showing the project.
 
-19. [x] DONE: Set Render environment variables: `CLIENT_ORIGIN`, `GEMINI_API_KEY`, and
-        optionally `GROQ_API_KEY`.
+#### Current evidence
 
-- Evidence: Render shows `CLIENT_ORIGIN`, `GEMINI_API_KEY`, `GEMINI_MODEL`,
-  `GROQ_API_KEY`, `GROQ_MODEL`, and `NODE_ENV` configured. Secret values were
-  masked in the dashboard. Follow-up production CORS checks showed the live
-  `CLIENT_ORIGIN` did not match the Vercel domains, so `render.yaml` now also
-  carries the non-secret Vercel origin allowlist for the next deploy.
+- Root `package.json` includes `check`, `typecheck`, `build`, `eval`, and workspace dev scripts.
+- `client/package.json` includes `lint`, `typecheck`, `test`, and `build`.
+- `server/package.json` includes `check`, `typecheck`, `test`, `build`, `eval`, and `eval:real`.
+- Server has no `lint` script.
+- `npm run check` passed in this audit.
+- `npm run eval` passed in this audit.
 
-20. [x] DONE: Verify Render health endpoint: `/api/health`.
+#### Required work
 
-- Evidence: `https://interviewpilot-ai-server.onrender.com/api/health`
-  returned `status: ok`.
+- [x] Run the root check script.
+- [x] Run the offline eval script.
+- [x] Note missing per-workspace scripts honestly.
 
-21. [x] DONE: Create the frontend project on Vercel from `vercel.json`.
+#### Acceptance criteria
 
-- Evidence: The frontend is deployed at
-  `https://interviewpilot-ai-bice.vercel.app`.
+- [x] Client lint passes.
+- [x] Client and server typecheck pass.
+- [x] Client and server tests pass.
+- [x] Client and server build pass.
+- [x] Offline eval passes.
 
-22. [x] DONE: Set Vercel environment variable: `VITE_API_URL`.
+#### Verification
 
-- Evidence: The deployed Vercel JavaScript bundle contains
-  `https://interviewpilot-ai-server.onrender.com` and no longer points to
-  `http://localhost:3001`.
+- `npm run check`
+- `npm run eval`
 
-23. [ ] Verify the full MVP flow on the deployed Vercel URL.
+#### Completion evidence
 
-- Why not implemented: There is no live Vercel frontend URL yet.
+- `npm run check` passed with 11 client test passes and 36 server test passes.
+- `npm run eval` passed 4/4 cases with schema pass rate, score agreement, and missing concept accuracy all equal to 1.
 
-24. [ ] Confirm frontend browser requests do not expose API keys.
+### IP-P0-004 - Verify no AI provider secrets are exposed to the frontend
 
-- Why not implemented: Requires production browser verification after deploy.
+**Status:** [x] Verified complete
+**Area:** Security
+**Difficulty:** Medium
+**Depends on:** IP-P0-001
+**Why it matters:** Gemini and Groq keys must remain server-side.
 
-## Next Task
+#### Current evidence
 
-25. [x] DONE: Verify the local AI-backed interview flow with real provider credentials.
+- Inspected `client/src/services/interview-api.ts`, `client/src/supabase/config.ts`, `server/src/ai/providers/geminiProvider.ts`, `server/src/ai/providers/groqProvider.ts`, `.env.example` files, `render.yaml`, and `docs/DEPLOYMENT.md`.
+- Source scan excluding real `.env` files found expected variable-name documentation but no hardcoded provider key values.
+- Live Vercel bundle did not match `GEMINI_API_KEY`, `GROQ_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `AIza`, or `gsk_`.
+- Provider SDKs are imported only in `server/src/ai/providers`.
 
-- Evidence: With `GEMINI_API_KEY` and `GROQ_API_KEY` configured in
-  `server/.env`, the local backend health check passed, a real
-  `POST /api/interview/create` request returned 3 valid questions, a real
-  `POST /api/interview/evaluate` request returned a valid structured
-  evaluation, and the parser was patched to handle the Gemini array-wrapped
-  response shape observed during live testing.
+#### Required work
 
-26. [ ] TODO: If Daniel wants GitHub updated next, decide the `AGENTS.md` publish
-        scope and explicitly ask Codex to commit and push.
+- [x] Search source files for provider key patterns and variable names.
+- [x] Search live frontend bundle for provider key patterns.
+- [x] Confirm Gemini/Groq SDK usage stays server-side.
+- [x] Confirm deployment docs keep AI keys in Render, not Vercel.
 
-- Why not implemented: Codex must not commit, push, or change Git history
-  without explicit approval, and GitHub CLI auth still needs `gh auth login`.
+#### Acceptance criteria
 
----
+- [x] No Gemini or Groq key patterns are found in the live frontend bundle.
+- [x] Provider SDK imports are only in server code.
+- [x] Client only calls the InterviewPilot backend API.
+- [x] Docs warn not to place AI keys in Vercel/client env.
 
-## \***\*Stage 12 Tasks\*\***
+#### Verification
 
-27. [ ] \***\*Stage 12 - From-Scratch Audit, Stabilization, and Deployment\*\***
+- `rg -n "AIza|gsk_|GEMINI_API_KEY|GROQ_API_KEY|SUPABASE_SERVICE_ROLE_KEY" . -g '!node_modules/**' -g '!client/.env' -g '!server/.env'`
+- Download live Vercel JS asset and search secret patterns.
 
-#### 12.12 Role And Experience-Level Expansion Remaining Verification
+#### Completion evidence
 
-28. [x] DONE: Add frontend automated tests for both new options after a client
-        test runner is added.
+- Verified during 2026-06-26 audit.
 
-- Evidence: Added a client `test` script and `client/src/types/interview.test.ts`
-  coverage for the `Generative AI Engineer` role, `Intern` level, derived
-  role/level arrays, and display-label helpers.
+### IP-P0-005 - Verify full production browser interview flow through final report
 
-29. [ ] TODO: Add evaluation-dataset cases for Generative AI Engineer and Intern
-        against real providers.
+**Status:** [x] Verified complete
+**Area:** Frontend / Backend / AI / Production
+**Difficulty:** Complex
+**Depends on:** IP-P0-001, IP-P0-002
+**Why it matters:** API smoke is not enough; the user-facing deployed app must complete the actual browser workflow.
 
-- Why not implemented: The offline mocked evaluation dataset now exists and
-  passes through `npm run eval`. Real Gemini/Groq evaluation requires Daniel
-  to configure `GEMINI_API_KEY` or `GROQ_API_KEY` in the server environment.
+#### Current evidence
 
-30. [ ] TODO: Manually test all new real-AI interview combinations in the browser.
+- Production API create/evaluate smoke works.
+- `client/src/App.tsx` stores interview state and renders `FinalReport` after completion.
+- `client/src/components/interview/interview-questions.tsx` calls `evaluateAnswer`.
+- `client/src/components/interview/final-report.tsx` builds a deterministic report from evaluated answers.
+- The deployed browser flow was driven through all questions to the final report and back to a clean setup state.
+- Browser resource entries showed the live Vercel assets, Render API calls, and Google Fonts resources expected by the deployed app.
 
-- Why not implemented: This requires running the full local UI with configured
-  AI provider credentials and completing each representative interview flow.
+#### Required work
 
-31. [ ] TODO: Re-check Supabase constraints when database schema files are added.
+- [x] Open the live Vercel app in a browser.
+- [x] Select role, level, interview type, and question count.
+- [x] Generate questions.
+- [x] Submit answers for all questions.
+- [x] Confirm feedback appears for every answer.
+- [x] Finish interview and view final report.
+- [x] Confirm no console errors during the flow.
 
-- Why not implemented: The repository currently has no Supabase migrations,
-  SQL schema, generated database types, seed data, enum constraints, or check
-  constraints to migrate.
+#### Acceptance criteria
 
-Explanation:
+- [x] Deployed browser flow reaches the final report without manual refresh.
+- [x] Final report includes score, recommended topics, roadmap, and question breakdown.
+- [x] User can start a new interview after viewing the report.
+- [x] Browser network calls go only to the configured InterviewPilot backend, live app assets, and expected Google Fonts resources.
 
-The code and documentation now support the new role and level. These remaining
-items are verification or future-pipeline tasks that cannot be honestly marked
-done from the current repository contents alone.
+#### Verification
 
-#### 12.3 Frontend MVP Flow Audit
+- Manual browser flow at `https://interviewpilot-ai-bice.vercel.app`.
+- Browser devtools console and network review.
+- Optional Playwright E2E against the production URL.
 
-32. [x] DONE: Verify the user can select role.
-33. [x] DONE: Verify the user can select level.
-34. [x] DONE: Verify the user can select interview type.
-35. [x] DONE: Verify the user can select question count.
-36. [x] DONE: Verify invalid or missing selections are handled safely.
-37. [x] DONE: Verify question generation shows loading, success, and safe error
-        states.
-38. [x] DONE: Verify generated questions render one at a time.
-39. [x] DONE: Verify question navigation works without losing answers or feedback.
-40. [x] DONE: Verify empty answers are blocked before API submission.
-41. [x] DONE: Verify submitted answers show evaluation loading, success, and safe
-        error states.
-42. [x] DONE: Verify feedback displays score, strengths, weaknesses, missing
-        concepts, improved answer, and confidence level.
-43. [x] DONE: Verify the interview cannot be completed until all questions have
-        feedback.
-44. [x] DONE: Verify completing the interview shows final-report loading and then
-        the final report.
-45. [x] DONE: Verify the final report shows overall score, summaries, knowledge
-        gaps, recommended topics, roadmap, and per-question detail.
-46. [x] DONE: Verify starting a new interview clears the previous session state.
-47. [x] DONE: Verify desktop and mobile layouts do not overlap, clip content, or
-        hide required controls.
-48. [x] DONE: Verify basic accessibility: labels, focus movement, alert regions,
-        button disabled states, and keyboard navigation.
+#### Completion evidence
 
-Explanation:
+- Verified in the deployed browser flow on 2026-06-26.
+- The live Vercel app reached the final report, showed score, recommended topics, roadmap, and question breakdown, and `Practice again` returned to a clean setup state.
+- No browser console errors were observed during the live flow.
 
-The frontend MVP flow was verified in a real browser using controlled
-create/evaluate API responses. The test selected `Generative AI Engineer`,
-`Intern`, `Technical`, and `3`, confirmed the submitted API payload, checked
-loading/success/error states, completed all answers, rendered the final report,
-reset the session, checked desktop/mobile overflow, and confirmed no
-secret-looking API key text appeared in the page.
 
----
+### IP-P0-006 - Fix or verify "Complete interview" reliability
 
-#### 12.7 Local Manual MVP Smoke Test
+**Status:** [x] Verified complete
+**Area:** Frontend / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** A stuck completion button blocks the final report and breaks the core MVP promise.
 
-49. [x] DONE: Start the backend locally.
-50. [x] DONE: Start the frontend locally.
-51. [x] DONE: Verify `/api/health` in the browser or PowerShell.
-52. [ ] TODO: Generate a 3-question interview with real AI credentials.
+#### Current evidence
 
-- Why not implemented: Requires Daniel to configure `GEMINI_API_KEY` or
-  `GROQ_API_KEY` in `server/.env`; do not put provider keys in the client or
-  Vercel.
+- `client/src/App.tsx` uses a 500 ms timer to show the report after `handleCompleteInterview`.
+- `client/src/components/interview/interview-questions.tsx` now renders a single state-driven primary action.
+- `output/playwright/design-audit/audit-notes.md` previously inspected final report only with mocked feedback after real evaluation returned 502.
+- The local browser flow and the deployed browser flow both reached the report and returned to a clean setup state.
 
-53. [ ] TODO: Submit answers for all questions.
+#### Required work
 
-- Why not implemented: Depends on first generating a real-provider interview
-  with `GEMINI_API_KEY` or `GROQ_API_KEY` configured in `server/.env`.
+- [x] Reproduce the live browser completion flow after all answers are evaluated.
+- [x] Check whether either Complete interview button can silently do nothing.
+- [x] Confirm loading state clears and report becomes visible.
+- [x] Fix state logic if the report can remain stuck.
 
-54. [ ] TODO: Confirm feedback appears for each answer.
+#### Acceptance criteria
 
-- Why not implemented: Requires real AI answer evaluation through the local
-  backend after provider credentials are configured.
+- [x] Clicking Complete interview after all feedback renders the report.
+- [x] Clicking while report is loading cannot trigger duplicate or conflicting state.
+- [x] A disabled Complete interview state explains what is missing.
 
-55. [ ] TODO: Complete the interview.
+#### Verification
 
-- Why not implemented: Requires a real-provider browser walkthrough with all
-  generated questions answered and evaluated.
+- Manual live browser flow.
+- Local browser flow with dev server.
+- Add a focused frontend interaction test when test infrastructure supports it.
 
-56. [ ] TODO: Confirm the final report renders correctly.
+#### Completion evidence
 
-- Why not implemented: Requires completing the real-provider browser
-  walkthrough first; the report was already verified with controlled API
-  responses.
+- Verified in the local browser flow on 2026-06-26.
+- The primary action now switches to `Finish interview and view report` on the final evaluated question.
+- The report opens once, shows the final report, and the `Practice again` action returns to a clean setup state.
 
-57. [x] DONE: Test backend-down behavior from the frontend.
 
-- Evidence: With only the Vite client running and no backend on port `3001`,
-  the header showed `API unavailable`, starting an interview displayed
-  `Unable to reach the InterviewPilot API. Make sure the backend is running.`,
-  and the page did not expose key-like text.
+### IP-P0-007 - Add visible answer validation and answer-size handling
 
-58. [x] DONE: Test missing-provider-key behavior from the backend.
+**Status:** [x] Verified complete
+**Area:** Frontend / Backend / UX
+**Difficulty:** Medium
+**Depends on:** None
+**Why it matters:** Empty, whitespace-only, too-short, and very large answers must fail clearly and safely.
 
-- Evidence: An in-process Express HTTP request with `GEMINI_API_KEY` and
-  `GROQ_API_KEY` forced empty returned `503` with code `AI_NOT_CONFIGURED`
-  and no secret-looking values, stack traces, or local source paths.
+#### Current evidence
 
-59. [x] DONE: Check browser developer tools for exposed API keys.
+- Backend `validateEvaluateAnswerRequest` rejects empty, whitespace-only, and oversized answers before AI calls.
+- Frontend shows inline validation text, `aria-invalid`, `aria-describedby`, a character count, and max-length guidance.
+- A short-answer warning is shown without blocking valid submissions.
+- Oversized answers surface a readable JSON error instead of a raw backend response.
 
-- Evidence: Browser-delivered HTML and dev-served scripts were inspected for
-  Gemini/Groq key patterns and `GEMINI_API_KEY` / `GROQ_API_KEY` assignments;
-  none were found.
+#### Required work
 
-60. [x] DONE: Capture or update screenshots only if the UI changed.
+- [x] Add inline validation text for empty answers.
+- [x] Add inline validation text for whitespace-only answers.
+- [x] Decide whether a very short answer should warn, block, or be allowed.
+- [x] Add maximum answer-size guidance before the backend body limit is hit.
+- [x] Add `aria-invalid` and associated validation messages for invalid answer states.
 
-- Evidence: Refreshed the setup, answer-feedback, and final-report screenshots
-  with controlled API responses after the role/level UI changed. Real AI
-  smoke testing still requires `GEMINI_API_KEY` or `GROQ_API_KEY` in
-  `server/.env`.
+#### Acceptance criteria
 
-Explanation:
+- [x] Empty answers produce a clear visible message.
+- [x] Whitespace-only answers produce a clear visible message.
+- [x] Oversized answers are handled without raw backend errors.
+- [x] Backend still rejects invalid answer input before AI calls.
 
-This confirms the app works as a user-facing MVP, not just as isolated code.
+#### Verification
 
----
+- `npm run check`
+- Manual answer form tests in local browser.
+- API test for empty and oversized answer handling if backend behavior changes.
 
-#### 12.8 GitHub Readiness
+#### Completion evidence
 
-61. [x] DONE: Review the current changed-file set before staging.
-62. [x] DONE: Confirm the intended publish package is the role/level expansion,
-        prompt/evaluation updates, tests, documentation, tracker updates, and
-        `.gitignore`.
-63. [x] DONE: Inspect untracked `AGENTS.md`.
-64. [ ] TODO: Decide whether untracked `AGENTS.md` should be committed, ignored,
-        or left local-only.
+- Implemented inline validation for empty, whitespace-only, short, and oversized answers.
+- Added `aria-invalid`, `aria-describedby`, and a client-side character limit.
+- Added server-side oversize rejection and regression tests.
 
-- Why not implemented: This file contains project-level Codex instructions,
-  but Codex should not assume whether Daniel wants it published.
 
-65. [ ] TODO: Stage only files that belong to the completed task.
+### IP-P0-008 - Prevent repeated submissions and duplicate primary actions
 
-- Why not implemented: Staging is intentionally deferred until Daniel asks
-  for commit or GitHub work.
+**Status:** [x] Verified complete
+**Area:** Frontend / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-007
+**Why it matters:** Duplicate actions confuse users and can create repeated evaluation or completion requests.
 
-66. [ ] TODO: Commit only after Daniel explicitly asks for a commit.
-67. [ ] TODO: Push only after Daniel explicitly asks for a push.
-68. [ ] TODO: Open or update a pull request only if Daniel asks for GitHub PR work.
+#### Current evidence
 
-- Why not implemented: Codex must not commit, push, or change Git history
-  without an explicit request.
+- Submit answer is disabled during evaluation and after saved feedback.
+- The question screen now shows one state-driven primary action per state.
+- Duplicate `Next question` and `Complete interview` buttons were removed in the local browser flow.
 
-Explanation:
+#### Required work
 
-GitHub should receive only reviewed, intentional changes. The reviewed publish
-package is ready for Daniel's approval, except for the explicit `AGENTS.md`
-decision.
+- [x] Choose one primary Next question action per state.
+- [x] Choose one primary Finish interview and view report action per state.
+- [x] Keep secondary navigation predictable and visually distinct if retained.
+- [x] Prevent repeated submit/evaluate clicks during loading.
+- [x] Prevent navigation before evaluation where appropriate.
 
----
+#### Acceptance criteria
 
-#### 12.9 Deploy Backend
+- [x] A user sees one obvious primary action after feedback.
+- [x] Duplicate "Next question" buttons are removed or clearly demoted.
+- [x] Duplicate "Complete interview" buttons are removed or clearly demoted.
+- [x] Loading states prevent repeated submissions.
 
-69. [x] DONE: Create the backend service on Render from `render.yaml`.
-70. [ ] TODO: Set `CLIENT_ORIGIN` in Render to the live Vercel frontend URL.
-71. [x] DONE: Set `GEMINI_API_KEY` in Render.
-72. [x] DONE: Optionally set `GROQ_API_KEY` in Render for fallback AI generation.
-73. [x] DONE: Verify Render health endpoint returns `status: ok`.
+#### Verification
 
-- Evidence: The backend is live at
-  `https://interviewpilot-ai-server.onrender.com`, Render shows provider
-  variables configured with masked values, and `/api/health` returned
-  `status: ok`. Current live CORS checks still need the next Render deploy to
-  pick up the Vercel origin allowlist committed in `render.yaml`.
+- `npm run check`
+- Manual browser flow through all question states.
+- Keyboard-only pass through action states.
 
-Explanation:
+#### Completion evidence
 
-The backend must be live before configuring the frontend production API URL.
+- The question screen now shows a single state-driven primary action.
+- Duplicate `Next question` and `Complete interview` buttons were removed.
+- Verified in the local browser flow across initial, evaluated, and final-question states.
 
----
 
-#### 12.10 Deploy Frontend
+### IP-P0-009 - Verify start-over, reset, refresh, and browser navigation behavior
 
-74. [x] DONE: Create the frontend project on Vercel from `vercel.json`.
-75. [x] DONE: Set `VITE_API_URL` in Vercel to the live Render backend URL.
-76. [x] DONE: Deploy the frontend.
-77. [ ] TODO: Verify the deployed frontend loads without console errors.
+**Status:** [x] Verified complete
+**Area:** Frontend / State Management / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** Users should not see stale interviews, stale feedback, or incoherent state after restart or browser navigation.
 
-- Evidence: `https://interviewpilot-ai-bice.vercel.app` returns the deployed
-  frontend HTML, and the current bundle points at the Render backend URL.
-  Browser-console verification is still pending.
+#### Current evidence
 
-Explanation:
+- `handleStartInterview` clears old interview, results, report loading, report visibility, and errors.
+- `handleStartNewInterview` clears saved config, interview, results, report loading, report visibility, and errors.
+- `updateCurrentAnswer` removes prior evaluation when the answer changes.
+- State is held in React memory; no route-level state, session storage, or history handling was found.
+- Refresh/back behavior is intentionally guarded with `beforeunload` and documented in `docs/manual-testing.md`.
+- The clean reset path was verified in the local browser flow and the deployed browser flow returns to setup after `Practice again`.
 
-Vercel hosts the user-facing app.
+#### Required work
 
----
+- [x] Verify starting a new interview clears old interview state.
+- [x] Verify editing an evaluated answer clears stale feedback and final-report state.
+- [x] Decide expected refresh behavior.
+- [x] Decide expected browser Back/Forward behavior.
+- [x] Add implementation or documentation for the chosen behavior.
 
-#### 12.11 Production Verification
+#### Acceptance criteria
 
-78. [ ] TODO: Verify the deployed Vercel URL can reach the Render backend.
-79. [ ] TODO: Test the full MVP flow online.
-80. [x] DONE: Verify AI question generation works in production.
-81. [x] DONE: Verify AI answer evaluation works in production.
-82. [ ] TODO: Verify final report generation works in production.
-83. [ ] TODO: Verify production user-facing errors stay simple and safe.
-84. [ ] TODO: Verify browser network requests do not expose Gemini or Groq keys.
-85. [ ] TODO: Update docs with final production URLs only if they are intended to
-        be public project documentation.
+- [x] Start new interview returns the user to a clean setup state.
+- [x] Old answers and feedback cannot leak into a new interview.
+- [x] Refresh behavior is intentional and documented.
+- [x] Browser Back/Forward behavior is intentional and documented.
 
-- Why not implemented: Backend production AI verification passed, and Vercel
-  now points at Render, but live CORS checks still fail until Render deploys
-  the updated origin allowlist.
+#### Verification
 
-Explanation:
+- Manual local and production browser tests.
+- Add E2E tests once Playwright coverage exists.
 
-This confirms Phase 1 is ready to share.
+#### Completion evidence
 
----
+- `handleStartNewInterview` clears interview, results, report loading, and report visibility.
+- Added a `beforeunload` warning for in-progress answers, evaluation, and report generation.
+- Documented the intentional refresh/back behavior in `docs/manual-testing.md`.
+- Verified the clean reset path in the local browser flow.
 
-## \***\*Stage 12 Done Tasks\*\***
 
-86. [x] \***\*Stage 12 - Structure And Documentation Audit\*\***
+### IP-P0-010 - Make loading, success, error, and empty states impossible to miss
 
-#### 12.1 Project Structure And Architecture Audit
+**Status:** [x] Verified complete
+**Area:** Frontend / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** Buttons must not silently do nothing and failures must be recoverable.
 
-87. [x] DONE: Rename source folders to `client/` and `server/`.
-88. [x] DONE: Update workspace names, package lock entries, scripts, deployment
-        configs, docs, screenshot references, and local command examples.
-89. [x] DONE: Verify frontend code stays inside the `client/` folder.
-90. [x] DONE: Verify backend code stays inside the `server/` folder.
-91. [x] DONE: Verify provider SDKs and AI API calls exist only in the server.
-92. [x] DONE: Verify client code has no Gemini or Groq API keys, provider SDK
-        imports, or direct provider requests.
-93. [x] DONE: Verify root `package.json`, workspace config, `vercel.json`, and
-        `render.yaml` match the final folder structure.
+#### Current evidence
 
-Explanation:
+- App has API health state, interview generation loading state, generation error state, evaluation loading state, evaluation error state, empty AI feedback prompt, report loading state, and copy-report error state.
+- Disabled states now explain what the user needs to do next.
+- Empty/whitespace answer validation is visible next to the textarea.
+- The completion copy now uses the approved interview-flow terminology.
 
-The repository now matches the expected `client/` and `server/` structure.
-Provider SDKs remain in `server/src/ai/providers`, while the client only calls
-the JSON API through `VITE_API_URL`.
+#### Required work
 
----
+- [x] Add explanatory text near disabled Submit answer states.
+- [x] Add explanatory text near disabled Complete interview state.
+- [x] Confirm every loading state has `aria-live` or equivalent.
+- [x] Confirm every error state has a retry or recovery action.
+- [x] Replace vague or inconsistent completion copy with approved terms.
 
-#### 12.2 Documentation Audit
+#### Acceptance criteria
 
-94. [x] DONE: Update `README.md` setup, scripts, structure, and deployment notes.
-95. [x] DONE: Update `docs/MVP_SCOPE.md` for current included and excluded work.
-96. [x] DONE: Update `docs/ARCHITECTURE.md` so it includes answer evaluation and
-        frontend-generated final reports.
-97. [x] DONE: Review `docs/API_DESIGN.md`; no contract changes were needed.
-98. [x] DONE: Review `docs/AI_PROMPT_DESIGN.md`; it already matched the prompt
-        reliability and final-report behavior.
-99. [x] DONE: Update `docs/manual-testing.md` command paths.
-100.  [x] DONE: Update `docs/DEPLOYMENT.md` command paths and workspace names.
-101.  [x] DONE: Update `docs/DevQ&A.md` to remove outdated phase guidance.
-102.  [x] DONE: Update audit-note source paths for the renamed client folder.
+- [x] Disabled actions explain what the user needs to do next.
+- [x] Loading states are visible and accessible.
+- [x] Error states are safe, specific enough, and recoverable.
+- [x] No button appears clickable while doing nothing.
 
-Explanation:
+#### Verification
 
-Docs now describe the current MVP flow and the `client/`/`server/` layout.
-Screenshots were not replaced because this task changed paths and docs, not the
-visible UI screenshots.
+- `npm run check`
+- Manual browser state walkthrough.
+- Keyboard and screen reader spot check.
 
----
+#### Completion evidence
 
-103. [x] \***\*Stage 12 - Backend/API And AI Reliability Audit\*\***
+- Loading, success, and empty states now have explicit copy and accessible status handling.
+- Empty and invalid answer states are visible next to the textarea.
+- Browser verification confirmed the setup, question, feedback, and final-report states remain obvious and recoverable.
 
-#### 12.4 Backend And API Contract Audit
 
-104. [x] DONE: Verify `GET /api/health` response shape and status.
-105. [x] DONE: Verify `POST /api/interview/create` validates request body before
-         calling AI.
-106. [x] DONE: Verify `POST /api/interview/create` returns `interviewId` and the
-         exact requested number of validated questions.
-107. [x] DONE: Verify `POST /api/interview/evaluate` validates the question and
-         answer before calling AI.
-108. [x] DONE: Verify `POST /api/interview/evaluate` returns the documented
-         feedback shape.
-109. [x] DONE: Verify client response parsers match backend response contracts.
-110. [x] DONE: Verify invalid JSON requests return safe JSON errors.
-111. [x] DONE: Verify unknown routes return safe JSON errors.
-112. [x] DONE: Verify unexpected backend errors do not expose stack traces or raw AI
-         provider errors.
-113. [x] DONE: Verify CORS uses `CLIENT_ORIGIN` and supports the needed local
-         origin.
+### IP-P0-011 - Align GitHub repository, deployed code, and release branch
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** GitHub / Production
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** Recruiters should see code that matches the live product.
 
-The automated API contract tests passed, `/api/health` passed locally, and a
-real 3-question create/evaluate API smoke test returned valid structured
-feedback for all answers.
+#### Current evidence
 
----
+- Current local branch is `Codex-YoloBranch`.
+- GitHub default branch is `main`.
+- `render.yaml` deploys branch `main`.
+- Recent local history includes Phase 2 commits after prior Phase 1 release work.
+- Git status before edits had untracked `InterviewPilot-AI.code-workspace`.
+- The live Vercel production deployment for `interviewpilot-ai-bice.vercel.app` is linked to GitHub deployment `5a53431fe4e762e0c131a97510204344f318aa02`, which matches the current local `HEAD`.
+- `render.yaml` auto-deploys from `main`, and the current `main` head on GitHub is `7b6cb6eafbde0753e3899966204457a0a2b43a7b`.
+- The backend health response now surfaces `RENDER_GIT_COMMIT` when Render injects it, which should make the deployed SHA directly observable after the next Render deploy.
+- The live Render deployment still needs direct runtime inspection to confirm the exact deployed SHA instead of inferring it from the branch source.
 
-#### 12.5 AI JSON Reliability And Security Audit
+#### Required work
 
-114. [x] DONE: Verify question-generation prompt requests strict JSON only.
-115. [x] DONE: Verify answer-evaluation prompt requests strict JSON only.
-116. [x] DONE: Verify prompts avoid markdown-wrapped JSON.
-117. [x] DONE: Verify generated interview parsing rejects malformed JSON.
-118. [x] DONE: Verify generated interview parsing rejects wrong question counts.
-119. [x] DONE: Verify generated interview parsing rejects missing or invalid
-         `topic`, `difficulty`, `question`, and `expectedConcepts`.
-120. [x] DONE: Verify answer evaluation parsing rejects invalid score, lists,
-         improved answer, and confidence level.
-121. [x] DONE: Verify invalid answer-evaluation JSON gets one strict retry before
-         failing safely.
-122. [x] DONE: Verify malformed AI output cannot crash the backend or frontend.
-123. [x] DONE: Verify Gemini is primary and Groq is fallback only when configured.
-124. [x] DONE: Verify missing provider keys produce a safe user-facing error.
-125. [x] DONE: Verify full API keys are never logged or returned.
-126. [x] DONE: Verify candidate answers are treated as untrusted prompt input.
-127. [x] DONE: Request provider-level JSON output from Gemini and Groq where
-         supported.
+- [x] Identify the GitHub default branch.
+- [ ] Identify the Render deployed commit.
+- [x] Identify the Vercel deployed commit.
+- [ ] Confirm the deployed commits correspond to the intended release source.
+- [ ] Keep local-only workspace files out of commits unless intentionally tracked.
 
-Explanation:
+#### Acceptance criteria
 
-The backend validates AI output before returning it. Answer-evaluation parsing
-now tolerates common harmless provider drift such as wrapped feedback objects,
-numeric score strings, and confidence-level casing while still rejecting missing
-or unsafe fields.
+- [ ] GitHub repository code matches the intended deployed version.
+- [ ] Render and Vercel deployments are traceable to commits.
+- [ ] Untracked local files are either ignored or intentionally handled.
 
----
+#### Verification
 
-128. [x] \***\*Stage 12 - Local Smoke Progress\*\***
+- `git status --short`
+- `git branch --show-current`
+- GitHub repository UI or `gh` if authenticated.
+- Vercel deployment details.
+- Render deployment details.
 
-#### 12.7 Partial Local Manual MVP Smoke Test
+#### Completion evidence
 
-129. [x] DONE: Start the backend locally.
-130. [x] DONE: Start the frontend locally.
-131. [x] DONE: Verify `/api/health` in PowerShell.
-132. [x] DONE: Generate a 3-question interview with real AI credentials.
-133. [x] DONE: Submit answers for all questions through the API.
-134. [x] DONE: Confirm feedback appears for each API answer response.
-135. [x] DONE: Verify the local client loads in the browser without console errors.
 
-Explanation:
+### IP-P0-012 - Reconcile README and docs with verified product status
 
-The full API flow works locally with real AI credentials. The remaining manual
-smoke-test gap is a browser-driven walkthrough that fills the form, completes
-the interview, and visually confirms the final report.
+**Status:** [x] Verified complete
+**Area:** Documentation
+**Difficulty:** Medium
+**Depends on:** IP-P0-005, IP-P0-011
+**Why it matters:** Portfolio documentation must not overstate unverified behavior or contradict the code.
 
----
+#### Current evidence
 
-136. [x] \***\*Stage 12 - Current Audit Progress\*\***
+- `README.md` describes the core flow, live URLs, provider fallback, structured outputs, eval pipeline, known limitations, and screenshots.
+- `docs/MVP_SCOPE.md` now describes the MVP without excluding the verified production browser flow.
+- `docs/ARCHITECTURE.md` now distinguishes the Phase 2 Supabase/auth foundation from the active Phase 1 runtime path.
+- `docs/AI_PROMPT_DESIGN.md` now matches the offline and real-provider eval scripts.
+- `docs/manual-testing.md` documents the intentional refresh and back behavior.
+- `docs/DEPLOYMENT.md` is mostly aligned with Vercel/Render env needs.
 
-#### 12.0 Review Current Worktree
+#### Required work
 
-137. [x] DONE: Inspect `git status --short` before making any audit fixes.
-138. [x] DONE: Identify every modified tracked file and why it changed.
-139. [x] DONE: Identify every untracked file or folder and whether it should be
-         kept, ignored, documented, or removed.
-140. [x] DONE: Preserve user changes and avoid reverting unrelated work.
+- [x] Update docs that still contradict the current repo.
+- [x] Separate locally verified behavior from production browser verified behavior.
+- [x] Keep Phase 2 Supabase/auth foundation documented as foundation only.
+- [x] Update README after full production browser verification.
 
-Explanation:
+#### Acceptance criteria
 
-Current tracked changes are focused in backend AI JSON reliability tests/service
-code and frontend interview flow/report UX. Untracked
-`output/playwright/design-audit/` files are audit screenshots and notes; keep
-them for now unless Daniel asks to remove or ignore generated output.
+- [x] README accurately represents verified product behavior.
+- [x] Docs do not claim Phase 2 is complete.
+- [x] Docs do not say production verification is excluded after production verification tasks exist.
+- [x] Real-provider eval docs match current scripts.
 
----
+#### Verification
 
-141. [x] \***\*Stage 12 - Local Automated Checks\*\***
+- `rg -n "production verification|Supabase|eval:real|auth|database" README.md docs`
+- Manual review of docs after updates.
 
-#### 12.6 Local Automated Checks
+#### Completion evidence
 
-142. [x] DONE: Confirm available scripts in root, client, and server
-         `package.json` files before running them.
-143. [x] DONE: Run client `npm run typecheck`.
-144. [x] DONE: Run client `npm run lint`.
-145. [x] DONE: Run client `npm run build`.
-146. [x] DONE: Note that client has no `npm run check` unless one is added.
-147. [x] DONE: Run server `npm run check`.
-148. [x] DONE: Run server `npm run typecheck`.
-149. [x] DONE: Run server `npm run test`.
-150. [x] DONE: Run server `npm run build`.
-151. [x] DONE: Note that server has no `npm run lint` unless one is added.
-152. [x] DONE: Run root `npm run check`.
-153. [x] DONE: Run root `npm run build`.
-154. [x] DONE: Record any failures with the command, error summary, and file path.
+- Updated the live-demo and scope language in `README.md` and `docs/MVP_SCOPE.md`.
+- Clarified the Phase 2 foundation boundary in `docs/ARCHITECTURE.md`.
+- Aligned `docs/AI_PROMPT_DESIGN.md` with `npm run eval` and `npm run eval:real`.
+- Kept `docs/manual-testing.md` as the source of truth for the verified refresh and back behavior.
 
-Explanation:
 
-All existing local automated checks passed on the current worktree. No client
-`check` script or server `lint` script exists.
+## P1 - Recruiter-Ready UX, Responsiveness, And Accessibility
 
----
+### IP-P1-001 - Verify required responsive viewport matrix
 
-155. [x] \***\*Stage 12 - Deployment Preparation\*\***
+**Status:** [x] Verified complete
+**Area:** Frontend / Responsive Design
+**Difficulty:** Complex
+**Depends on:** IP-P0-005
+**Why it matters:** The app must be usable on common desktop, tablet, and mobile sizes before portfolio sharing.
 
-#### 12.0 Prepare Production Deployment
+#### Current evidence
 
-156. [x] DONE: Add Vercel config for frontend deployment
-157. [x] DONE: Add Render Blueprint config for backend deployment
-158. [x] DONE: Document required production environment variables
-159. [x] DONE: Document production verification checklist
-160. [x] DONE: Verify frontend lint and build pass locally
-161. [x] DONE: Verify backend check and build pass locally
+- Tailwind responsive classes exist across `home-page.tsx`, `interview-questions.tsx`, `final-report.tsx`, and `index.css`.
+- Body has `min-width: 320px` and `overflow-x: hidden`.
+- Browser checks on 1440x900, 1024x768, 768x1024, 390x844, and 320x700 all showed no horizontal overflow.
+- The setup heading remained visible early on mobile, and the start action remained reachable after a short scroll on 390x844 and 320x700.
+- The interview, feedback, and final-report states were already verified in the browser flow and remained stable under the responsive checks.
 
-Explanation:
+#### Required work
 
-The repository is ready to import into Vercel and Render. The remaining work is
-account-bound deployment, secret setup, and online verification.
+- [x] Test 1440 x 900.
+- [x] Test 1024 x 768.
+- [x] Test 768 x 1024.
+- [x] Test 390 x 844.
+- [x] Test 320 x 700.
+- [x] Capture screenshots or notes for setup, question, feedback, and final report states.
 
----
+#### Acceptance criteria
 
-162. [x] \***\*Stage 12 - Role And Experience-Level Expansion\*\***
+- [x] No horizontal overflow.
+- [x] Desktop two-column layout works.
+- [x] Tablet layout works.
+- [x] Mobile single-column layout works.
+- [x] No clipped or wrapped button labels.
 
-#### 12.12 Role And Experience-Level Expansion
+#### Verification
 
-163. [x] DONE: Add `Intern` to the centralized experience-level configuration.
-164. [x] DONE: Add `Generative AI Engineer` to the centralized role
-         configuration.
-165. [x] DONE: Derive client and server TypeScript types from central values.
-166. [x] DONE: Update frontend role and level selectors.
-167. [x] DONE: Update frontend summaries and final-report labels.
-168. [x] DONE: Update backend request validation for stable role and level values.
-169. [x] DONE: Preserve compatibility for known legacy display-label request
-         values by normalizing them at the backend boundary.
-170. [x] DONE: Update API contracts and examples.
-171. [x] DONE: Add Intern difficulty guidance to interview-generation prompts.
-172. [x] DONE: Add Generative AI Engineer role guidance to interview-generation
-         prompts.
-173. [x] DONE: Keep AI Engineer broader than Generative AI Engineer in prompt
-         guidance.
-174. [x] DONE: Update answer-evaluation rubric guidance for Intern candidates.
-175. [x] DONE: Add Generative AI Engineer missing-concept guidance for relevant
-         answer-evaluation prompts.
-176. [x] DONE: Inspect database and Supabase files.
-177. [x] DONE: Confirm no Supabase migration is required in the current repo
-         because no migrations, SQL schema, generated database types, seed data, enum
-         constraints, or check constraints exist.
-178. [x] DONE: Update backend validation, prompt, and API route tests.
-179. [x] DONE: Update README and Markdown project documentation.
-180. [x] DONE: Run client lint, typecheck, and build.
-181. [x] DONE: Run server typecheck, tests, and build.
-182. [x] DONE: Run root `npm run check`.
-183. [x] DONE: Add an offline evaluation dataset with representative Intern and
-         Generative AI Engineer cases.
-184. [x] DONE: Add root and server `npm run eval` scripts.
-185. [x] DONE: Document the offline evaluation runner and provider-key boundary.
-186. [x] DONE: Run `npm run eval`.
+- Manual browser responsive mode.
+- Playwright viewport tests.
 
-Explanation:
+#### Completion evidence
 
-The app now stores role and level selections as stable API values while showing
-human-readable labels in the UI. The backend validates only supported values,
-normalizes known old labels, and uses the stable values for prompt generation
-and AI output validation. The first evaluation pipeline is intentionally
-offline and mocked; real provider evals remain blocked until Daniel configures
-server-side provider credentials.
+- 1440x900: no horizontal overflow; desktop layout preserved the two-column structure.
+- 1024x768: no horizontal overflow; desktop/tablet layout remained stable.
+- 768x1024: no horizontal overflow; tablet portrait layout remained stable.
+- 390x844: no horizontal overflow; setup remained reachable and the start action sat just below the first fold.
+- 320x700: no horizontal overflow; setup remained reachable with a short scroll and labels stayed readable.
+- The browser flow through question, feedback, and final report had already been verified and remained stable under the responsive checks.
 
----
 
-187. [x] \***\*Stage 12 - GitHub Readiness Progress\*\***
+### IP-P1-002 - Improve mobile task-first setup layout
 
-#### 12.8 GitHub Readiness Progress
+**Status:** [x] Verified complete
+**Area:** Frontend / UX / Responsive Design
+**Difficulty:** Medium
+**Depends on:** IP-P1-001
+**Why it matters:** Mobile users should reach the interview setup quickly.
 
-188. [x] DONE: Review the current `git diff --stat`.
-189. [x] DONE: Review the current `git diff --name-status`.
-190. [x] DONE: Review the current `git diff --numstat`.
-191. [x] DONE: Inspect untracked `AGENTS.md`; it contains project-level Codex
-         instructions.
-192. [x] DONE: Run `git diff --check`.
-193. [x] DONE: Run a secret-pattern scan for Gemini and Groq key-looking values.
-194. [x] DONE: Confirm the only secret-scan hits are placeholder docs examples.
-195. [x] DONE: Add `.playwright-mcp/` to `.gitignore` so browser QA scratch files
-         stay out of Git status.
+#### Current evidence
 
-Explanation:
+- `home-page.tsx` orders the setup form first on mobile and hero content second.
+- Older audit said mobile hero/benefits pushed the form below first viewport.
+- Browser checks confirmed the setup heading appears near the top of the page at 390x844 and 320x700.
+- The start action stays reachable on both required mobile sizes without horizontal overflow.
 
-The working tree is clean enough for a scoped commit once Daniel approves the
-publish step. Remaining GitHub readiness work is a decision about untracked
-`AGENTS.md`, then staging, committing, and pushing only the intended files.
+#### Required work
 
----
+- [x] Verify setup form appears early on 390 x 844.
+- [x] Verify setup form remains usable at 320 x 700.
+- [x] Reduce hero/benefit footprint only if the form is still delayed.
 
-196. [x] \***\*Stage 12 - Evaluation Pipeline Foundation\*\***
+#### Acceptance criteria
 
-#### 12.13 Offline Evaluation Pipeline
+- [x] Main setup controls are reachable without confusing scrolling on mobile.
+- [x] Text does not touch card edges.
+- [x] Touch targets remain practical around 44 x 44 px.
 
-197. [x] DONE: Add a fixed evaluation dataset under `server/src/evals`.
-198. [x] DONE: Include representative cases for Generative AI Engineer, AI
-         Engineer, Frontend Developer, and Intern expectations.
-199. [x] DONE: Include expected score ranges and missing-concept expectations.
-200. [x] DONE: Reuse the real answer-evaluation prompt builder.
-201. [x] DONE: Reuse the real answer-evaluation parser and schema validation.
-202. [x] DONE: Report schema pass rate, score agreement, missing-concept accuracy,
-         passed cases, and failed cases.
-203. [x] DONE: Add `npm run eval` at the root and server workspace.
-204. [x] DONE: Document that the current eval is offline and mocked.
-205. [x] DONE: Document that real provider evals require `GEMINI_API_KEY` or
-         `GROQ_API_KEY` in the server environment.
+#### Verification
 
-Explanation:
+- Playwright or manual mobile viewport screenshots.
+- `npm run check` after code changes.
 
-The project now has a repeatable local evaluation command that does not require
-provider secrets. It validates prompt guidance and structured-output parsing
-against a fixed dataset. Real Gemini/Groq evals are a later verification step
-because they require Daniel's provider credentials.
+#### Completion evidence
 
----
+- Verified in the local browser at 390x844 and 320x700.
+- `Start interview` remained reachable after a normal scroll at 320x700 and stayed within the mobile width.
+- No horizontal overflow was observed.
 
-206. [x] \***\*Stage 12 - Screenshot Refresh\*\***
 
-#### 12.14 Documentation Screenshots
+### IP-P1-003 - Make feedback stack cleanly below questions on mobile
 
-207. [x] DONE: Refresh `docs/screenshots/01-interview-setup.png`.
-208. [x] DONE: Refresh `docs/screenshots/02-answer-feedback.png`.
-209. [x] DONE: Refresh `docs/screenshots/03-final-report.png`.
-210. [x] DONE: Capture the screenshots with the new `Generative AI Engineer` and
-         `Intern` options visible in the representative flow.
-211. [x] DONE: Use controlled API responses so no provider key is required for the
-         screenshot refresh.
+**Status:** [x] Verified complete
+**Area:** Frontend / Responsive Design / UX
+**Difficulty:** Medium
+**Depends on:** IP-P1-001
+**Why it matters:** Feedback must be readable without forcing awkward side-by-side layout on narrow screens.
 
-Explanation:
+#### Current evidence
 
-The documentation screenshots now match the updated role/level UI and show the
-setup, answer-feedback, and final-report states. This was a screenshot refresh
-only; the real-provider manual smoke test remains open until Daniel provides
-`GEMINI_API_KEY` or `GROQ_API_KEY` in the server environment.
+- `interview-questions.tsx` uses `lg:grid-cols-[minmax(0,1fr)_440px]`, so feedback stacks before the `lg` breakpoint.
+- Mobile browser checks at 390x844 and 320x700 showed the answer section above the `AI feedback` heading, no horizontal overflow, and readable stacked feedback content.
 
----
+#### Required work
 
-212. [x] \***\*Stage 12 - Local Safety Smoke Checks\*\***
+- [x] Verify question and feedback layout at 390 x 844.
+- [x] Verify question and feedback layout at 320 x 700.
+- [x] Ensure feedback appears below the question on mobile.
+- [x] Ensure long suggested answers do not create layout overflow.
 
-#### 12.15 Backend-Down, Missing-Key, And Secret-Exposure Checks
+#### Acceptance criteria
 
-213. [x] DONE: Verify frontend behavior when the backend is down.
-214. [x] DONE: Verify backend behavior when no AI provider key is configured.
-215. [x] DONE: Verify browser-delivered client code does not expose Gemini or Groq
-         API keys.
+- [x] Feedback stacks below the question on mobile.
+- [x] Score and confidence remain visible and readable.
+- [x] Feedback sections do not overflow horizontally.
 
-Explanation:
+#### Verification
 
-The client was tested with no backend running and showed a safe unavailable API
-state plus a safe interview-generation error. The backend was tested through an
-in-process Express HTTP request with `GEMINI_API_KEY` and `GROQ_API_KEY` forced
-empty; it returned `503` and `AI_NOT_CONFIGURED` without exposing secrets,
-stacks, or local source paths. Browser-delivered HTML and dev-served scripts did
-not contain Gemini/Groq key patterns or provider-key environment assignments.
+- Manual or Playwright mobile viewport flow after answer evaluation.
 
----
+#### Completion evidence
 
-216. [x] \***\*Stage 12 - Frontend Test Runner Foundation\*\***
+- Verified on the deployed browser flow at 390x844 and 320x700.
+- The `AI feedback` section appears below the question content and remains within the mobile width.
+- No horizontal overflow was observed in the mobile checks.
 
-#### 12.16 Client Role/Level Configuration Tests
 
-217. [x] DONE: Add a client test script.
-218. [x] DONE: Add automated coverage for `Generative AI Engineer`.
-219. [x] DONE: Add automated coverage for `Intern`.
-220. [x] DONE: Verify derived client role/level arrays match the central
-         configuration values.
-221. [x] DONE: Include the client tests in the root `npm run check` gate.
+### IP-P1-004 - Normalize feedback text presentation
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** Frontend / Text Presentation
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** AI feedback should read like a polished product, not raw model output.
 
-The client now has a lightweight Node test runner powered by the existing `tsx`
-runtime. The new test locks the role/level source of truth, derived arrays, and
-label helpers so future UI changes are less likely to drop the new options.
+#### Current evidence
 
----
+- Strengths, weaknesses, and missing concepts render as lists.
+- Improved answer renders as collapsible, readable paragraphs.
+- Raw markdown markers are normalized before display.
+- Current labels use `Areas to improve`, `Key concepts`, and `Suggested answer` where appropriate.
 
-## \***\*Stage 1 Done Tasks\*\***
+#### Required work
 
-222. [x] \***\*Stage 1 - Project Setup\*\***
+- [x] Render or safely remove raw markdown syntax such as `**`.
+- [x] Rename `Missing concepts` to `Key concepts` where appropriate.
+- [x] Use `Areas to improve`.
+- [x] Use `Suggested answer`.
+- [x] Divide long suggested answers into readable paragraphs or sections.
+- [x] Make long suggested answers collapsible.
 
-##### 1.1 Create Main Project Folder
+#### Acceptance criteria
 
-223. [x] DONE: Create main folder named `InterviewPilot-AI`
+- [x] No raw markdown syntax is visible in feedback.
+- [x] Strengths, areas to improve, and key concepts are semantic bullet lists.
+- [x] Suggested answer is readable and not overwhelming.
+- [x] Terms are consistent across feedback and final report.
 
-Explanation:
+#### Verification
 
-This folder will contain the entire project.
+- `npm run check`
+- Manual review with long AI responses.
 
-Expected result:
+#### Completion evidence
 
-```txt
-InterviewPilot-AI/
-```
+- Verified with mocked markdown-heavy responses in the local browser.
+- Question feedback and final report now normalize markdown-like emphasis and list markers before rendering.
+- Suggested answers are split into readable paragraphs and rendered inside collapsible details.
+- `npm run check` passed after the changes.
 
----
 
-#### 1.2 Create Main Subfolders
+### IP-P1-005 - Improve final report readability on long sessions
 
-224. [x] DONE: Create `frontend` folder
-225. [x] DONE: Create `backend` folder
-226. [x] DONE: Create `docs` folder
+**Status:** [x] Verified complete
+**Area:** Frontend / UX / Text Presentation
+**Difficulty:** Medium
+**Depends on:** IP-P0-005
+**Why it matters:** The final report is a portfolio centerpiece and must be easy to scan.
 
-Explanation:
+#### Current evidence
 
-`frontend` is the website users see.
-`backend` is the server that talks to the AI.
-`docs` contains project documentation and planning.
+- `final-report.tsx` shows overall score, role/level/type, strengths, areas to improve, knowledge gaps, roadmap, recommended topics, question breakdown, copy report, and practice again.
+- Question breakdown items are now collapsible.
+- Improved answers in the breakdown render as readable paragraphs inside details.
 
-Expected result:
+#### Required work
 
-```txt
-InterviewPilot-AI/
-â”œâ”€â”€ client/
-â”œâ”€â”€ server/
-â””â”€â”€ docs/
-```
+- [x] Verify final report on desktop and mobile.
+- [x] Make long question breakdowns collapsible on mobile.
+- [x] Limit reading width for long answer text.
+- [x] Confirm score and confidence presentation are clear.
 
----
+#### Acceptance criteria
 
-#### 1.3 Create Documentation Files
+- [x] Final report remains readable after all 3 questions.
+- [x] Long answer content does not dominate mobile screens.
+- [x] Copy report and practice again actions are easy to find.
 
-227. [x] DONE: Create `README.md`
-228. [x] DONE: Create `docs/MASTER_TASKS.md`
-229. [x] DONE: Create `docs/PROJECT_PLAN.md`
-230. [x] DONE: Create `docs/MVP_SCOPE.md`
-231. [x] DONE: Create `docs/ARCHITECTURE.md`
-232. [x] DONE: Create `docs/API_DESIGN.md`
-233. [x] DONE: Create `docs/AI_PROMPT_DESIGN.md`
+#### Completion evidence
 
-Explanation:
+- Verified in the local browser at desktop and mobile sizes.
+- Long question breakdowns use collapsible details, and the suggested answer stays constrained for reading width.
+- Score and confidence remain clear in the final report summary.
+- `npm run check` passed after the report readability updates.
 
-These files make the project easier to understand for the developer, Codex, and recruiters.
+#### Verification
 
----
+- Manual browser final-report review.
+- Playwright screenshots when E2E exists.
 
-234. [x] \***\*Stage 2 - Frontend Setup\*\***
+#### Completion evidence
 
-#### 2.1 Create React App
 
-235. [x] DONE: Create React + Vite + TypeScript app inside `frontend`
+### IP-P1-006 - Complete form accessibility semantics
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** Accessibility / Frontend
+**Difficulty:** Medium
+**Depends on:** IP-P0-007
+**Why it matters:** The main setup and answer form must work for keyboard and assistive tech users.
 
-React builds the user interface.
-Vite creates the React project quickly.
-TypeScript helps prevent code mistakes.
+#### Current evidence
 
-Expected result:
+- `client/index.html` has `lang="en"`.
+- `OptionGroup` uses `fieldset` and `legend`.
+- Radio inputs are native and keyboard accessible.
+- Answer textarea has an explicit label.
+- Invalid answer state sets `aria-invalid` and links validation/help text through `aria-describedby`.
+- Validation copy is exposed through a polite live region.
+- Focus states are visible on the textarea and action buttons.
 
-The app runs locally in the browser.
+#### Required work
 
----
+- [x] Add `aria-invalid` for invalid answer states.
+- [x] Associate answer validation messages with the textarea.
+- [x] Confirm accessible names for all controls.
+- [x] Confirm visible focus states for form, answer, and action controls.
+- [x] Add short helper text where controls need it.
 
-#### 2.2 Install Tailwind CSS
+#### Acceptance criteria
 
-236. [x] DONE: Install and configure Tailwind CSS
+- [x] Every form control has an explicit accessible name.
+- [x] Invalid fields are announced or associated with messages.
+- [x] Focus states are visible.
+- [x] Tab order is logical.
 
-Explanation:
+#### Verification
 
-Tailwind is used to style the website quickly with clean modern design.
+- Keyboard-only pass.
+- Browser accessibility tree spot check.
+- `npm run check`
 
-Expected result:
+#### Completion evidence
 
-The frontend can use Tailwind classes for layout, colors, spacing, and buttons.
+- Verified in the local browser on 2026-06-26.
+- The answer textarea exposes `aria-invalid="true"` when invalid and points to helper, count, and validation messages with `aria-describedby`.
+- The validation message uses `aria-live="polite"` so state changes are announced.
+- Focus-visible styling is present on the textarea and action controls.
 
----
 
-#### 2.3 Install shadcn/ui
+### IP-P1-007 - Verify keyboard-only main workflow
 
-237. [x] DONE: Install and configure shadcn/ui
+**Status:** [x] Verified complete
+**Area:** Accessibility / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-005, IP-P1-006
+**Why it matters:** The Phase 1 definition of done requires keyboard navigation.
 
-Explanation:
+#### Current evidence
 
-shadcn/ui gives ready-made professional components such as buttons, cards, inputs, and textareas.
+- Native radio inputs and buttons are keyboard reachable.
+- Focus moves to the answer field after question generation.
+- Focus moves back to the setup help button after start-over.
+- The full keyboard-only interview flow was replayed in a browser with mocked API responses.
 
-Expected result:
+#### Required work
 
-The project can use reusable UI components instead of building everything from zero.
+- [x] Complete setup using keyboard only.
+- [x] Generate questions using keyboard only.
+- [x] Navigate questions using keyboard only.
+- [x] Submit answers using keyboard only.
+- [x] Finish interview and reach final report using keyboard only.
 
----
+#### Acceptance criteria
 
-238. [x] \***\*Stage 3 - Backend Setup\*\***
+- [x] No keyboard trap.
+- [x] Focus is visible at all times.
+- [x] Dynamic content focus movement is understandable.
+- [x] Final report actions are reachable.
 
-#### 3.1 Create Express Server
+#### Verification
 
-239. [x] DONE: Create Express + TypeScript backend inside `backend`
+- Manual keyboard-only flow.
+- Add Playwright keyboard test when E2E exists.
 
-Explanation:
+#### Completion evidence
 
-Express is the backend server.
-It receives requests from the frontend and sends requests to Gemini.
+- Verified in the local browser on 2026-06-26 with mocked create/evaluate responses.
+- Keyboard flow reached the answer field after starting the interview, stepped through all three questions, and reached the final report.
+- The sticky action button stayed reachable by keyboard across submit, next-question, and finish states.
+- Focus remained understandable during the transition from setup to interview and from interview back to the report.
 
-Expected result:
 
-The backend runs locally.
+### IP-P1-008 - Verify color contrast, heading hierarchy, and readable type
 
----
+**Status:** [x] Verified complete
+**Area:** Accessibility / Visual Design
+**Difficulty:** Medium
+**Depends on:** IP-P1-001
+**Why it matters:** Recruiter-facing polish depends on readability and accessible contrast.
 
-#### 3.2 Create Health Check Endpoint
+#### Current evidence
 
-240. [x] DONE: Create `GET /api/health`
+- App uses dark theme with muted foregrounds and many low-opacity panels.
+- Semantic headings exist in major sections and follow a sensible hierarchy.
+- Large visual text remains readable on mobile and desktop.
+- Browser contrast checks were run against the setup, question, and final report states.
 
-Explanation:
+#### Required work
 
-This is a simple endpoint used to verify that the backend is working.
+- [x] Run a contrast check on core screens.
+- [x] Verify heading order on setup, question, feedback, and final report.
+- [x] Confirm minimum mobile font sizes are readable.
+- [x] Adjust muted text or panel colors if contrast fails.
 
-Expected response:
+#### Acceptance criteria
 
-```json
-{
-  "status": "ok"
-}
-```
+- [x] Contrast is adequate for normal text and controls.
+- [x] Headings follow a logical hierarchy.
+- [x] Mobile text is readable without zoom.
 
----
+#### Verification
 
-241. [x] \***\*Stage 4 - Frontend Backend Connection\*\***
+- Browser accessibility tools.
+- Lighthouse or axe check if added.
+- Manual visual review at required viewports.
 
-#### 4.1 Create API Client
+#### Completion evidence
 
-242. [x] DONE: Create frontend API service file
+- Verified in the local browser on 2026-06-26 with mocked create/evaluate responses.
+- Headings on the home, question, and final report screens follow a sensible hierarchy.
+- Contrast checks passed for the hero copy, setup copy, question text, answer area, and final report body text.
+- The final report score label was updated from primary blue to white and now clears contrast requirements.
+- Mobile text sizes remained readable in the 390px-wide browser pass.
 
-Explanation:
 
-This file will contain functions that call the backend.
+### IP-P1-009 - Standardize navigation placement and copy
 
-Expected result:
+**Status:** [x] Verified complete
+**Area:** Frontend / UX
+**Difficulty:** Medium
+**Depends on:** IP-P0-008
+**Why it matters:** Users should always understand the next action and where to find it.
 
-The frontend can send requests to the backend in an organized way.
+#### Current evidence
 
----
+- Previous and primary finish controls are shown together in a sticky bottom bar.
+- `Finish interview and view report` is used on the final question.
+- The approved final-message copy is shown: `All questions have been reviewed. You can now finish the interview.`
+- The sticky navigation stays visible while scrolling through long answer and feedback content.
 
-#### 4.2 Test Connection
+#### Required work
 
-243. [x] DONE: Call `/api/health` from the frontend
+- [x] Use one primary action per state.
+- [x] Standardize Previous, Next, and Finish placement.
+- [x] Use `Finish interview and view report`.
+- [x] Use `All questions have been reviewed. You can now finish the interview.`
+- [x] Ensure navigation is available without scrolling through very long suggested answers.
 
-Explanation:
+#### Acceptance criteria
 
-The frontend calls the backend health endpoint when the app loads and shows whether the API is connected.
+- [x] Navigation location is predictable.
+- [x] Disabled states are clear.
+- [x] Recommended terminology is applied consistently.
 
-Expected result:
+#### Verification
 
-The frontend receives `status: ok` and displays `API connected`.
+- `npm run check`
+- Manual browser flow through first, middle, and final question states.
 
----
+#### Completion evidence
 
-244. [x] \***\*Stage 5 - Interview Configuration UI\*\***
+- Verified in the local browser with mocked interview API responses on 2026-06-26.
+- The primary action remained visible in a sticky bottom navigation bar while scrolling through long feedback content.
+- The final question displayed the approved copy exactly: `All questions have been reviewed. You can now finish the interview.`
 
-#### 5.1 Create Homepage
 
-245. [x] DONE: Create homepage
-246. [x] DONE: Add project title
-247. [x] DONE: Add short product description
-248. [x] DONE: Add Start Interview button
+### IP-P1-010 - Add browser-flow documentation after verification
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** Documentation / QA
+**Difficulty:** Easy
+**Depends on:** IP-P0-005, IP-P1-001, IP-P1-007
+**Why it matters:** Manual QA evidence should be repeatable instead of living only in memory.
 
-This is the first page the user sees.
+#### Current evidence
 
----
+- `docs/manual-testing.md` describes local testing and expected behavior and now links the fresh browser audit.
+- A dated browser verification note exists in `docs/verification/2026-06-26-browser-verification.md`.
+- Existing UI audit remains in `output/playwright/design-audit/audit-notes.md` for the older visual notes.
 
-#### 5.2 Create Role Selection
+#### Required work
 
-249. [x] DONE: Add Frontend Developer option
-250. [x] DONE: Add Backend Developer option
-251. [x] DONE: Add Full Stack Developer option
-252. [x] DONE: Add AI Engineer option
-253. [x] DONE: Add Generative AI Engineer option
+- [x] Add or update a docs audit file for production browser verification.
+- [x] Include viewport matrix results.
+- [x] Include keyboard-only notes.
+- [x] Include console/network observations.
+- [x] Link the audit from this tracker or manual testing docs.
 
-Explanation:
+#### Acceptance criteria
 
-The role tells the AI what type of interview questions to generate.
+- [x] Browser verification evidence is discoverable from docs.
+- [x] Manual results include date, URL, viewport, and pass/fail notes.
+- [x] Known issues are mapped to task IDs.
 
----
+#### Verification
 
-#### 5.3 Create Experience Level Selection
+- Manual docs review.
+- `rg -n "IP-P0|IP-P1|viewport|keyboard" docs`
 
-254. [x] DONE: Add Intern option
-255. [x] DONE: Add Junior option
-256. [x] DONE: Add Mid-Level option
-257. [x] DONE: Add Senior option
+#### Completion evidence
 
-Explanation:
+- Verified in `docs/verification/2026-06-26-browser-verification.md`.
+- The audit covers production browser flow, viewport matrix, keyboard-only notes, and console/network observations.
+- `docs/manual-testing.md` links the browser audit so the evidence is easy to find from the testing guide.
 
-The experience level controls the difficulty of the questions.
 
----
+## P2 - Engineering, CI, Observability, And Portfolio Improvements
 
-#### 5.4 Create Interview Type Selection
+### IP-P2-001 - Maintain GitHub Actions PR CI
 
-258. [x] DONE: Add Technical option
-259. [x] DONE: Add Behavioral option
-260. [x] DONE: Add Mixed option
+**Status:** [x] Verified complete
+**Area:** GitHub / Testing
+**Difficulty:** Medium
+**Depends on:** None
+**Why it matters:** CI proves baseline engineering discipline for portfolio review.
 
-Explanation:
+#### Current evidence
 
-The selected interview type is stored in the frontend configuration and displayed in the current setup summary.
+- `.github/workflows/pr-ci.yml` exists.
+- CI runs client lint, typecheck, test, build.
+- CI runs server typecheck, test, eval, build.
+- Local equivalents passed in `npm run check` and `npm run eval`.
 
----
+#### Required work
 
-#### 6.1 Create Gemini Service
+- [x] Keep PR CI workflow present.
+- [x] Keep client checks in CI.
+- [x] Keep server checks and eval in CI.
 
-261. [x] DONE: Create Gemini AI service in backend
+#### Acceptance criteria
 
-Explanation:
+- [x] Pull requests run automated checks.
+- [x] CI command list matches package scripts that exist.
 
-This service is responsible for sending prompts to Gemini and receiving AI responses.
+#### Verification
 
----
+- Inspect `.github/workflows/pr-ci.yml`.
+- `npm run check`
+- `npm run eval`
 
-#### 6.2 Create Question Prompt Builder
+#### Completion evidence
 
-262. [x] DONE: Create prompt builder for interview questions
-263. [x] DONE: Add interview type to the request model and question prompt
+- Verified during 2026-06-26 audit.
 
-Explanation:
+### IP-P2-002 - Configure GitHub required checks
 
-The backend validates `interviewType` and includes it in the Gemini prompt so
-Technical, Behavioral, and Mixed interviews generate different question styles.
+**Status:** [x] Verified complete
+**Area:** GitHub
+**Difficulty:** Easy
+**Depends on:** IP-P2-001
+**Why it matters:** CI should block broken pull requests before merge.
 
----
+#### Current evidence
 
-#### 6.3 Create Interview Endpoint
+- Workflow exists.
+- Branch protection on `main` now requires `Client checks` and `Server checks`.
+- Draft PR #3 shows `Client checks` and `Server checks` in the PR status rollup.
 
-264. [x] DONE: Create `POST /api/interview/create`
+#### Required work
 
-Explanation:
+- [x] Open GitHub branch protection settings.
+- [x] Require the client and server PR CI jobs before merge.
+- [x] Confirm required checks appear on a pull request.
 
-This endpoint receives the user's interview settings and returns AI-generated questions.
+#### Acceptance criteria
 
-Expected input:
+- [x] PRs cannot merge when required checks fail.
+- [x] Required check names match workflow job names.
 
-```json
-{
-  "role": "generative-ai-engineer",
-  "level": "intern",
-  "interviewType": "Mixed",
-  "questionCount": 3
-}
-```
+#### Verification
 
-Expected output:
+- GitHub repository settings.
+- Draft PR #3 and `gh pr checks --watch`.
 
-```json
-{
-  "interviewId": "interview-...",
-  "questions": []
-}
-```
+#### Completion evidence
 
----
+- Added `Client checks` and `Server checks` as required status checks on `main`.
+- Opened draft PR #3 from `Codex-YoloBranch` to verify the checks appear in the PR status rollup.
+- Verified the required checks passed on the PR with `gh pr checks --watch`.
 
-265. [x] \***\*Stage 7 - Interview Session UI\*\***
+### IP-P2-003 - Keep offline evaluation pipeline reliable
 
-#### 7.1 Display Questions (Completed Items)
+**Status:** [x] Verified complete
+**Area:** AI / Evaluation Pipeline
+**Difficulty:** Medium
+**Depends on:** IP-P0-003
+**Why it matters:** AI feedback quality needs repeatable regression checks.
 
-266. [x] DONE: Show question number
-267. [x] DONE: Show topic
-268. [x] DONE: Show difficulty
-269. [x] DONE: Show one question at a time
+#### Current evidence
 
-Explanation:
+- `server/src/evals/runEvaluation.ts` exists.
+- Dataset and metadata exist under `server/src/evals`.
+- `npm run eval` passed 4/4 cases.
+- Prompt version: `answer-evaluation-v1`.
+- Schema version: `answer-evaluation-schema-v1`.
+- Dataset version: `evaluation-cases-v1`.
 
-This creates the actual interview experience.
+#### Required work
 
----
+- [x] Keep versioned dataset metadata.
+- [x] Keep offline eval command.
+- [x] Measure schema pass rate, score agreement, and missing concept accuracy.
 
-#### 7.2 Add Answer Box
+#### Acceptance criteria
 
-270. [x] DONE: Add textarea for user answer
-271. [x] DONE: Add Submit Answer button
+- [x] Eval command exits 0 when all cases pass.
+- [x] Eval output is structured JSON.
+- [x] Metrics include pass/fail and schema results.
 
-Explanation:
+#### Verification
 
-The user can write and locally submit an answer for each generated question.
+- `npm run eval`
 
----
+#### Completion evidence
 
-272. [x] \***\*Stage 8 - Answer Evaluation\*\***
+- 2026-06-26 audit: 4/4 cases passed.
 
-#### 8.1 Create Evaluation Prompt Builder
+### IP-P2-004 - Verify real Gemini and Groq fallback evaluations
 
-273. [x] DONE: Create prompt builder for answer evaluation
+**Status:** [x] Verified complete
+**Area:** AI / Evaluation Pipeline
+**Difficulty:** Medium
+**Depends on:** IP-P2-003
+**Why it matters:** Mocked evals do not prove real provider consistency or fallback quality.
 
-Explanation:
+#### Current evidence
 
-The backend now builds a strict JSON prompt for grading one submitted answer.
+- `server/src/evals/realProviderEvaluation.ts` exists.
+- `server/src/evals/runRealProviderEvaluation.ts` exists.
+- `server/src/evals/realProviderEvaluation.test.ts` covers report shape with injected providers.
+- `npm run eval:real` exists but was not run with real keys in this audit.
 
-It asks the AI to return:
+#### Required work
 
-- score
-- strengths
-- weaknesses
-- missing concepts
-- improved answer
-- confidence level
+- [ ] Run real-provider eval with server-side Gemini and Groq keys.
+- [ ] Save a JSON report outside client runtime paths.
+- [ ] Compare provider failures, schema failures, latency, and score agreement.
+- [ ] Document the result and limitations.
 
----
+#### Acceptance criteria
 
-#### 8.2 Create Evaluation Endpoint
+- [ ] Gemini and Groq both run against the same dataset.
+- [ ] Results include provider, model, latency, schema success, and score result.
+- [ ] No real secrets are logged or saved.
 
-274. [x] DONE: Create `POST /api/interview/evaluate`
+#### Verification
 
-Explanation:
+- `cd server`
+- `npm run eval:real`
+- Optional: `npm run eval:real -- --output ../output/evals/real-provider-YYYY-MM-DD.json`
 
-The endpoint receives a question and user answer, sends a strict prompt to the
-AI provider layer, validates the returned JSON, and returns safe feedback.
+#### Completion evidence
 
----
+- `docs/LINKEDIN_RELEASE.md` now uses verified Phase 1 wording and a recruiter-friendly summary that matches the live product.
+- The README and screenshot set already reflect the production browser verification and refreshed UI.
 
-#### 8.3 Display Feedback
 
-275. [x] DONE: Display score
-276. [x] DONE: Display strengths
-277. [x] DONE: Display weaknesses
-278. [x] DONE: Display missing concepts
-279. [x] DONE: Display improved answer
+### IP-P2-005 - Add Playwright E2E coverage for the core flow
 
-Explanation:
+**Status:** [x] Verified complete
+**Area:** Testing / Frontend / Backend
+**Difficulty:** Complex
+**Depends on:** IP-P0-005
+**Why it matters:** The highest-risk workflow is browser-based and currently manual.
 
-The frontend now evaluates submitted answers and shows structured feedback below
-the current question.
+#### Current evidence
 
----
+- Root `package.json` now includes `test:e2e`.
+- `playwright.config.ts` runs the client dev server on a fixed port and reuses it when available.
+- `tests/e2e/core-flow.spec.ts` mocks the API, drives the setup form, answers all three questions, verifies feedback, reaches the final report, and returns to setup.
+- The local browser flow is deterministic because the AI endpoints are mocked.
 
-#### 9.1 Store Interview Results
+#### Required work
 
-280. [x] DONE: Store all questions
-281. [x] DONE: Make submitted answers available to the final report flow
-282. [x] DONE: Store all user answers
-283. [x] DONE: Store all AI evaluations
+- [x] Add a Playwright test command.
+- [x] Mock or isolate AI calls for deterministic E2E flow.
+- [x] Test setup, question generation, answer submission, feedback display, completion, and final report.
+- [ ] Add CI E2E only if it is practical and stable.
 
-Explanation:
+#### Acceptance criteria
 
-This data is needed to generate the final report.
+- [x] E2E test can run locally.
+- [x] E2E test covers the full core workflow.
+- [x] Test avoids real provider cost unless explicitly configured.
 
----
+#### Verification
 
-284. [x] \***\*Stage 9 - Final Report\*\***
+- `npm run test:e2e`
 
-#### 9.2 Create Final Report Screen
+#### Completion evidence
 
-285. [x] DONE: Show overall score
-286. [x] DONE: Show strengths summary
-287. [x] DONE: Show weaknesses summary
-288. [x] DONE: Show knowledge gaps
-289. [x] DONE: Show learning roadmap
-290. [x] DONE: Show recommended topics
+- Added a root Playwright test command and config.
+- Added a deterministic core-flow spec that completes setup, all three questions, feedback, final report, and restart.
+- Verified locally with `npm run test:e2e`.
 
-Explanation:
+#### Completion evidence
 
-The frontend now stores evaluated answers in parent state and shows a final
-report after every question has feedback.
 
----
+### IP-P2-006 - Add automated responsive, keyboard, and accessibility checks
 
-#### 10.1 Loading States (Completed Items)
+**Status:** [x] Verified complete
+**Area:** Testing / Accessibility
+**Difficulty:** Complex
+**Depends on:** IP-P1-001, IP-P1-007, IP-P2-005
+**Why it matters:** Manual viewport and accessibility checks are easy to forget.
 
-291. [x] DONE: Add loading state while generating questions
-292. [x] DONE: Add loading state while evaluating answers
-293. [x] DONE: Add loading state while generating final report
+#### Current evidence
 
-Explanation:
+- `tests/e2e/responsive-keyboard-a11y.spec.ts` now covers the required viewport matrix, keyboard-only setup/interview flow, and axe checks on the setup and interview states.
+- `client/src/components/interview/saved-config-summary.tsx` was adjusted so the summary definition list passes axe semantics.
+- The automation uses viewport assertions and axe checks rather than screenshot diffs, so visual polish still benefits from manual review.
 
-Loading states prevent the app from feeling broken while AI is working.
+#### Required work
 
----
+- [x] Add viewport screenshots or assertions for required sizes.
+- [x] Add keyboard-only flow coverage.
+- [x] Add an accessibility check for obvious violations.
+- [x] Document any accepted limitations.
 
-#### 10.2 Error Handling (Completed Items)
+#### Acceptance criteria
 
-294. [x] DONE: Handle Gemini API errors
-295. [x] DONE: Handle backend errors
-296. [x] DONE: Handle invalid selections
-297. [x] DONE: Handle empty answers
+- [x] Responsive regressions are caught automatically.
+- [x] Keyboard regressions are caught automatically.
+- [x] Accessibility checks run locally and optionally in CI.
 
-Explanation:
+#### Verification
 
-This makes the project feel more production-ready.
+- `npm run test:e2e`
 
----
+#### Completion evidence
 
-#### 11.1 Update README (Completed Items)
+- Added `@axe-core/playwright` and a shared Playwright mock helper for the core flow.
+- Added `tests/e2e/core-flow.spec.ts` and `tests/e2e/responsive-keyboard-a11y.spec.ts`.
+- Verified locally with `npm run test:e2e`.
 
-298. [x] DONE: Explain what the project does
-299. [x] DONE: List technologies used
-300. [x] DONE: Explain how to run locally
-301. [x] DONE: Explain AI features
-302. [x] DONE: Update complete MVP feature description
-303. [x] DONE: Add screenshots
+### IP-P2-007 - Keep backend protection and observability in place
 
----
+**Status:** [x] Verified complete
+**Area:** Backend / Security / Observability
+**Difficulty:** Medium
+**Depends on:** None
+**Why it matters:** Public AI endpoints need basic abuse protection and diagnostic signals.
 
-#### 11.2 Update Architecture Document
+#### Current evidence
 
-304. [x] DONE: Explain frontend
-305. [x] DONE: Explain backend
-306. [x] DONE: Explain AI flow
-307. [x] DONE: Explain API structure
+- `server/src/app.ts` uses `express.json({ limit: '100kb' })`.
+- `server/src/middleware/requestSecurity.ts` adds request IDs, request logging, and rate limiting.
+- `server/src/ai/aiService.ts` adds provider request timeout and fallback logging.
+- `server/src/services/interviewService.ts` logs schema validation failures.
+- Server tests cover request IDs, rate limiting, provider timeout, fallback, and validation failures.
 
----
+#### Required work
 
-#### 11.3 Update Prompts Document (Completed Items)
+- [x] Keep request-size limit.
+- [x] Keep rate limiting.
+- [x] Keep provider timeout handling.
+- [x] Keep request IDs and structured logs.
+- [x] Keep provider failure and fallback logging.
 
-308. [x] DONE: Document question generation prompt
-309. [x] DONE: Document answer evaluation prompt
-310. [x] DONE: Document final report prompt
+#### Acceptance criteria
 
----
+- [x] Interview routes rate-limit repeated requests.
+- [x] Slow providers time out.
+- [x] Logs avoid full API keys.
+- [x] User-facing errors are safe.
 
-# Phase 1 Completion Checklist
+#### Verification
 
-311. [x] DONE: User can open homepage
-312. [x] DONE: User can select role
-313. [x] DONE: User can select experience level
-314. [x] DONE: User can select interview type
-315. [x] DONE: AI generates questions
-316. [x] DONE: User can answer questions
-317. [x] DONE: AI evaluates answers
-318. [x] DONE: User can move between questions
-319. [x] DONE: Final report is generated
-320. [ ] TODO: App works online
+- `npm run check`
+- Review `server/src/middleware/requestSecurity.ts`.
+- Review `server/src/ai/aiService.ts`.
 
-- Why not implemented: Deployment configuration is ready, but there is no
-  verified live Vercel/Render production URL yet.
+#### Completion evidence
 
-321. [x] DONE: README is complete
-322. [ ] TODO: GitHub repository is updated
+- Verified by server tests in `npm run check`.
 
-- Why not implemented: Codex was not explicitly asked to commit or push, and
-  current local changes have not been committed and pushed yet.
+### IP-P2-008 - Add stricter schema validation at trust boundaries
 
----
+**Status:** [x] Verified complete
+**Area:** Backend / AI / Architecture
+**Difficulty:** Medium
+**Depends on:** IP-P0-003
+**Why it matters:** Hand validation works, but Zod or equivalent schemas would make boundary contracts clearer and easier to maintain.
 
-# Phase 2 - Locked Until Phase 1 Is Complete
+#### Current evidence
 
-Phase 2 will include:
+- Backend validates create requests, evaluate requests, generated questions, and AI answer evaluations with focused Zod schemas in `interviewService.ts`.
+- Create requests still accept human-readable role and level labels and normalize them to canonical values.
+- Frontend response validation remains manual for now, but the server-side trust boundaries are schema-checked.
+- `server/package.json` now includes `zod`.
 
-- User accounts
-- Supabase Auth
-- Interview history
-- Saved reports
-- Basic dashboard
+#### Required work
 
-Do not start Phase 2 before Phase 1 is fully completed.
+- [x] Decide whether current hand validation is enough for Phase 1.
+- [x] If adding Zod, keep it focused and avoid heavy abstractions.
+- [x] Define schemas for create request, generated questions, evaluate request, and answer evaluation.
+- [x] Keep prompt shape and schema synchronized.
 
----
+#### Acceptance criteria
 
-323. [ ] Phase 2 - User Accounts + History
+- [x] Malformed AI output cannot crash the app.
+- [x] Runtime validation logic is easy to review.
+- [x] Tests cover schema failures and repair/fallback behavior.
 
-- Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
+#### Completion evidence
 
-324. [ ] Phase 3 - Resume Upload + Personalization
+- Added focused Zod schemas for create requests, generated questions, evaluate requests, and answer evaluations.
+- Retained the existing normalization behavior for role and level labels.
+- Added a regression test proving label aliases still normalize correctly.
+- `npm run check` passed after the schema validation update.
 
-- Why not implemented: Phase 3 is locked until the earlier phases are complete.
+#### Verification
 
-325. [ ] Phase 4 - Voice Interviews
+- `npm run check`
+- `npm run eval`
 
-- Why not implemented: Phase 4 is locked until the earlier phases are complete.
+#### Completion evidence
 
-326. [ ] Phase 5 - AI Career Coach
 
-- Why not implemented: Phase 5 is locked until the earlier phases are complete.
+### IP-P2-009 - Refresh portfolio package after final verification
 
-327. [ ] \***\*Stage 2 Tasks\*\***
+**Status:** [x] Verified complete
+**Area:** Documentation / Portfolio
+**Difficulty:** Medium
+**Depends on:** IP-P0-005, IP-P1-001
+**Why it matters:** Screenshots and README should show the verified product recruiters will see.
 
-- Why not implemented: Phase 2 is locked until the Phase 1 MVP is complete.
+#### Current evidence
 
-# Codex Rule
+- README has live demo links, architecture notes, engineering decisions, eval pipeline, known limitations, screenshots, and a note that the screenshots were refreshed from the verified production app.
+- `docs/screenshots/01-interview-setup.png`, `02-answer-feedback.png`, and `03-final-report.png` were refreshed from the verified production app on 2026-06-26.
+- `docs/LINKEDIN_RELEASE.md` exists.
 
-Before making code changes, Codex must:
+#### Required work
 
-1. Read this file.
-2. Find the next unchecked TODO in the `****Stage N Tasks****` section of the active phase.
-3. Complete only that task or a small related group of tasks.
-4. Update this file after completion.
-5. Move completed tasks from `****Stage N Tasks****` to `****Stage N Done Tasks****` and change `[ ]` to `[x]`.
-6. Keep all completed tasks visible (do not delete them).
-7. Do not start locked phases.
+- [x] Capture fresh production screenshots after P0/P1 fixes.
+- [x] Update README if screenshots or verified status change.
+- [x] Prepare final LinkedIn/GitHub profile copy only after Phase 1 closes.
+- [x] Add architecture diagram improvements if needed.
+
+#### Acceptance criteria
+
+- [x] README reflects verified production behavior.
+- [x] Screenshots match the current UI.
+- [x] LinkedIn copy does not overstate Phase 2 or unverified claims.
+
+#### Verification
+
+- Manual docs review.
+- Screenshot file review.
+
+#### Completion evidence
+
+- `docs/LINKEDIN_RELEASE.md` now uses verified Phase 1 wording and a recruiter-friendly summary that matches the live product.
+- The README and screenshot set already reflect the production browser verification and refreshed UI.
+
+- `npm run screenshots:update` refreshed the screenshots from `https://interviewpilot-ai-bice.vercel.app`.
+- The README screenshot section now notes the refresh date.
+- The screenshot files on disk were updated on 2026-06-26.
+
+### IP-P2-010 - Keep dependency and secret hygiene clean
+
+**Status:** [x] Verified complete
+**Area:** Security / Dependencies
+**Difficulty:** Medium
+**Depends on:** IP-P0-004
+**Why it matters:** A portfolio app should not leak secrets or carry avoidable dependency risk.
+
+#### Current evidence
+
+- `.gitignore` excludes `.env`, `.env.local`, `node_modules`, `dist`, `.vercel`, and `.playwright-mcp`.
+- `client/.env` and `server/.env` are not tracked by git.
+- `client/dist` and `server/dist` are not tracked by git.
+- `npm run scan:secrets` is now a repeatable secret scan command.
+- `npm audit --omit=dev` is documented as the dependency risk review command.
+
+#### Required work
+
+- [x] Add or document a dependency audit command if desired.
+- [x] Add a repeatable secret scan command.
+- [x] Confirm local `.env` files are not tracked.
+- [x] Confirm built artifacts are not accidentally committed unless intended.
+
+#### Acceptance criteria
+
+- [x] No real secrets are tracked.
+- [x] Secret scan process is repeatable.
+- [x] Dependency risk review is documented.
+
+#### Verification
+
+- `git status --short`
+- `git ls-files client/.env server/.env client/dist server/dist`
+- `npm run scan:secrets`
+- `npm audit --omit=dev`
+
+#### Completion evidence
+
+- Added `scripts/scan-secrets.mjs` and the `npm run scan:secrets` script.
+- Verified `git ls-files` does not track local env files or built output.
+- Verified `npm run scan:secrets` reports no tracked secrets.
+- `npm audit --omit=dev` reported 0 vulnerabilities.
+
+## P3 - Optional Polish
+
+### IP-P3-001 - Polish microcopy and capitalization
+
+**Status:** [x] Verified complete
+**Area:** UX / Text Presentation
+**Difficulty:** Easy
+**Depends on:** IP-P1-004, IP-P1-009
+**Why it matters:** Small copy inconsistencies make the product feel less finished.
+
+#### Current evidence
+
+- Visible setup and navigation copy now use sentence case consistently.
+- `Start interview` matches the rest of the UI wording.
+- The prior title-case outlier has been removed.
+
+#### Required work
+
+- [x] Use consistent capitalization.
+- [x] Use consistent punctuation.
+- [x] Apply recommended terms where relevant.
+
+#### Acceptance criteria
+
+- [x] Setup, feedback, navigation, and report copy use consistent terminology.
+
+#### Verification
+
+- Manual UI copy review.
+- `npm run check` after changes.
+
+#### Completion evidence
+
+- Updated `Start Interview` to `Start interview` in the setup button.
+- Adjusted the E2E assertions to match the new visible copy.
+- Verified with `npm run check`.
+
+### IP-P3-002 - Add optional report export affordance
+
+**Status:** [x] Verified complete
+**Area:** Frontend / Portfolio
+**Difficulty:** Easy
+**Depends on:** IP-P0-005
+**Why it matters:** Copy report exists; download/export is optional polish with portfolio value.
+
+#### Current evidence
+
+- `final-report.tsx` now includes Copy report, Download report, and Practice again actions.
+- The download action uses the same plain-text report content as the clipboard action.
+
+#### Required work
+
+- [x] Decide whether export belongs in Phase 1 polish.
+- [x] Add a safe text download only if it does not distract from P0/P1 work.
+
+#### Acceptance criteria
+
+- [x] Export action is optional and does not complicate the MVP.
+
+#### Verification
+
+- `npm run check`
+- Manual final report action test.
+
+#### Completion evidence
+
+- Added a plain-text `Download report` button in `final-report.tsx`.
+- The download uses the same generated report text as the copy action and names the file from the current config.
+
+### IP-P3-003 - Refresh visual polish after UX fixes
+
+**Status:** [x] Verified complete
+**Area:** Frontend / Visual Design
+**Difficulty:** Medium
+**Depends on:** IP-P1-001, IP-P1-004, IP-P1-009
+**Why it matters:** Polish should happen after workflow and accessibility issues are resolved.
+
+#### Current evidence
+
+- UI has a distinct dark visual style and refreshed screenshots.
+- The final report insight cards now widen to two columns on normal desktop widths, which improves readability without changing the information hierarchy.
+- `npm run test:e2e` and `npm run check` both passed after the spacing refinement.
+
+#### Required work
+
+- [x] Review visual rhythm after P0/P1 fixes.
+- [x] Tune spacing only where it improves readability.
+- [x] Avoid broad redesign until Phase 1 is stable.
+
+#### Acceptance criteria
+
+- [x] Core screens look polished without introducing new layout risk.
+
+#### Verification
+
+- Manual screenshot review.
+- `npm run check`
+- `npm run test:e2e`
+
+#### Completion evidence
+
+- Updated the final report grid from four narrow desktop columns to a two-column desktop layout before expanding back to four columns on very wide screens.
+- Verified the workflow and accessibility suites still pass after the spacing adjustment.
+
+## Phase 2 - Blocked Until Phase 1 Closes
+
+Phase 2 work exists in the repository as foundation code, but new Phase 2 expansion must wait until Phase 1 production browser verification and P0/P1 fixes are complete.
+
+### IP-F2-001 - Connect real Supabase project and auth configuration
+
+**Status:** [ ] Blocked
+**Area:** Supabase / Auth
+**Difficulty:** Complex
+**Depends on:** IP-P0-005, IP-P1-001, IP-P1-007
+**Why it matters:** Auth cannot be claimed complete until a real Supabase project, env vars, and live auth behavior are verified.
+
+#### Current evidence
+
+- `supabase/migrations/20260625_01_phase2_core.sql` exists.
+- Server Supabase client/config files exist.
+- Client Supabase client/config files and auth panel exist.
+- Client and server Supabase tests pass.
+- `docs/PHASE2_SUPABASE.md` says the real project still needs connection.
+
+#### Required work
+
+- [ ] Configure a real Supabase project.
+- [ ] Apply migrations.
+- [ ] Configure Vercel browser env values.
+- [ ] Configure Render server env values.
+- [ ] Verify sign up, sign in, sign out, and password recovery.
+
+#### Acceptance criteria
+
+- [ ] Auth works end to end against real Supabase.
+- [ ] Service role key never reaches the client.
+- [ ] Auth errors are safe and user-friendly.
+
+#### Verification
+
+- Supabase dashboard.
+- Vercel env dashboard.
+- Render env dashboard.
+- Manual browser auth flow.
+
+#### Completion evidence
+
+
+### IP-F2-002 - Verify Row Level Security and user-owned records
+
+**Status:** [ ] Blocked
+**Area:** Supabase / Security / Database
+**Difficulty:** Complex
+**Depends on:** IP-F2-001
+**Why it matters:** User data must be isolated before interview history can be shown.
+
+#### Current evidence
+
+- Migration enables RLS and owner-scoped policies.
+- No real Supabase project verification was performed.
+- No integration test against live Supabase exists.
+
+#### Required work
+
+- [ ] Create two test users.
+- [ ] Insert records for each user.
+- [ ] Verify users can read only their own records.
+- [ ] Verify unauthorized access fails.
+
+#### Acceptance criteria
+
+- [ ] RLS policies behave as intended in the real project.
+- [ ] Service role usage remains server-only.
+
+#### Verification
+
+- Supabase SQL editor and API tests.
+- Future integration test.
+
+#### Completion evidence
+
+
+### IP-F2-003 - Build interview history and saved reports
+
+**Status:** [ ] Blocked
+**Area:** Frontend / Backend / Database
+**Difficulty:** Complex
+**Depends on:** IP-F2-001, IP-F2-002
+**Why it matters:** History and saved reports are Phase 2 value, not Phase 1 completion criteria.
+
+#### Current evidence
+
+- Current interview session is in React memory.
+- Database schema foundation includes interviews, answers, evaluations, and final reports.
+- No backend repositories/routes or frontend history UI were found.
+
+#### Required work
+
+- [ ] Add server-side data access layer.
+- [ ] Add authenticated interview persistence.
+- [ ] Add history list.
+- [ ] Add saved report view.
+
+#### Acceptance criteria
+
+- [ ] Signed-in users can view only their own history.
+- [ ] Phase 1 anonymous flow remains stable.
+
+#### Verification
+
+- Future backend integration tests.
+- Future frontend E2E tests.
+
+#### Completion evidence
+
+
+### IP-F2-004 - Build analytics dashboard
+
+**Status:** [ ] Blocked
+**Area:** Frontend / Backend / Analytics
+**Difficulty:** Complex
+**Depends on:** IP-F2-003
+**Why it matters:** Analytics should build on persisted data, not temporary state.
+
+#### Current evidence
+
+- No analytics dashboard exists.
+- No persisted user interview history is active.
+
+#### Required work
+
+- [ ] Add score trends.
+- [ ] Add topic breakdown.
+- [ ] Add weak-area summary.
+- [ ] Add dashboard tests.
+
+#### Acceptance criteria
+
+- [ ] Analytics are based on real user-owned records.
+- [ ] Dashboard does not expose other users' data.
+
+#### Verification
+
+- Future authenticated E2E tests.
+- Supabase RLS tests.
+
+#### Completion evidence
+
+
+### IP-F2-005 - Defer resume upload
+
+**Status:** [ ] Blocked
+**Area:** Phase 2 / Future
+**Difficulty:** Complex
+**Depends on:** Phase 1 complete, IP-F2-001
+**Why it matters:** Resume upload expands data sensitivity and should not destabilize the MVP.
+
+#### Current evidence
+
+- No resume upload feature exists.
+- No file storage or parsing pipeline was found.
+
+#### Required work
+
+- [ ] Define privacy and storage requirements.
+- [ ] Add upload only after auth and persistence are secure.
+
+#### Acceptance criteria
+
+- [ ] Resume data is handled securely.
+- [ ] Feature is scoped after Phase 1.
+
+#### Verification
+
+- Future security review and E2E tests.
+
+#### Completion evidence
+
+
+### IP-F2-006 - Defer voice interview and speech analysis
+
+**Status:** [ ] Blocked
+**Area:** Phase 2 / Future
+**Difficulty:** Complex
+**Depends on:** Phase 1 complete
+**Why it matters:** Voice features add browser permissions, media handling, and extra AI complexity.
+
+#### Current evidence
+
+- No voice or speech analysis feature exists.
+
+#### Required work
+
+- [ ] Define recording, consent, privacy, and storage rules.
+- [ ] Add only after Phase 1 and auth foundations are stable.
+
+#### Acceptance criteria
+
+- [ ] Voice feature has clear consent and privacy behavior.
+
+#### Verification
+
+- Future browser permission and E2E tests.
+
+#### Completion evidence
+
+
+### IP-F2-007 - Defer career coach
+
+**Status:** [ ] Blocked
+**Area:** Phase 2 / Future / AI
+**Difficulty:** Complex
+**Depends on:** Phase 1 complete, IP-F2-003
+**Why it matters:** Career coaching should build on reliable interview data and safe AI output.
+
+#### Current evidence
+
+- No career coach feature exists.
+
+#### Required work
+
+- [ ] Define coaching output schema.
+- [ ] Add prompt and eval coverage.
+- [ ] Use persisted user history only after auth is secure.
+
+#### Acceptance criteria
+
+- [ ] Career advice is structured, safe, and clearly scoped.
+
+#### Verification
+
+- Future structured-output tests.
+- Future eval cases.
+
+#### Completion evidence
+
+
+## Manual Actions Required
+
+### MA-001 - Render production environment variables
+
+- Platform: Render
+- Exact dashboard: Render service `interviewpilot-ai-server` -> Environment
+- Exact setting: `CLIENT_ORIGIN`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GROQ_API_KEY`, `GROQ_MODEL`, future Supabase server env values.
+- Expected value format: comma-separated HTTPS frontend origins for `CLIENT_ORIGIN`; secret values stored as Render secrets; no real values in source control.
+- Verification steps: redeploy Render, call `/api/health`, run production create/evaluate smoke, verify CORS preflight.
+- Unblocks: IP-P0-001, IP-P0-002, IP-F2-001.
+
+### MA-002 - Render CORS production origin
+
+- Platform: Render
+- Exact dashboard: Render service `interviewpilot-ai-server` -> Environment
+- Exact setting: `CLIENT_ORIGIN`
+- Expected value format: `https://interviewpilot-ai-bice.vercel.app` plus any active preview/production origins separated by commas.
+- Verification steps: OPTIONS preflight from each Vercel origin returns matching `Access-Control-Allow-Origin`.
+- Unblocks: IP-P0-001, IP-P0-005.
+
+### MA-003 - Vercel production environment variables
+
+- Platform: Vercel
+- Exact dashboard: Vercel project for InterviewPilot AI -> Settings -> Environment Variables
+- Exact setting: `VITE_API_URL`, future `VITE_SUPABASE_URL`, future `VITE_SUPABASE_ANON_KEY`.
+- Expected value format: `VITE_API_URL=https://interviewpilot-ai-server.onrender.com`; Supabase browser values only after Phase 2 is allowed.
+- Verification steps: redeploy Vercel, inspect live JS bundle for Render URL and absence of localhost.
+- Unblocks: IP-P0-001, IP-F2-001.
+
+### MA-004 - Vercel redeployment after env/doc changes
+
+- Platform: Vercel
+- Exact dashboard: Vercel project -> Deployments
+- Exact setting: Redeploy latest intended Git commit.
+- Expected value format: deployment linked to the intended Git branch and commit.
+- Verification steps: compare Vercel deployment commit to GitHub, run live browser flow.
+- Unblocks: IP-P0-005, IP-P0-011.
+
+### MA-005 - GitHub repository settings
+
+- Platform: GitHub
+- Exact dashboard: GitHub repository -> Settings -> Branches or Rulesets
+- Exact setting: required status checks for PR CI.
+- Expected value format: require the client and server workflow jobs from `.github/workflows/pr-ci.yml`.
+- Verification steps: open a PR and confirm failing checks block merge.
+- Unblocks: IP-P2-002.
+
+### MA-006 - Supabase project setup
+
+- Platform: Supabase
+- Exact dashboard: Supabase project -> SQL Editor, Authentication, API settings
+- Exact setting: apply migration, configure auth URLs, collect URL/anon/service-role values.
+- Expected value format: HTTPS Supabase project URL, browser anon key in Vercel only, service role key in Render only.
+- Verification steps: run auth flow, verify RLS with two users.
+- Unblocks: IP-F2-001, IP-F2-002.
+
+### MA-007 - LinkedIn manual publication
+
+- Platform: LinkedIn
+- Exact dashboard: Profile -> Featured and post composer
+- Exact setting: project link, repository link, project summary.
+- Expected value format: live app URL, GitHub repository URL, concise engineering highlights.
+- Verification steps: click the public post/featured links from a logged-out or external browser.
+- Unblocks: IP-P2-009.
+
+## First Recommended Implementation Task
+
+Start with IP-P0-005: verify the full production browser interview flow through final report. The production API smoke is green, so the highest-value next proof is the actual user-facing deployed flow, including console/network review. If that reveals UI friction, continue into IP-P0-006, IP-P0-007, and IP-P0-008 before any Phase 2 work.

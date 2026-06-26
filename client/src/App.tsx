@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { SupabaseAuthPanel } from '@/components/auth/supabase-auth-panel'
 import { AppLayout } from '@/components/layout/app-layout'
 import { HomePage } from '@/pages/home-page'
 import {
@@ -7,6 +7,12 @@ import {
   getApiHealth,
   InterviewApiError,
 } from '@/services/interview-api'
+import {
+  createSupabaseBrowserClient,
+} from '@/supabase/client'
+import {
+  hasSupabaseClientEnvironment,
+} from '@/supabase/config'
 import type {
   ApiConnectionStatus,
   CreateInterviewResponse,
@@ -28,6 +34,30 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [apiConnectionStatus, setApiConnectionStatus] =
     useState<ApiConnectionStatus>('checking')
+  const supabaseEnabled = hasSupabaseClientEnvironment()
+  const { client: supabaseClient, error: supabaseError } = useMemo(() => {
+    if (!supabaseEnabled) {
+      return {
+        client: null,
+        error: '',
+      }
+    }
+
+    try {
+      return {
+        client: createSupabaseBrowserClient(),
+        error: '',
+      }
+    } catch (supabaseEnvironmentError) {
+      return {
+        client: null,
+        error:
+          supabaseEnvironmentError instanceof Error
+            ? 'Supabase auth is not available because the browser env is invalid.'
+            : 'Supabase auth is not available right now.',
+      }
+    }
+  }, [supabaseEnabled])
 
   useEffect(() => {
     let isActive = true
@@ -58,7 +88,10 @@ function App() {
     pendingSessionFocusRef.current = false
     window.requestAnimationFrame(() => {
       sessionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      sessionRef.current?.focus({ preventScroll: true })
+      const firstQuestionControl =
+        sessionRef.current?.querySelector<HTMLTextAreaElement>('textarea')
+
+      firstQuestionControl?.focus({ preventScroll: true })
     })
   }, [interview])
 
@@ -68,6 +101,10 @@ function App() {
   }
 
   function handleCompleteInterview() {
+    if (!interview || isReportLoading || isReportVisible) {
+      return
+    }
+
     clearReportLoadingTimer()
     setIsReportVisible(false)
     setIsReportLoading(true)
@@ -115,7 +152,12 @@ function App() {
 
     window.requestAnimationFrame(() => {
       setupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      setupRef.current?.focus({ preventScroll: true })
+      const setupHelpButton =
+        setupRef.current?.querySelector<HTMLButtonElement>(
+          'button[aria-label="Setup help"]',
+        )
+
+      setupHelpButton?.focus({ preventScroll: true })
     })
   }
 
@@ -148,6 +190,13 @@ function App() {
         }}
         onStartInterview={handleStartInterview}
         savedConfig={savedConfig}
+        supabaseAuth={
+          <SupabaseAuthPanel
+            client={supabaseClient}
+            configurationError={supabaseError || null}
+            isConfigured={supabaseEnabled}
+          />
+        }
         sessionRef={sessionRef}
         setupRef={setupRef}
       />

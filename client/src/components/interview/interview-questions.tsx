@@ -14,6 +14,16 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { evaluateAnswer } from '@/services/interview-api'
+import {
+  normalizeFeedbackItems,
+  normalizeFeedbackText,
+  splitFeedbackParagraphs,
+} from '@/lib/feedback-text'
+import {
+  MAX_ANSWER_CHARACTERS,
+  getAnswerValidationState,
+  getQuestionPrimaryActionState,
+} from './question-flow'
 import type {
   AnswerEvaluation,
   CreateInterviewResponse,
@@ -40,6 +50,9 @@ export function InterviewQuestions({
   sessionRef,
 }: InterviewQuestionsProps) {
   const isMountedRef = useRef(true)
+  const answerTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const primaryActionButtonRef = useRef<HTMLButtonElement | null>(null)
+  const pendingPrimaryFocusQuestionIdRef = useRef<string | null>(null)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({})
   const [evaluationErrors, setEvaluationErrors] = useState<Record<string, string>>({})
@@ -69,11 +82,16 @@ export function InterviewQuestions({
   const isSavedAnswerCurrent =
     typeof submittedAnswer === 'string' && submittedAnswer === trimmedCurrentAnswer
   const areHintsVisible = question ? Boolean(visibleHintQuestionIds[question.id]) : false
-  const canSubmitAnswer =
-    trimmedCurrentAnswer.length > 0 &&
-    (!isSavedAnswerCurrent || Boolean(currentEvaluationError)) &&
-    !isEvaluatingCurrentQuestion
+  const answerValidationState = getAnswerValidationState(currentAnswer)
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
+  const primaryActionState = getQuestionPrimaryActionState({
+    currentEvaluation,
+    currentEvaluationError,
+    isAnswerValid: !answerValidationState.isInvalid,
+    isEvaluatingCurrentQuestion,
+    isLastQuestion,
+    isReportLoading,
+  })
 
   useEffect(() => {
     isMountedRef.current = true
@@ -82,6 +100,69 @@ export function InterviewQuestions({
       isMountedRef.current = false
     }
   }, [])
+
+  useEffect(() => {
+    const hasPendingQuestionWork = Boolean(submittedAnswer) && !currentEvaluation
+    const hasUnsavedDraft =
+      trimmedCurrentAnswer.length > 0 &&
+      !isSavedAnswerCurrent &&
+      !currentEvaluation &&
+      !currentEvaluationError
+    const shouldWarnBeforeUnload =
+      isEvaluatingCurrentQuestion ||
+      isReportLoading ||
+      hasPendingQuestionWork ||
+      hasUnsavedDraft
+
+    if (!shouldWarnBeforeUnload) {
+      return
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [
+    currentEvaluation,
+    currentEvaluationError,
+    isEvaluatingCurrentQuestion,
+    isReportLoading,
+    isSavedAnswerCurrent,
+    submittedAnswer,
+    trimmedCurrentAnswer,
+  ])
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      answerTextareaRef.current?.focus({ preventScroll: true })
+    })
+  }, [question.id])
+
+  useEffect(() => {
+    if (
+      pendingPrimaryFocusQuestionIdRef.current !== question.id ||
+      isEvaluatingCurrentQuestion ||
+      (!currentEvaluation && !currentEvaluationError)
+    ) {
+      return
+    }
+
+    pendingPrimaryFocusQuestionIdRef.current = null
+    window.requestAnimationFrame(() => {
+      primaryActionButtonRef.current?.focus({ preventScroll: true })
+    })
+  }, [
+    currentEvaluation,
+    currentEvaluationError,
+    isEvaluatingCurrentQuestion,
+    question.id,
+  ])
 
   if (!question) {
     return null
@@ -116,12 +197,13 @@ export function InterviewQuestions({
   }
 
   async function submitCurrentAnswer() {
-    if (!trimmedCurrentAnswer) {
+    if (answerValidationState.isInvalid) {
       return
     }
 
     const submittedQuestion = question
     const submittedText = trimmedCurrentAnswer
+    pendingPrimaryFocusQuestionIdRef.current = submittedQuestion.id
 
     setSubmittedAnswers((answers) => ({
       ...answers,
@@ -192,6 +274,26 @@ export function InterviewQuestions({
     }))
   }
 
+  function handlePrimaryAction() {
+    if (primaryActionState.kind === 'evaluating') {
+      return
+    }
+
+    if (primaryActionState.kind === 'retry' || primaryActionState.kind === 'submit') {
+      void submitCurrentAnswer()
+      return
+    }
+
+    if (primaryActionState.kind === 'finish') {
+      onCompleteInterview()
+      return
+    }
+
+    if (primaryActionState.kind === 'next') {
+      goToNextQuestion()
+    }
+  }
+
   return (
     <section
       aria-labelledby="questions-title"
@@ -224,222 +326,228 @@ export function InterviewQuestions({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px]">
-        <article className="glass-panel rounded-lg p-5 sm:p-7">
-          <h2 className="sr-only" id="questions-title">
-            Interview session
-          </h2>
-          <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
-            <span className="inline-flex items-center gap-2 rounded-full text-primary">
-              <Code2 aria-hidden="true" className="size-5" />
-              Question {questionNumber}
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-secondary-foreground">
-              {question.topic}
-            </span>
-            <span className="capitalize text-muted-foreground">
-              {question.difficulty}
-            </span>
-          </div>
-
-          <p className="mt-7 max-w-3xl text-3xl font-extrabold leading-tight text-white">
-            {question.question}
-          </p>
-
-          <div className="mt-8 border-t border-white/10 pt-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="flex items-center gap-2 text-lg font-extrabold text-white">
-                  <BookOpen aria-hidden="true" className="size-5 text-primary" />
-                  Expected concepts
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Use hints only when you want study guidance.
-                </p>
-              </div>
-              <Button
-                aria-expanded={areHintsVisible}
-                aria-controls={`hints-${question.id}`}
-                onClick={toggleCurrentHints}
-                type="button"
-                variant="outline"
-              >
-                {areHintsVisible ? 'Hide hints' : `Show hints for question ${questionNumber}`}
-              </Button>
+          <article className="glass-panel rounded-lg p-5 sm:p-7">
+            <h2 className="sr-only" id="questions-title">
+              Interview session
+            </h2>
+            <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
+              <span className="inline-flex items-center gap-2 rounded-full text-primary">
+                <Code2 aria-hidden="true" className="size-5" />
+                Question {questionNumber}
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-secondary-foreground">
+                {question.topic}
+              </span>
+              <span className="capitalize text-muted-foreground">
+                {question.difficulty}
+              </span>
             </div>
-            {areHintsVisible ? (
-              <ul className="mt-4 flex flex-wrap gap-3" id={`hints-${question.id}`}>
-                {question.expectedConcepts.map((concept) => (
-                  <li className="flex items-center gap-2 rounded-full bg-white/[0.04] px-3 py-1.5 text-sm text-muted-foreground" key={concept}>
-                    <CheckCircle2
-                      aria-hidden="true"
-                      className="size-4 shrink-0 text-primary"
-                    />
-                    <span>{concept}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
 
-          <div className="mt-8 border-t border-white/10 pt-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <label className="flex items-center gap-2 text-lg font-extrabold text-white" htmlFor={`answer-${question.id}`}>
-                <Pencil aria-hidden="true" className="size-5 text-primary" />
-                Your answer
-              </label>
-              {isSavedAnswerCurrent ? (
-                <span className="text-xs font-medium text-primary">Answer saved</span>
-              ) : null}
-            </div>
-            <textarea
-              className="mt-4 min-h-56 w-full resize-y rounded-lg border border-primary/40 bg-[#091225] px-4 py-4 text-base leading-7 text-white outline-none shadow-[inset_0_0_28px_rgb(47_107_255_/_0.08),0_0_24px_rgb(47_107_255_/_0.12)] transition-colors placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-primary/60"
-              id={`answer-${question.id}`}
-              onChange={(event) => updateCurrentAnswer(event.target.value)}
-              placeholder="Type your answer here..."
-              value={currentAnswer}
-              disabled={isEvaluatingCurrentQuestion}
-            />
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-muted-foreground">
-                {currentAnswer.trim().length} characters entered
-              </p>
-              <Button
-                disabled={!canSubmitAnswer}
-                onClick={submitCurrentAnswer}
-                type="button"
-              >
-                {isEvaluatingCurrentQuestion ? (
-                  <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-                ) : null}
-                {isSavedAnswerCurrent
-                  ? currentEvaluation
-                    ? 'Feedback ready'
-                    : currentEvaluationError
-                      ? 'Retry evaluation'
-                    : isEvaluatingCurrentQuestion
-                      ? 'Evaluating answer'
-                      : 'Answer submitted'
-                  : typeof submittedAnswer === 'string'
-                    ? 'Update answer'
-                    : 'Submit answer'}
-              </Button>
-            </div>
-          </div>
-        </article>
+            <p className="mt-7 max-w-3xl text-3xl font-extrabold leading-tight text-white">
+              {normalizeFeedbackText(question.question)}
+            </p>
 
-        <aside className="space-y-4">
-
-          {isEvaluatingCurrentQuestion ? (
-            <section
-              aria-live="polite"
-              className="glass-panel flex items-start gap-3 rounded-lg p-5"
-            >
-              <LoaderCircle
-                aria-hidden="true"
-                className="mt-0.5 size-4 animate-spin text-primary"
-              />
-              <div>
-                <h3 className="text-sm font-semibold">Evaluating answer</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  The AI is reviewing your answer and preparing feedback.
-                </p>
-              </div>
-            </section>
-          ) : null}
-
-          {currentEvaluationError ? (
-            <section
-              className="flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100"
-              role="alert"
-            >
-              <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-              <div>
-                <h3 className="text-sm font-semibold">Could not evaluate answer</h3>
-                <p className="mt-1 text-sm leading-6">{currentEvaluationError}</p>
-              </div>
-            </section>
-          ) : null}
-
-          {currentEvaluation && isSavedAnswerCurrent ? (
-            <section className="glass-panel rounded-lg p-5">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
-                    <Sparkles aria-hidden="true" className="size-5 text-primary" />
-                    AI feedback
+                  <h3 className="flex items-center gap-2 text-lg font-extrabold text-white">
+                    <BookOpen aria-hidden="true" className="size-5 text-primary" />
+                    Expected concepts
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Confidence: {currentEvaluation.confidenceLevel}
+                    Use hints only when you want study guidance.
                   </p>
                 </div>
-                <span className="rounded-full border border-primary/40 bg-primary/15 px-4 py-2 text-sm font-extrabold text-white">
-                  {currentEvaluation.score}/5
-                </span>
+                <Button
+                  aria-controls={`hints-${question.id}`}
+                  aria-expanded={areHintsVisible}
+                  onClick={toggleCurrentHints}
+                  type="button"
+                  variant="outline"
+                >
+                  {areHintsVisible ? 'Hide hints' : `Show hints for question ${questionNumber}`}
+                </Button>
               </div>
+              {areHintsVisible ? (
+                <ul className="mt-4 flex flex-wrap gap-3" id={`hints-${question.id}`}>
+                  {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
+                    <li
+                      className="flex items-center gap-2 rounded-full bg-white/[0.04] px-3 py-1.5 text-sm text-muted-foreground"
+                      key={concept}
+                    >
+                      <CheckCircle2
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-primary"
+                      />
+                      <span>{concept}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
 
-              <div className="mt-6 grid gap-5">
-                <FeedbackList title="Strengths" items={currentEvaluation.strengths} />
-                <FeedbackList title="Weaknesses" items={currentEvaluation.weaknesses} />
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <label
+                  className="flex items-center gap-2 text-lg font-extrabold text-white"
+                  htmlFor={`answer-${question.id}`}
+                >
+                  <Pencil aria-hidden="true" className="size-5 text-primary" />
+                  Your answer
+                </label>
+                {isSavedAnswerCurrent ? (
+                  <span className="text-xs font-medium text-primary">Answer saved</span>
+                ) : null}
               </div>
-
-              <FeedbackList
-                className="mt-4"
-                emptyText="No major missing concepts were identified."
-                items={currentEvaluation.missingConcepts}
-                title="Missing concepts"
+              <textarea
+                aria-describedby={`answer-help-${question.id} answer-count-${question.id} answer-validation-${question.id}`}
+                aria-invalid={answerValidationState.isInvalid}
+                className="mt-4 min-h-56 w-full resize-y rounded-lg border border-primary/40 bg-[#091225] px-4 py-4 text-base leading-7 text-white outline-none shadow-[inset_0_0_28px_rgb(47_107_255_/_0.08),0_0_24px_rgb(47_107_255_/_0.12)] transition-colors placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-primary/60"
+                id={`answer-${question.id}`}
+                maxLength={MAX_ANSWER_CHARACTERS}
+                onChange={(event) => updateCurrentAnswer(event.target.value)}
+                placeholder="Type your answer here..."
+                ref={answerTextareaRef}
+                value={currentAnswer}
+                disabled={isEvaluatingCurrentQuestion}
               />
-
-              <div className="mt-5 border-t border-white/10 pt-5">
-                <h4 className="text-sm font-semibold">Improved answer</h4>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {currentEvaluation.improvedAnswer}
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-muted-foreground" id={`answer-help-${question.id}`}>
+                  Keep answers under {MAX_ANSWER_CHARACTERS.toLocaleString()} characters.
+                </p>
+                <p
+                  className={`text-sm leading-6 ${
+                    answerValidationState.tone === 'error'
+                      ? 'text-red-200'
+                      : answerValidationState.tone === 'warning'
+                        ? 'text-amber-200'
+                        : 'text-muted-foreground'
+                  }`}
+                  id={`answer-validation-${question.id}`}
+                  aria-live="polite"
+                >
+                  {answerValidationState.message || 'Answer looks ready to review.'}
+                </p>
+                <p className="text-xs text-muted-foreground" id={`answer-count-${question.id}`}>
+                  {currentAnswer.trim().length.toLocaleString()} characters entered
                 </p>
               </div>
+            </div>
+          </article>
 
-              <div className="mt-5 flex flex-col gap-3 border-t border-white/10 pt-5">
-                <p className="text-sm text-muted-foreground">
-                  {canCompleteInterview
-                    ? 'All answers have feedback. You can finish the session.'
-                    : 'Feedback is ready. Continue when you are ready.'}
+          <aside className="space-y-4">
+            {isEvaluatingCurrentQuestion ? (
+              <section
+                aria-live="polite"
+                className="glass-panel flex items-start gap-3 rounded-lg p-5"
+              >
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="mt-0.5 size-4 animate-spin text-primary"
+                />
+                <div>
+                  <h3 className="text-sm font-semibold">Evaluating answer</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    The AI is reviewing your answer and preparing feedback.
+                  </p>
+                </div>
+              </section>
+            ) : null}
+
+            {currentEvaluationError ? (
+              <section
+                className="flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100"
+                role="alert"
+              >
+                <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-semibold">Could not evaluate answer</h3>
+                  <p className="mt-1 text-sm leading-6">{currentEvaluationError}</p>
+                </div>
+              </section>
+            ) : null}
+
+            {currentEvaluation && isSavedAnswerCurrent ? (
+              <section className="glass-panel rounded-lg p-5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
+                      <Sparkles aria-hidden="true" className="size-5 text-primary" />
+                      AI feedback
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Confidence: {currentEvaluation.confidenceLevel}
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-primary/40 bg-primary/15 px-4 py-2 text-sm font-extrabold text-white">
+                    {currentEvaluation.score}/5
+                  </span>
+                </div>
+
+                <div className="mt-6 grid gap-5">
+                  <FeedbackList
+                    items={normalizeFeedbackItems(currentEvaluation.strengths)}
+                    title="Strengths"
+                  />
+                  <FeedbackList
+                    items={normalizeFeedbackItems(currentEvaluation.weaknesses)}
+                    title="Areas to improve"
+                  />
+                </div>
+
+                <FeedbackList
+                  className="mt-4"
+                  emptyText="No major key concepts were identified."
+                  items={normalizeFeedbackItems(currentEvaluation.missingConcepts)}
+                  title="Key concepts"
+                />
+
+                <details
+                  className="mt-5 rounded-2xl border border-white/10 bg-white/[0.025] p-4"
+                  open
+                >
+                  <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+                    Suggested answer
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    {splitFeedbackParagraphs(currentEvaluation.improvedAnswer).map(
+                      (paragraph) => (
+                        <p
+                          className="max-w-3xl text-sm leading-6 text-muted-foreground"
+                          key={paragraph}
+                        >
+                          {paragraph}
+                        </p>
+                      ),
+                    )}
+                  </div>
+                </details>
+
+                <div className="mt-5 border-t border-white/10 pt-5">
+                  <p className="text-sm text-muted-foreground">
+                    {canCompleteInterview
+                      ? 'All questions have been reviewed. You can now finish the interview.'
+                      : 'Feedback is ready. Continue when you are ready.'}
+                  </p>
+                </div>
+              </section>
+            ) : null}
+
+            {!isEvaluatingCurrentQuestion && !currentEvaluationError && !currentEvaluation ? (
+              <section className="glass-panel rounded-lg p-5">
+                <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
+                  <Sparkles aria-hidden="true" className="size-5 text-primary" />
+                  AI feedback
+                </h3>
+                <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                  Submit your answer to unlock a score, strengths, improvements, and a stronger sample answer.
                 </p>
-                {canCompleteInterview ? (
-                  <Button
-                    disabled={isReportLoading}
-                    onClick={onCompleteInterview}
-                    type="button"
-                  >
-                    {isReportLoading ? (
-                      <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-                    ) : null}
-                    {isReportLoading ? 'Generating report' : 'Complete interview'}
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={isLastQuestion}
-                    onClick={goToNextQuestion}
-                    type="button"
-                  >
-                    Next question
-                  </Button>
-                )}
-              </div>
-            </section>
-          ) : null}
-          {!isEvaluatingCurrentQuestion && !currentEvaluationError && !currentEvaluation ? (
-            <section className="glass-panel rounded-lg p-5">
-              <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
-                <Sparkles aria-hidden="true" className="size-5 text-primary" />
-                AI feedback
-              </h3>
-              <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                Submit your answer to unlock a score, strengths, improvements, and a stronger sample answer.
-              </p>
-            </section>
-          ) : null}
-        </aside>
+              </section>
+            ) : null}
+          </aside>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="sticky bottom-4 z-20 mt-5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-4">
           <Button
             disabled={isFirstQuestion}
             onClick={() => setActiveQuestionIndex((index) => Math.max(index - 1, 0))}
@@ -450,12 +558,19 @@ export function InterviewQuestions({
             Previous question
           </Button>
           <Button
-            disabled={isLastQuestion}
-            onClick={goToNextQuestion}
+            ref={primaryActionButtonRef}
+            disabled={primaryActionState.disabled}
+            onClick={handlePrimaryAction}
             type="button"
           >
-            Next question
-            <ArrowRight aria-hidden="true" className="size-4" />
+            {primaryActionState.kind === 'evaluating' ? (
+              <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+            ) : primaryActionState.kind === 'finish' ? (
+              <CheckCircle2 aria-hidden="true" className="size-4" />
+            ) : (
+              <ArrowRight aria-hidden="true" className="size-4" />
+            )}
+            {primaryActionState.label}
           </Button>
         </div>
 
@@ -467,16 +582,6 @@ export function InterviewQuestions({
                 {evaluatedQuestionCount} of {totalQuestions} answers have feedback.
               </p>
             </div>
-            <Button
-              disabled={!canCompleteInterview || isReportLoading}
-              onClick={onCompleteInterview}
-              type="button"
-            >
-              {isReportLoading ? (
-                <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-              ) : null}
-              {isReportLoading ? 'Generating report' : 'Complete interview'}
-            </Button>
           </div>
         </section>
       </div>
@@ -503,7 +608,7 @@ function FeedbackList({
       {items.length > 0 ? (
         <ul className="mt-2 space-y-2">
           {items.map((item) => (
-            <li className="text-sm leading-6 text-muted-foreground" key={item}>
+            <li className="max-w-3xl text-sm leading-6 text-muted-foreground" key={item}>
               {item}
             </li>
           ))}
