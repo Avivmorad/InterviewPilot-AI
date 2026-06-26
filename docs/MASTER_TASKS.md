@@ -535,29 +535,29 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 
 #### Current evidence
 
-- Current local branch is `Codex-YoloBranch`.
+- Current local branch is `main`.
 - GitHub default branch is `main`.
 - `render.yaml` deploys branch `main`.
 - Recent local history includes Phase 2 commits after prior Phase 1 release work.
 - Git status before edits had untracked `InterviewPilot-AI.code-workspace`.
 - The live Vercel production deployment for `interviewpilot-ai-bice.vercel.app` is linked to GitHub deployment `5a53431fe4e762e0c131a97510204344f318aa02`, which matches the current local `HEAD`.
-- `render.yaml` auto-deploys from `main`, and the current `main` head on GitHub is `7b6cb6eafbde0753e3899966204457a0a2b43a7b`.
-- The backend health response now surfaces `RENDER_GIT_COMMIT` when Render injects it, which should make the deployed SHA directly observable after the next Render deploy.
-- The live Render deployment still needs direct runtime inspection to confirm the exact deployed SHA instead of inferring it from the branch source.
+- `render.yaml` auto-deploys from `main`, and the current `main` head on GitHub is `51e53342c199fe97d72ee0c5b6f6fbbdfc20ea0d`.
+- The backend health response now surfaces `RENDER_GIT_COMMIT` when Render injects it.
+- The live Render deployment reports `gitCommit: 51e53342c199fe97d72ee0c5b6f6fbbdfc20ea0d`, which matches GitHub `main` and the merged release commit.
 
 #### Required work
 
 - [x] Identify the GitHub default branch.
-- [ ] Identify the Render deployed commit.
+- [x] Identify the Render deployed commit.
 - [x] Identify the Vercel deployed commit.
-- [ ] Confirm the deployed commits correspond to the intended release source.
-- [ ] Keep local-only workspace files out of commits unless intentionally tracked.
+- [x] Confirm the deployed commits correspond to the intended release source.
+- [x] Keep local-only workspace files out of commits unless intentionally tracked.
 
 #### Acceptance criteria
 
-- [ ] GitHub repository code matches the intended deployed version.
-- [ ] Render and Vercel deployments are traceable to commits.
-- [ ] Untracked local files are either ignored or intentionally handled.
+- [x] GitHub repository code matches the intended deployed version.
+- [x] Render and Vercel deployments are traceable to commits.
+- [x] Untracked local files are either ignored or intentionally handled.
 
 #### Verification
 
@@ -568,6 +568,13 @@ Phase 1 progress uses only P0 and P1 tasks because those define core workflow an
 - Render deployment details.
 
 #### Completion evidence
+
+- `git status --short` is clean on the merged release state.
+- `git ls-files InterviewPilot-AI.code-workspace` confirms the workspace file is intentionally tracked.
+
+- The live Render health endpoint returned `gitCommit: 51e53342c199fe97d72ee0c5b6f6fbbdfc20ea0d`.
+- The merged GitHub `main` head is the same commit, so the live Render deployment is traceable to the intended release source.
+- The Vercel deployment trace was already confirmed against the same release branch history.
 
 
 ### IP-P0-012 - Reconcile README and docs with verified product status
