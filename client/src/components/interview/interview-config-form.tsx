@@ -58,6 +58,8 @@ const interviewTypeIcons = {
 
 const setupHelpText =
   'Pick the role, level, interview type, and question count so the practice session matches your goal.'
+const startHelpText =
+  'Starts the interview right away using the selections you made above.'
 
 export function InterviewConfigForm({
   isLoading,
@@ -201,6 +203,28 @@ export function InterviewConfigForm({
         )}
         {isLoading ? 'Generating questions...' : 'Start interview'}
       </Button>
+      <div className="relative z-10 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-xs font-medium leading-5 text-muted-foreground">
+        <button
+          aria-describedby="start-help"
+          aria-label="Start interview help"
+          className="group relative mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-300 transition hover:border-primary/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+          title={startHelpText}
+          type="button"
+        >
+          <Info aria-hidden="true" className="size-3.5" />
+          <span
+            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-950/95 px-3 py-2 text-left text-xs font-medium leading-5 text-slate-200 opacity-0 shadow-[0_18px_30px_rgba(0,0,0,0.35)] transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+            id="start-help"
+            role="tooltip"
+          >
+            {startHelpText}
+          </span>
+        </button>
+        <div className="space-y-1">
+          <p className="text-slate-200">Quick start tip</p>
+          <p>Use this when you&apos;re ready to generate question 1 from the settings above.</p>
+        </div>
+      </div>
       <p className="relative z-10 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
         <ShieldCheck aria-hidden="true" className="size-4 text-slate-400" />
         Your answers are private and used only for feedback.
