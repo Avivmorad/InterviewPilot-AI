@@ -6,6 +6,7 @@ import {
   evaluateAnswer,
   InterviewGenerationError,
   InterviewValidationError,
+  MAX_ANSWER_CHARACTERS,
   parseAnswerEvaluation,
   parseGeneratedInterview,
 } from './interviewService.js'
@@ -71,6 +72,26 @@ test('creates an interview from valid generated JSON', async () => {
   assert.match(receivedPrompt, /exactly 3/)
   assert.match(receivedPrompt, /in English/)
   assert.match(receivedPrompt, /strict JSON only/)
+})
+
+test('accepts role and level labels in create requests', async () => {
+  let receivedPrompt = ''
+
+  const result = await createInterview(
+    {
+      ...request,
+      role: 'Frontend Developer',
+      level: 'Junior',
+    },
+    async (prompt) => {
+      receivedPrompt = prompt
+      return validGeneratedText
+    },
+  )
+
+  assert.equal(result.questions.length, 3)
+  assert.match(receivedPrompt, /Frontend Developer/)
+  assert.match(receivedPrompt, /Junior/)
 })
 
 test('retries interview generation once after invalid AI output', async () => {
@@ -399,6 +420,26 @@ test('rejects an empty answer before calling AI', async () => {
       {
         question: JSON.parse(validGeneratedText).questions[0],
         answer: '   ',
+      },
+      async () => {
+        calls += 1
+        return validEvaluationText
+      },
+    ),
+    InterviewValidationError,
+  )
+
+  assert.equal(calls, 0)
+})
+
+test('rejects an oversized answer before calling AI', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    evaluateAnswer(
+      {
+        question: JSON.parse(validGeneratedText).questions[0],
+        answer: 'x'.repeat(MAX_ANSWER_CHARACTERS + 1),
       },
       async () => {
         calls += 1

@@ -211,10 +211,13 @@ report. Authentication and persistence are not included yet.
 ## Known Limitations
 
 - Authentication and persistence are not included in Phase 1.
-- Production verification still depends on the live browser flow and deployment accounts.
+- Production browser verification was completed in this audit; ongoing release management still depends on the Vercel and Render accounts.
 - Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
 
 ## Screenshots
+
+These screenshots were refreshed from the verified production app on June 26,
+2026.
 
 ### Interview Setup
 

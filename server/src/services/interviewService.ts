@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { z } from 'zod'
 
 import { generateText } from '../ai/aiService.js'
 import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
@@ -14,7 +15,6 @@ import {
   type CreateInterviewResponse,
   type Difficulty,
   type EvaluateAnswerRequest,
-  type EvaluationConfidenceLevel,
   type InterviewQuestion,
   type InterviewType,
   type Level,
@@ -31,7 +31,76 @@ export class InterviewGenerationError extends Error {
   }
 }
 
+export const MAX_ANSWER_CHARACTERS = 75_000
+
 type TextGenerator = (prompt: string) => Promise<string>
+
+const roleValues = INTERVIEW_ROLES.map((role) => role.value) as [Role, ...Role[]]
+const levelValues = INTERVIEW_LEVELS.map((level) => level.value) as [Level, ...Level[]]
+const interviewTypeValues = [...INTERVIEW_TYPES] as [InterviewType, ...InterviewType[]]
+const confidenceLevelValues = ['low', 'medium', 'high'] as const
+
+const roleSchema = z.preprocess(
+  normalizeRole,
+  z.enum(roleValues, {
+    message: 'Select a valid role.',
+  }),
+)
+const levelSchema = z.preprocess(
+  normalizeLevel,
+  z.enum(levelValues, {
+    message: 'Select a valid level.',
+  }),
+)
+const interviewTypeSchema = z.enum(interviewTypeValues, {
+  message: 'Select a valid interview type.',
+})
+const questionCountSchema = z.custom<QuestionCount>(isQuestionCount, {
+  message: 'Question count must be 3 for the MVP.',
+})
+
+const createInterviewRequestSchema = z.object({
+  role: roleSchema,
+  level: levelSchema,
+  interviewType: interviewTypeSchema,
+  questionCount: questionCountSchema,
+})
+
+const generatedQuestionSchema = z.object({
+  topic: z.string().trim().min(1, 'Question topic is required.'),
+  difficulty: z.enum(levelValues),
+  question: z.string().trim().min(1, 'Question text is required.'),
+  expectedConcepts: z
+    .array(z.string().trim().min(1, 'Expected concept is required.'))
+    .min(2, 'At least 2 expected concepts are required.'),
+})
+
+const interviewQuestionSchema = generatedQuestionSchema.extend({
+  id: z.string().trim().min(1, 'Question id is required.').optional(),
+})
+
+const answerEvaluationSchema = z.object({
+  score: z.preprocess(
+    (value) =>
+      typeof value === 'string' && value.trim().length > 0 ? Number(value) : value,
+    z.number().finite().min(1).max(5),
+  ),
+  strengths: z
+    .array(z.string().trim().min(1, 'List items must not be empty.'))
+    .min(1),
+  weaknesses: z
+    .array(z.string().trim().min(1, 'List items must not be empty.'))
+    .min(1),
+  missingConcepts: z.array(z.string().trim().min(1, 'List items must not be empty.')),
+  improvedAnswer: z.string().trim().min(1, 'Improved answer is required.'),
+  confidenceLevel: z.preprocess(
+    (value) =>
+      typeof value === 'string' ? value.trim().toLowerCase() : value,
+    z.enum(confidenceLevelValues, {
+      message: 'Select a valid confidence level.',
+    }),
+  ),
+})
 
 function isRole(value: unknown): value is Role {
   return INTERVIEW_ROLES.some((role) => role.value === value)
@@ -41,20 +110,8 @@ function isLevel(value: unknown): value is Level {
   return INTERVIEW_LEVELS.some((level) => level.value === value)
 }
 
-function isInterviewType(value: unknown): value is InterviewType {
-  return INTERVIEW_TYPES.includes(value as InterviewType)
-}
-
 function isQuestionCount(value: unknown): value is QuestionCount {
   return QUESTION_COUNTS.includes(value as QuestionCount)
-}
-
-function isDifficulty(value: unknown): value is Difficulty {
-  return isLevel(value)
-}
-
-function isConfidenceLevel(value: unknown): value is EvaluationConfidenceLevel {
-  return value === 'low' || value === 'medium' || value === 'high'
 }
 
 function validateCreateInterviewRequest(
@@ -64,31 +121,15 @@ function validateCreateInterviewRequest(
     throw new InterviewValidationError('Request body must be a JSON object.')
   }
 
-  const role = normalizeRole(input.role)
-  const level = normalizeLevel(input.level)
+  const parsedRequest = createInterviewRequestSchema.safeParse(input)
 
-  if (!role) {
-    throw new InterviewValidationError('Select a valid role.')
+  if (!parsedRequest.success) {
+    throw new InterviewValidationError(
+      parsedRequest.error.issues[0]?.message ?? 'Request body must be a JSON object.',
+    )
   }
 
-  if (!level) {
-    throw new InterviewValidationError('Select a valid level.')
-  }
-
-  if (!isInterviewType(input.interviewType)) {
-    throw new InterviewValidationError('Select a valid interview type.')
-  }
-
-  if (!isQuestionCount(input.questionCount)) {
-    throw new InterviewValidationError('Question count must be 3 for the MVP.')
-  }
-
-  return {
-    role,
-    level,
-    interviewType: input.interviewType,
-    questionCount: input.questionCount,
-  }
+  return parsedRequest.data
 }
 
 function normalizeRole(value: unknown): Role | null {
@@ -124,19 +165,24 @@ function validateEvaluateAnswerRequest(input: unknown): EvaluateAnswerRequest {
     throw new InterviewValidationError('Question must be a valid interview question.')
   }
 
-  if (!isDifficulty(input.question.difficulty)) {
-    throw new InterviewValidationError('Question must be a valid interview question.')
-  }
+  const question = parseInterviewQuestion(input.question)
 
-  const question = parseQuestion(input.question, 0, input.question.difficulty)
+  const answerResult = z
+    .string()
+    .trim()
+    .min(1, 'Answer must not be empty.')
+    .max(MAX_ANSWER_CHARACTERS, 'Answer is too long. Please shorten it and try again.')
+    .safeParse(input.answer)
 
-  if (typeof input.answer !== 'string' || input.answer.trim().length === 0) {
-    throw new InterviewValidationError('Answer must not be empty.')
+  if (!answerResult.success) {
+    throw new InterviewValidationError(
+      answerResult.error.issues[0]?.message ?? 'Answer must not be empty.',
+    )
   }
 
   return {
     question,
-    answer: input.answer.trim(),
+    answer: answerResult.data,
   }
 }
 
@@ -144,90 +190,35 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function parseQuestion(
+function parseGeneratedQuestion(
   value: unknown,
   index: number,
   expectedDifficulty: Difficulty,
 ): InterviewQuestion {
-  if (!isRecord(value)) {
-    throw new InterviewGenerationError()
-  }
+  const parsedQuestion = generatedQuestionSchema.safeParse(value)
 
-  const topic = value.topic
-  const difficulty = value.difficulty
-  const question = value.question
-  const expectedConcepts = value.expectedConcepts
-
-  if (
-    typeof topic !== 'string' ||
-    topic.trim().length === 0 ||
-    difficulty !== expectedDifficulty ||
-    typeof question !== 'string' ||
-    question.trim().length === 0 ||
-    !Array.isArray(expectedConcepts) ||
-    expectedConcepts.length < 2 ||
-    !expectedConcepts.every(
-      (concept) => typeof concept === 'string' && concept.trim().length > 0,
-    )
-  ) {
+  if (!parsedQuestion.success || parsedQuestion.data.difficulty !== expectedDifficulty) {
     throw new InterviewGenerationError()
   }
 
   return {
     id: `q${index + 1}`,
-    topic: topic.trim(),
-    difficulty: expectedDifficulty,
-    question: question.trim(),
-    expectedConcepts: expectedConcepts.map((concept) => concept.trim()).slice(0, 5),
+    ...parsedQuestion.data,
+    expectedConcepts: parsedQuestion.data.expectedConcepts.slice(0, 5),
   }
 }
 
-function parseStringList(
-  value: unknown,
-  minLength: number,
-  maxLength: number,
-): string[] {
-  if (
-    !Array.isArray(value) ||
-    value.length < minLength ||
-    !value.every((item) => typeof item === 'string' && item.trim().length > 0)
-  ) {
-    throw new InterviewGenerationError()
+function parseInterviewQuestion(value: unknown): InterviewQuestion {
+  const parsedQuestion = interviewQuestionSchema.safeParse(value)
+
+  if (!parsedQuestion.success) {
+    throw new InterviewValidationError('Question must be a valid interview question.')
   }
 
-  return value.map((item) => item.trim()).slice(0, maxLength)
-}
-
-function parseScore(value: unknown): number {
-  const score =
-    typeof value === 'string' && value.trim().length > 0
-      ? Number(value)
-      : value
-
-  if (
-    typeof score !== 'number' ||
-    !Number.isFinite(score) ||
-    score < 1 ||
-    score > 5
-  ) {
-    throw new InterviewGenerationError()
+  return {
+    ...parsedQuestion.data,
+    id: parsedQuestion.data.id ?? 'q1',
   }
-
-  return score
-}
-
-function parseConfidenceLevel(value: unknown): EvaluationConfidenceLevel {
-  if (typeof value !== 'string') {
-    throw new InterviewGenerationError()
-  }
-
-  const normalizedValue = value.trim().toLowerCase()
-
-  if (!isConfidenceLevel(normalizedValue)) {
-    throw new InterviewGenerationError()
-  }
-
-  return normalizedValue
 }
 
 function getEvaluationRecord(value: unknown): Record<string, unknown> {
@@ -355,31 +346,28 @@ export function parseGeneratedInterview(
   const expectedDifficulty = request.level
 
   return generatedQuestions.map((question, index) =>
-    parseQuestion(question, index, expectedDifficulty),
+    parseGeneratedQuestion(question, index, expectedDifficulty),
   )
 }
 
 export function parseAnswerEvaluation(text: string): AnswerEvaluation {
   const parsed = getEvaluationRecord(parseJsonObjectText(text))
 
-  const score = parseScore(parsed.score)
-  const improvedAnswer = parsed.improvedAnswer
-  const confidenceLevel = parseConfidenceLevel(parsed.confidenceLevel)
+  const parsedEvaluation = answerEvaluationSchema.safeParse(parsed)
 
-  if (
-    typeof improvedAnswer !== 'string' ||
-    improvedAnswer.trim().length === 0
-  ) {
+  if (!parsedEvaluation.success) {
     throw new InterviewGenerationError()
   }
 
+  const evaluation = parsedEvaluation.data
+
   return {
-    score,
-    strengths: parseStringList(parsed.strengths, 1, 4),
-    weaknesses: parseStringList(parsed.weaknesses, 1, 4),
-    missingConcepts: parseStringList(parsed.missingConcepts, 0, 5),
-    improvedAnswer: improvedAnswer.trim(),
-    confidenceLevel,
+    score: evaluation.score,
+    strengths: evaluation.strengths.slice(0, 4),
+    weaknesses: evaluation.weaknesses.slice(0, 4),
+    missingConcepts: evaluation.missingConcepts.slice(0, 5),
+    improvedAnswer: evaluation.improvedAnswer,
+    confidenceLevel: evaluation.confidenceLevel,
   }
 }
 

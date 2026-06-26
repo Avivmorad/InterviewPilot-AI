@@ -207,6 +207,63 @@ $response | ConvertTo-Json -Depth 10
 Verify that the response contains `score`, `strengths`, `weaknesses`,
 `missingConcepts`, `improvedAnswer`, and `confidenceLevel`.
 
+## 7. Responsive Browser Notes
+
+Fresh browser audit log:
+
+- `docs/verification/2026-06-26-browser-verification.md`
+
+The current responsive browser pass checked these viewports:
+
+- `1440 x 900`
+- `1024 x 768`
+- `768 x 1024`
+- `390 x 844`
+- `320 x 700`
+
+What to look for:
+
+- No horizontal overflow at any of the above sizes.
+- The setup heading stays visible near the top of the page on mobile.
+- The main start action remains reachable with a short scroll on smaller phones.
+- The question, feedback, and final report screens stay readable after the interview starts.
+
+## 8. Automated Browser Checks
+
+Run this command from the repository root:
+
+```powershell
+npm run test:e2e
+```
+
+This Playwright suite covers:
+
+- The full core interview flow from setup through final report.
+- A required viewport matrix for responsive regressions.
+- Keyboard-only completion of the main interview flow.
+- Basic axe checks on the setup and interview states.
+
+Limitations:
+
+- These checks rely on behavior assertions and axe, not screenshot diffs.
+- Manual browser review is still useful for visual polish and spacing issues.
+
+## 9. Secret And Dependency Hygiene
+
+Run these commands from the repository root:
+
+```powershell
+npm run scan:secrets
+npm audit --omit=dev
+git ls-files client/.env server/.env client/dist server/dist
+```
+
+What to look for:
+
+- `npm run scan:secrets` should report no tracked secrets.
+- `npm audit --omit=dev` gives a repeatable dependency risk review command.
+- `git ls-files` should not return tracked local env files or built output.
+
 ## Common Errors
 
 ### Backend Not Running
@@ -325,3 +382,16 @@ CLIENT_ORIGIN=http://localhost:5174
 # client/.env
 VITE_API_URL=http://localhost:3002
 ```
+
+### Refresh And Back Behavior
+
+The interview flow is intentionally memory-based during Phase 1.
+
+- Refreshing on the setup screen returns you to a clean setup state.
+- Refreshing or navigating away during an active answer, evaluation, or report
+  generation triggers the browser's leave-page warning so in-progress work is
+  not lost silently.
+- Browser Back and Forward follow the same in-memory behavior because the app
+  does not use route-based interview state.
+- Starting a new interview from the final report clears the previous session,
+  answers, feedback, and report view.

@@ -74,7 +74,7 @@ export function HomePage({
   return (
     <>
       <section
-        className="relative mx-auto grid max-w-[1488px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(380px,0.9fr)_minmax(520px,1.1fr)] lg:items-start lg:gap-10 lg:px-8 lg:py-7 xl:gap-16 xl:px-12 2xl:px-0"
+        className="relative mx-auto grid max-w-[1488px] gap-8 px-5 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(380px,0.9fr)_minmax(520px,1.1fr)] lg:items-start lg:gap-10 lg:px-8 lg:py-7 xl:gap-16 xl:px-12 2xl:px-0"
         id="home"
       >
         <div

@@ -105,17 +105,18 @@ and fall back to the deterministic report when provider output is invalid.
 
 ## Evaluation Pipeline
 
-The repository includes a small offline evaluation runner:
+The repository includes two evaluation runners:
 
 ```powershell
 npm run eval
+npm run eval:real
 ```
 
-The runner uses fixed mocked provider responses to verify prompt guidance,
-schema validation, score ranges, and expected missing concepts for representative
-answer-evaluation cases. It does not call Gemini or Groq yet. Real provider
-evaluation will require server-side `GEMINI_API_KEY` or `GROQ_API_KEY`
-configuration.
+`npm run eval` uses fixed mocked provider responses to verify prompt guidance,
+schema validation, score ranges, and expected missing concepts for
+representative answer-evaluation cases. `npm run eval:real` compares Gemini and
+Groq on the same dataset when server-side `GEMINI_API_KEY` or `GROQ_API_KEY`
+configuration is available.
 
 ## Safety and Reliability
 

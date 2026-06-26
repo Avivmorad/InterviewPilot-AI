@@ -65,6 +65,14 @@ export function createApp(
       return
     }
 
+    if (isPayloadTooLargeError(error)) {
+      response.status(413).json({
+        error: 'Request body is too large. Please shorten your answer and try again.',
+        code: 'PAYLOAD_TOO_LARGE',
+      })
+      return
+    }
+
     if (error instanceof InterviewValidationError) {
       response.status(400).json({
         error: error.message,
@@ -95,6 +103,15 @@ export function createApp(
 
   app.use(errorHandler)
   return app
+}
+
+function isPayloadTooLargeError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const errorWithStatus = error as Error & { status?: number; type?: string }
+  return errorWithStatus.status === 413 || errorWithStatus.type === 'entity.too.large'
 }
 
 export const app = createApp()

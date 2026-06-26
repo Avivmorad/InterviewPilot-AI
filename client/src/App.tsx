@@ -88,7 +88,10 @@ function App() {
     pendingSessionFocusRef.current = false
     window.requestAnimationFrame(() => {
       sessionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      sessionRef.current?.focus({ preventScroll: true })
+      const firstQuestionControl =
+        sessionRef.current?.querySelector<HTMLTextAreaElement>('textarea')
+
+      firstQuestionControl?.focus({ preventScroll: true })
     })
   }, [interview])
 
@@ -98,6 +101,10 @@ function App() {
   }
 
   function handleCompleteInterview() {
+    if (!interview || isReportLoading || isReportVisible) {
+      return
+    }
+
     clearReportLoadingTimer()
     setIsReportVisible(false)
     setIsReportLoading(true)
@@ -145,7 +152,12 @@ function App() {
 
     window.requestAnimationFrame(() => {
       setupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      setupRef.current?.focus({ preventScroll: true })
+      const setupHelpButton =
+        setupRef.current?.querySelector<HTMLButtonElement>(
+          'button[aria-label="Setup help"]',
+        )
+
+      setupHelpButton?.focus({ preventScroll: true })
     })
   }
 

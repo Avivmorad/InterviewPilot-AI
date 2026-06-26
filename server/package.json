@@ -19,7 +19,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "groq-sdk": "^0.37.0"
+    "groq-sdk": "^0.37.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

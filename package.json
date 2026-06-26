@@ -15,9 +15,14 @@
     "check": "npm run lint --workspace client && npm run typecheck && npm run test --workspace client && npm run test --workspace server && npm run build",
     "eval": "npm run eval --workspace server",
     "eval:real": "npm run eval:real --workspace server",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "screenshots:update": "node scripts/update-screenshots.mjs",
+    "test:e2e": "playwright test",
     "start": "npm run start --workspace server"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
     "concurrently": "^10.0.3"
   }
 }

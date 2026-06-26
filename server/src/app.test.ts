@@ -145,6 +145,37 @@ test('malformed JSON returns a readable JSON error', async (context) => {
   })
 })
 
+test('oversized JSON bodies return a readable JSON error', async (context) => {
+  const server = app.listen(0)
+  await new Promise<void>((resolve) => server.once('listening', resolve))
+  context.after(() => server.close())
+
+  const { port } = server.address() as AddressInfo
+  const response = await fetch(
+    `http://127.0.0.1:${port}/api/interview/evaluate`,
+    {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        question: {
+          id: 'q1',
+          topic: 'React',
+          difficulty: 'junior',
+          question: 'What problem does React state solve?',
+          expectedConcepts: ['State', 'Rendering'],
+        },
+        answer: 'x'.repeat(150_000),
+      }),
+    },
+  )
+
+  assert.equal(response.status, 413)
+  assert.deepEqual(await response.json(), {
+    error: 'Request body is too large. Please shorten your answer and try again.',
+    code: 'PAYLOAD_TOO_LARGE',
+  })
+})
+
 test('create route returns the required interview response shape', async (context) => {
   let receivedInput: unknown
   const createController = createCreateInterviewController(async (input) => {
