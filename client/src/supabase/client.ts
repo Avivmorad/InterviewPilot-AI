@@ -4,6 +4,7 @@ import {
   readSupabaseClientEnvironment,
   type SupabaseClientEnvironment,
 } from './config'
+import type { SupabaseDatabase } from './database'
 
 const browserAuthOptions = {
   auth: {
@@ -28,15 +29,15 @@ export function buildSupabaseBrowserClientConfig(
 
 export function createSupabaseBrowserClient(
   environment: SupabaseClientEnvironment = readSupabaseClientEnvironment(),
-): SupabaseClient {
+): SupabaseClient<SupabaseDatabase> {
   const config = buildSupabaseBrowserClientConfig(environment)
 
-  return createClient(config.url, config.anonKey, config.options)
+  return createClient<SupabaseDatabase>(config.url, config.anonKey, config.options)
 }
 
-let browserClient: SupabaseClient | undefined
+let browserClient: SupabaseClient<SupabaseDatabase> | undefined
 
-export function getSupabaseBrowserClient(): SupabaseClient {
+export function getSupabaseBrowserClient(): SupabaseClient<SupabaseDatabase> {
   if (!browserClient) {
     browserClient = createSupabaseBrowserClient()
   }

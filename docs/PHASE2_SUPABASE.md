@@ -9,13 +9,14 @@ This document captures the first database/auth foundation for Phase 2.
 - Row Level Security policies that scope each table to the signed-in user.
 - A server-side Supabase client wrapper in `server/src/supabase/client.ts`.
 - A browser-side Supabase client wrapper in `client/src/supabase/client.ts`.
+- Matching typed Supabase database contracts in both client and server code so the schema shape stays aligned before the live project exists.
 - A browser auth panel and supporting service in `client/src/components/auth/supabase-auth-panel.tsx` and `client/src/services/supabase-auth.ts`.
 
 ## Intended Next Steps
 
 - Connect the migration to a real Supabase project.
 - Connect the browser auth surface to a real Supabase project.
-- Generate TypeScript database types after the schema is live.
+- Generate Supabase-managed TypeScript database types after the schema is live.
 
 ## Notes
 
