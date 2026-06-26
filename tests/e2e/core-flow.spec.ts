@@ -16,7 +16,7 @@ test('core interview flow completes from setup through final report', async ({ p
   await page.getByText('Senior', { exact: true }).click()
   await page.getByText('Mixed', { exact: true }).click()
 
-  await page.getByRole('button', { name: 'Start interview' }).click()
+  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
 
   await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Show hints for question 1' })).toBeVisible()

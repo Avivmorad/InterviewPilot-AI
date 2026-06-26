@@ -53,14 +53,16 @@ test('responsive layout stays usable across the required viewport matrix', async
 
     await expect(page.getByRole('heading', { name: 'Set up your interview' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Setup help' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start interview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Start interview', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Start interview help' })).toBeVisible()
+    await expect(page.getByText('Quick start tip')).toBeVisible()
     await expectNoHorizontalOverflow(page)
 
     if (name === 'mobile') {
       await page.getByText('Backend Developer', { exact: true }).click()
       await page.getByText('Senior', { exact: true }).click()
       await page.getByText('Mixed', { exact: true }).click()
-      await page.getByRole('button', { name: 'Start interview' }).click()
+      await page.getByRole('button', { name: 'Start interview', exact: true }).click()
 
       await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
       await expect(page.getByLabel('Your answer')).toBeVisible()
@@ -77,7 +79,7 @@ test('the main interview flow works with keyboard only', async ({ page }) => {
   await selectWithKeyboard(page, 'Senior')
   await selectWithKeyboard(page, 'Mixed')
 
-  const startButton = page.getByRole('button', { name: 'Start interview' })
+  const startButton = page.getByRole('button', { name: 'Start interview', exact: true })
   await startButton.focus()
   await expect(startButton).toBeFocused()
   await page.keyboard.press('Enter')
@@ -126,7 +128,7 @@ test('setup and interview states pass basic axe checks', async ({ page }) => {
   await page.getByText('Backend Developer', { exact: true }).click()
   await page.getByText('Senior', { exact: true }).click()
   await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview' }).click()
+  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
 
   const interviewResults = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa'])
