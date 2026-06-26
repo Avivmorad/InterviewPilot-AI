@@ -2,7 +2,7 @@
 
 ## Short Project Description
 
-InterviewPilot AI is a full-stack technical interview simulator that uses AI to generate role-specific questions, grade answers with structured feedback, and produce a final learning roadmap. The app is built with React, Vite, TypeScript, and Express, uses Gemini as the primary model with Groq fallback, and includes a production deployment on Vercel and Render.
+InterviewPilot AI is a full-stack technical interview simulator that generates role-specific questions, grades answers with structured feedback, and turns each session into a final learning report. It uses React, Vite, TypeScript, and Express, with Gemini as the primary provider and Groq as fallback. The Phase 1 product has been verified in the browser on the deployed Vercel and Render stack.
 
 ## Featured Section Draft
 
@@ -10,14 +10,18 @@ Live app: https://interviewpilot-ai-bice.vercel.app
 
 GitHub: https://github.com/Avivmorad/InterviewPilot-AI
 
-### Highlights
+### What I built
 
-- End-to-end interview flow: role selection, level selection, interview type, question generation, answer evaluation, and final report.
-- Strict structured-output validation so malformed AI responses do not break the UI.
-- Gemini-first with Groq fallback for higher availability.
-- Offline evaluation pipeline for answer-feedback prompt quality and schema reliability.
-- Production browser verification on the deployed Vercel and Render stack.
+- An end-to-end interview flow with role selection, level selection, interview type selection, question generation, answer evaluation, and a final report.
+- Structured AI output validation so malformed model responses do not break the app or leak raw provider errors.
+- Gemini-first provider routing with Groq fallback to keep the interview flow available when the primary model is unavailable.
+- An offline evaluation pipeline plus a real-provider evaluator to measure prompt quality, schema reliability, and provider behavior over time.
+- Production browser verification on the deployed Vercel frontend and Render backend, including the full interview flow and return to setup.
+
+## GitHub Profile Blurb
+
+Building InterviewPilot AI to show practical AI engineering, structured outputs, evaluation discipline, and production-ready full-stack delivery in a recruiter-friendly MVP.
 
 ## One-Liner
 
-Built InterviewPilot AI to demonstrate practical AI engineering, structured outputs, and production-ready full-stack delivery in a recruiter-friendly MVP.
+InterviewPilot AI demonstrates a production-verified AI interview flow with structured outputs, fallback routing, and a polished final report.
