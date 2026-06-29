@@ -7,7 +7,7 @@ import {
   Sparkles,
   RotateCcw,
 } from "lucide-react";
-import type { ReactNode, RefObject } from "react";
+import type { RefObject } from "react";
 
 import { FinalReport } from "@/components/interview/final-report";
 import { InterviewConfigForm } from "@/components/interview/interview-config-form";
@@ -36,7 +36,6 @@ type HomePageProps = {
   savedConfig: InterviewConfig | null;
   reportError: string;
   setupResetKey: number;
-  supabaseAuth: ReactNode;
   sessionRef: RefObject<HTMLElement | null>;
   setupRef: RefObject<HTMLDivElement | null>;
 };
@@ -76,7 +75,6 @@ export function HomePage({
   savedConfig,
   reportError,
   setupResetKey,
-  supabaseAuth,
   sessionRef,
   setupRef,
 }: HomePageProps) {
@@ -138,8 +136,6 @@ export function HomePage({
             onSubmit={onStartInterview}
           />
           {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
-          {supabaseAuth}
-
           {isLoading ? (
             <section
               aria-live="polite"
