@@ -51,6 +51,7 @@ export function InterviewQuestions({
 }: InterviewQuestionsProps) {
   const isMountedRef = useRef(true)
   const answerTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const submissionInFlightRef = useRef(new Set<string>())
   const primaryActionButtonRef = useRef<HTMLButtonElement | null>(null)
   const pendingPrimaryFocusQuestionIdRef = useRef<string | null>(null)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
@@ -197,12 +198,16 @@ export function InterviewQuestions({
   }
 
   async function submitCurrentAnswer() {
-    if (answerValidationState.isInvalid) {
+    if (
+      answerValidationState.isInvalid ||
+      submissionInFlightRef.current.has(question.id)
+    ) {
       return
     }
 
     const submittedQuestion = question
     const submittedText = trimmedCurrentAnswer
+    submissionInFlightRef.current.add(submittedQuestion.id)
     pendingPrimaryFocusQuestionIdRef.current = submittedQuestion.id
 
     setSubmittedAnswers((answers) => ({
@@ -254,6 +259,8 @@ export function InterviewQuestions({
         [submittedQuestion.id]: message,
       }))
     } finally {
+      submissionInFlightRef.current.delete(submittedQuestion.id)
+
       if (isMountedRef.current) {
         setEvaluatingQuestionIds((questionIds) => ({
           ...questionIds,
@@ -558,6 +565,7 @@ export function InterviewQuestions({
             Previous question
           </Button>
           <Button
+            data-testid="question-primary-action"
             ref={primaryActionButtonRef}
             disabled={primaryActionState.disabled}
             onClick={handlePrimaryAction}

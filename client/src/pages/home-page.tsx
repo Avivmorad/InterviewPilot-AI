@@ -1,9 +1,11 @@
 import {
+  AlertCircle,
   Code2,
   Crosshair,
   LoaderCircle,
   MessageSquareText,
   Sparkles,
+  RotateCcw,
 } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 
@@ -11,6 +13,7 @@ import { FinalReport } from "@/components/interview/final-report";
 import { InterviewConfigForm } from "@/components/interview/interview-config-form";
 import { InterviewQuestions } from "@/components/interview/interview-questions";
 import { SavedConfigSummary } from "@/components/interview/saved-config-summary";
+import { Button } from "@/components/ui/button";
 import type {
   CreateInterviewResponse,
   InterviewConfig,
@@ -25,11 +28,14 @@ type HomePageProps = {
   isReportVisible: boolean;
   isLoading: boolean;
   onCompleteInterview: () => void;
+  onRetryReport: () => void;
   onResultChange: (result: InterviewQuestionResult) => void;
   onResultRemove: (questionId: string) => void;
   onStartNewInterview: () => void;
   onStartInterview: (config: InterviewConfig) => void | Promise<void>;
   savedConfig: InterviewConfig | null;
+  reportError: string;
+  setupResetKey: number;
   supabaseAuth: ReactNode;
   sessionRef: RefObject<HTMLElement | null>;
   setupRef: RefObject<HTMLDivElement | null>;
@@ -62,11 +68,14 @@ export function HomePage({
   isReportVisible,
   isLoading,
   onCompleteInterview,
+  onRetryReport,
   onResultChange,
   onResultRemove,
   onStartNewInterview,
   onStartInterview,
   savedConfig,
+  reportError,
+  setupResetKey,
   supabaseAuth,
   sessionRef,
   setupRef,
@@ -125,6 +134,7 @@ export function HomePage({
         >
           <InterviewConfigForm
             isLoading={isLoading}
+            key={setupResetKey}
             onSubmit={onStartInterview}
           />
           {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
@@ -194,6 +204,28 @@ export function HomePage({
                 topics.
               </p>
             </div>
+          </div>
+        </section>
+      ) : null}
+
+      {interview && reportError ? (
+        <section
+          aria-live="assertive"
+          className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
+          role="alert"
+        >
+          <div className="flex items-start justify-between gap-4 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100">
+            <div className="flex items-start gap-3">
+              <AlertCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+              <div>
+                <h2 className="font-semibold">Final report unavailable</h2>
+                <p className="mt-1 text-sm leading-6">{reportError}</p>
+              </div>
+            </div>
+            <Button onClick={onRetryReport} type="button" variant="outline">
+              <RotateCcw aria-hidden="true" className="size-4" />
+              Retry final report
+            </Button>
           </div>
         </section>
       ) : null}
