@@ -17,14 +17,12 @@ import { Button } from '@/components/ui/button'
 import {
   INTERVIEW_TYPES,
   LEVELS,
-  QUESTION_COUNTS,
   ROLES,
   getLevelLabel,
   getRoleLabel,
   type InterviewConfig,
   type InterviewType,
   type Level,
-  type QuestionCount,
   type Role,
 } from '@/types/interview'
 
@@ -108,7 +106,7 @@ export function InterviewConfigForm({
   const [role, setRole] = useState<Role>('frontend-developer')
   const [level, setLevel] = useState<Level>('mid-level')
   const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
-  const [questionCount, setQuestionCount] = useState<QuestionCount>(3)
+  const questionCount = 3 as const
 
   useEffect(() => {
     onConfigChange?.({ role, level, interviewType, questionCount })
@@ -227,18 +225,6 @@ export function InterviewConfigForm({
         size="feature"
         title="3. Select Interview Type"
         value={interviewType}
-      />
-
-      <OptionGroup
-        columnsClassName="grid-cols-1"
-        description="The MVP keeps this stable at 3 questions."
-        disabled={isLoading}
-        name="questionCount"
-        onChange={setQuestionCount}
-        options={QUESTION_COUNTS}
-        renderLabel={(count) => `${count} questions`}
-        title="Question Count"
-        value={questionCount}
       />
 
       <Button

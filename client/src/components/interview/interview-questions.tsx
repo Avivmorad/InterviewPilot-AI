@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import {
   AlertCircle,
-  ArrowLeft,
   ArrowRight,
   BookOpen,
   Bookmark,
@@ -65,13 +64,11 @@ export function InterviewQuestions({
   const [evaluationErrors, setEvaluationErrors] = useState<Record<string, string>>({})
   const [evaluations, setEvaluations] = useState<Record<string, AnswerEvaluation>>({})
   const [evaluatingQuestionIds, setEvaluatingQuestionIds] = useState<Record<string, boolean>>({})
-  const [visibleHintQuestionIds, setVisibleHintQuestionIds] = useState<Record<string, boolean>>({})
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, string>>({})
 
   const question = interview.questions[activeQuestionIndex]
   const questionNumber = activeQuestionIndex + 1
   const totalQuestions = interview.questions.length
-  const isFirstQuestion = activeQuestionIndex === 0
   const isLastQuestion = activeQuestionIndex === totalQuestions - 1
   const evaluatedQuestionCount = interview.questions.filter(
     (interviewQuestion) => results[interviewQuestion.id],
@@ -88,7 +85,6 @@ export function InterviewQuestions({
     : false
   const isSavedAnswerCurrent =
     typeof submittedAnswer === 'string' && submittedAnswer === trimmedCurrentAnswer
-  const areHintsVisible = question ? Boolean(visibleHintQuestionIds[question.id]) : false
   const answerValidationState = getAnswerValidationState(currentAnswer)
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
   const primaryActionState = getQuestionPrimaryActionState({
@@ -286,17 +282,6 @@ export function InterviewQuestions({
     setActiveQuestionIndex((index) => Math.min(index + 1, totalQuestions - 1))
   }
 
-  function goToPreviousQuestion() {
-    setActiveQuestionIndex((index) => Math.max(index - 1, 0))
-  }
-
-  function toggleCurrentHints() {
-    setVisibleHintQuestionIds((questionIds) => ({
-      ...questionIds,
-      [question.id]: !questionIds[question.id],
-    }))
-  }
-
   function handlePrimaryAction() {
     if (
       primaryActionState.kind === 'evaluating' ||
@@ -327,35 +312,29 @@ export function InterviewQuestions({
       ref={sessionRef}
       tabIndex={-1}
     >
-      <div className="space-y-5">
-        <div className="flex flex-col gap-5 border-b border-white/10 pb-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              aria-label="Previous question"
-              className="grid size-12 place-items-center rounded-2xl border border-white/12 bg-white/[0.03] text-white transition hover:border-primary/45 hover:bg-primary/10 disabled:opacity-45"
-              disabled={isFirstQuestion}
-              onClick={goToPreviousQuestion}
-              type="button"
+      <div className="space-y-6">
+        <div className="grid gap-5 border-b border-white/10 pb-6 lg:grid-cols-[minmax(0,30rem)_auto] lg:items-center lg:justify-between">
+          <div className="mx-auto flex w-full max-w-[30rem] flex-col items-center gap-3">
+            <h2
+              className="text-center text-2xl font-extrabold tracking-[-0.03em] text-white"
+              id="questions-title"
             >
-              <ArrowLeft aria-hidden="true" className="size-5" />
-            </button>
-            <div className="min-w-0">
-              <h2 className="text-2xl font-extrabold text-white" id="questions-title">
-                Question {questionNumber} of {totalQuestions}
-              </h2>
-              <div className="mt-2 h-2 w-full max-w-[24rem] overflow-hidden rounded-full bg-white/10">
+              Question {questionNumber} of {totalQuestions}
+            </h2>
+            <div className="flex w-full items-center gap-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
                 <div
                   className="h-full rounded-full bg-[linear-gradient(90deg,#2f6bff,#7346ff)] transition-all"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
+              <span className="min-w-12 text-right text-xl font-semibold text-white/85">
+                {progressPercent}%
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/25 bg-emerald-500/8 px-5 py-3 text-lg font-semibold text-white">
-              <span className="size-3 rounded-full bg-emerald-400" />
-              API connected
-            </span>
+
+          <div className="flex justify-start lg:justify-end">
             <Button
               className="h-12 rounded-2xl border-red-400/50 bg-transparent px-5 text-red-300 shadow-none hover:bg-red-500/10 hover:text-red-200"
               onClick={onCompleteInterview}
@@ -374,17 +353,18 @@ export function InterviewQuestions({
           <MetaPill icon={Sparkles} label={interviewTypeLabel} tone="violet" />
         </div>
 
-        <article className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.22)] sm:px-8">
+        <article className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-8">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary">
                 Question
               </p>
-              <h3 className="mt-4 max-w-6xl text-3xl font-extrabold leading-tight text-white sm:text-[3rem]">
+              <h3 className="mt-5 max-w-6xl text-[2.2rem] font-extrabold leading-[1.24] tracking-[-0.04em] text-white sm:text-[2.6rem]">
                 {normalizeFeedbackText(question.question)}
               </h3>
-              <p className="mt-5 max-w-5xl text-xl leading-10 text-slate-300">
-                Give a detailed explanation and structure your thinking clearly.
+              <p className="mt-5 max-w-5xl text-lg leading-9 text-slate-300">
+                Give a detailed explanation of what the concept means, how it works in practice,
+                and why it improves performance or code quality.
               </p>
             </div>
             <button
@@ -397,35 +377,22 @@ export function InterviewQuestions({
           </div>
 
           <div className="mt-8 border-t border-white/10 pt-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 text-lg font-extrabold text-primary">
-                <BookOpen aria-hidden="true" className="size-5" />
-                Hints <span className="font-medium text-slate-400">(optional)</span>
-              </div>
-              <Button
-                aria-controls={`hints-${question.id}`}
-                aria-expanded={areHintsVisible}
-                onClick={toggleCurrentHints}
-                type="button"
-                variant="ghost"
-              >
-                {areHintsVisible ? 'Hide hints' : 'Show hints'}
-              </Button>
+            <div className="flex items-center gap-2 text-lg font-extrabold text-primary">
+              <BookOpen aria-hidden="true" className="size-5" />
+              Hints <span className="font-medium text-slate-400">(optional)</span>
             </div>
-            {areHintsVisible ? (
-              <ul className="mt-4 space-y-3 text-lg leading-8 text-slate-300" id={`hints-${question.id}`}>
-                {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
-                  <li className="flex items-start gap-3" key={concept}>
-                    <span className="mt-3 size-1.5 rounded-full bg-slate-300" />
-                    <span>{concept}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            <ul className="mt-4 space-y-3 text-lg leading-8 text-slate-300" id={`hints-${question.id}`}>
+              {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
+                <li className="flex items-start gap-3" key={concept}>
+                  <span className="mt-3 size-1.5 rounded-full bg-slate-300" />
+                  <span>{concept}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </article>
 
-        <article className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.22)] sm:px-8">
+        <article className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-8">
           <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
             <label
               className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary"
@@ -449,7 +416,7 @@ export function InterviewQuestions({
           <textarea
             aria-describedby={`answer-help-${question.id} answer-validation-${question.id}`}
             aria-invalid={answerValidationState.isInvalid}
-            className="mt-5 min-h-[16rem] w-full resize-y rounded-[1.2rem] border border-primary/50 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-5 py-5 text-xl leading-9 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70"
+            className="mt-5 min-h-[16rem] w-full resize-y rounded-[1.1rem] border border-primary/55 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-5 py-5 text-xl leading-9 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70"
             disabled={isEvaluatingCurrentQuestion}
             id={`answer-${question.id}`}
             maxLength={MAX_ANSWER_CHARACTERS}
@@ -613,7 +580,7 @@ function MetaPill({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-3 rounded-2xl border px-5 py-3 text-lg ${
+      className={`inline-flex items-center gap-3 rounded-xl border px-5 py-3 text-lg ${
         tone === 'green'
           ? 'border-emerald-500/25 bg-emerald-500/8 text-emerald-300'
           : tone === 'violet'
