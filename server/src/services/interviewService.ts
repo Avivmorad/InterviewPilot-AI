@@ -32,6 +32,8 @@ export class InterviewGenerationError extends Error {
 }
 
 export const MAX_ANSWER_CHARACTERS = 75_000
+export const EMPTY_ANSWER_MESSAGE = 'Please enter your answer before submitting.'
+export const MAX_ANSWER_MESSAGE = `Your answer is too long. Please keep it under ${MAX_ANSWER_CHARACTERS.toLocaleString()} characters.`
 
 type TextGenerator = (prompt: string) => Promise<string>
 
@@ -170,13 +172,13 @@ function validateEvaluateAnswerRequest(input: unknown): EvaluateAnswerRequest {
   const answerResult = z
     .string()
     .trim()
-    .min(1, 'Answer must not be empty.')
-    .max(MAX_ANSWER_CHARACTERS, 'Answer is too long. Please shorten it and try again.')
+    .min(1, EMPTY_ANSWER_MESSAGE)
+    .max(MAX_ANSWER_CHARACTERS, MAX_ANSWER_MESSAGE)
     .safeParse(input.answer)
 
   if (!answerResult.success) {
     throw new InterviewValidationError(
-      answerResult.error.issues[0]?.message ?? 'Answer must not be empty.',
+      answerResult.error.issues[0]?.message ?? EMPTY_ANSWER_MESSAGE,
     )
   }
 

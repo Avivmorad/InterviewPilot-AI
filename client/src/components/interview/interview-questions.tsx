@@ -86,6 +86,7 @@ export function InterviewQuestions({
   const answerValidationState = getAnswerValidationState(currentAnswer)
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
   const primaryActionState = getQuestionPrimaryActionState({
+    canCompleteInterview,
     currentEvaluation,
     currentEvaluationError,
     isAnswerValid: !answerValidationState.isInvalid,
@@ -282,7 +283,10 @@ export function InterviewQuestions({
   }
 
   function handlePrimaryAction() {
-    if (primaryActionState.kind === 'evaluating') {
+    if (
+      primaryActionState.kind === 'evaluating' ||
+      primaryActionState.kind === 'report-loading'
+    ) {
       return
     }
 
@@ -571,7 +575,8 @@ export function InterviewQuestions({
             onClick={handlePrimaryAction}
             type="button"
           >
-            {primaryActionState.kind === 'evaluating' ? (
+            {primaryActionState.kind === 'evaluating' ||
+            primaryActionState.kind === 'report-loading' ? (
               <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
             ) : primaryActionState.kind === 'finish' ? (
               <CheckCircle2 aria-hidden="true" className="size-4" />

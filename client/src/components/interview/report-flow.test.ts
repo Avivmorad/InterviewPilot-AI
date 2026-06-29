@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getFinalReportPreparationState } from './report-flow.js'
+import {
+  getFinalReportPreparationState,
+  isValidInterviewQuestionResult,
+} from './report-flow.js'
 import type {
   CreateInterviewResponse,
   InterviewQuestionResult,
@@ -46,4 +49,23 @@ test('returns a clear retryable error when feedback is incomplete', () => {
     error:
       'Could not generate the final report. Please review all answers and retry.',
   })
+})
+
+test('rejects incomplete report data even when a result object exists', () => {
+  const incompleteResult = {
+    ...result,
+    answer: '   ',
+  }
+
+  assert.equal(isValidInterviewQuestionResult('q1', incompleteResult), false)
+  assert.deepEqual(
+    getFinalReportPreparationState(interview, {
+      q1: incompleteResult as InterviewQuestionResult,
+    }),
+    {
+      ready: false,
+      error:
+        'Could not generate the final report. Please review all answers and retry.',
+    },
+  )
 })

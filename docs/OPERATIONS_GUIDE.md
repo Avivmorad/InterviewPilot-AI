@@ -139,6 +139,14 @@ npm audit --omit=dev
 npm run scan:secrets
 ```
 
+Production smoke helper:
+
+```powershell
+$env:FRONTEND_URL = "https://your-vercel-app.vercel.app"
+$env:BACKEND_URL = "https://your-render-service.onrender.com"
+npm run smoke:production
+```
+
 ## Deployment: Render backend
 
 Set these environment variables in Render:
@@ -194,6 +202,8 @@ Use the deployed Vercel URL and confirm:
 - `Practice again` resets the session.
 - Browser Network, JavaScript bundles, and Storage do not expose AI keys.
 - Error messages do not expose raw provider stack traces.
+
+See [docs/PHASE1_PRODUCTION_VERIFICATION.md](./PHASE1_PRODUCTION_VERIFICATION.md) for the exact Phase 1 checklist and commands.
 
 ## Git workflow
 

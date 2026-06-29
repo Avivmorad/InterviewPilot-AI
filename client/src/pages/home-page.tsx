@@ -174,7 +174,7 @@ export function HomePage({
         </div>
       </section>
 
-      {interview ? (
+      {interview && !isReportVisible && !reportError ? (
         <InterviewQuestions
           interview={interview}
           key={interview.interviewId}

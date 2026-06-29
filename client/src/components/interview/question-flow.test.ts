@@ -2,7 +2,10 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  EMPTY_ANSWER_MESSAGE,
   MAX_ANSWER_CHARACTERS,
+  MAX_ANSWER_MESSAGE,
+  SHORT_ANSWER_WARNING_MESSAGE,
   getAnswerValidationState,
   getQuestionPrimaryActionState,
 } from './question-flow.js'
@@ -10,13 +13,13 @@ import {
 test('flags empty and whitespace-only answers with the required message', () => {
   assert.deepEqual(getAnswerValidationState(''), {
     isInvalid: true,
-    message: 'Please enter your answer before submitting.',
+    message: EMPTY_ANSWER_MESSAGE,
     tone: 'error',
   })
 
   assert.deepEqual(getAnswerValidationState('   \n\t  '), {
     isInvalid: true,
-    message: 'Please enter your answer before submitting.',
+    message: EMPTY_ANSWER_MESSAGE,
     tone: 'error',
   })
 })
@@ -26,7 +29,7 @@ test('warns when an answer is very short', () => {
 
   assert.equal(state.isInvalid, false)
   assert.equal(state.tone, 'warning')
-  assert.match(state.message, /quite short/)
+  assert.equal(state.message, SHORT_ANSWER_WARNING_MESSAGE)
 })
 
 test('rejects oversized answers', () => {
@@ -34,12 +37,13 @@ test('rejects oversized answers', () => {
 
   assert.equal(state.isInvalid, true)
   assert.equal(state.tone, 'error')
-  assert.match(state.message, /too long/)
+  assert.equal(state.message, MAX_ANSWER_MESSAGE)
 })
 
 test('returns the expected primary action for each interview state', () => {
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: false,
       isAnswerValid: true,
       isEvaluatingCurrentQuestion: true,
       isLastQuestion: false,
@@ -48,12 +52,36 @@ test('returns the expected primary action for each interview state', () => {
     {
       disabled: true,
       kind: 'evaluating',
-      label: 'Evaluating answer…',
+      label: 'Evaluating answer...',
     },
   )
 
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: false,
+      currentEvaluation: {
+        score: 4,
+        strengths: ['Clear explanation'],
+        weaknesses: ['Needs more detail'],
+        missingConcepts: ['Testing'],
+        improvedAnswer: 'A better answer.',
+        confidenceLevel: 'high',
+      },
+      isAnswerValid: true,
+      isEvaluatingCurrentQuestion: false,
+      isLastQuestion: true,
+      isReportLoading: true,
+    }),
+    {
+      disabled: true,
+      kind: 'report-loading',
+      label: 'Generating final report...',
+    },
+  )
+
+  assert.deepEqual(
+    getQuestionPrimaryActionState({
+      canCompleteInterview: false,
       isAnswerValid: false,
       isEvaluatingCurrentQuestion: false,
       isLastQuestion: false,
@@ -68,6 +96,7 @@ test('returns the expected primary action for each interview state', () => {
 
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: false,
       currentEvaluationError: 'Could not evaluate answer',
       isAnswerValid: true,
       isEvaluatingCurrentQuestion: false,
@@ -83,6 +112,7 @@ test('returns the expected primary action for each interview state', () => {
 
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: false,
       currentEvaluation: {
         score: 4,
         strengths: ['Clear explanation'],
@@ -105,6 +135,7 @@ test('returns the expected primary action for each interview state', () => {
 
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: true,
       currentEvaluation: {
         score: 4,
         strengths: ['Clear explanation'],
@@ -127,6 +158,7 @@ test('returns the expected primary action for each interview state', () => {
 
   assert.deepEqual(
     getQuestionPrimaryActionState({
+      canCompleteInterview: false,
       currentEvaluation: {
         score: 4,
         strengths: ['Clear explanation'],
@@ -138,7 +170,7 @@ test('returns the expected primary action for each interview state', () => {
       isAnswerValid: true,
       isEvaluatingCurrentQuestion: false,
       isLastQuestion: true,
-      isReportLoading: true,
+      isReportLoading: false,
     }),
     {
       disabled: true,

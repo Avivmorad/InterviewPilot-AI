@@ -1,79 +1,63 @@
-# InterviewPilot AI — Task Tracker
+# InterviewPilot AI - Task Tracker
 
 Last updated: 2026-06-29  
 Current source of truth: `docs/TASK_TRACKER.md`
 
+## Tracker rules
+
+- The active Phase 1 section below contains only unfinished work.
+- The completed Phase 1 section contains only verified DONE tasks with evidence.
+- Phase 2 stays separate and must not be mixed into Phase 1 release status.
+- Phase 1 is not fully complete until the active Phase 1 section is empty.
+
 ## Status definitions
 
-- `[x] Verified complete` — implemented and verified with current evidence.
-- `[ ] Not started` — no meaningful implementation evidence.
-- `[ ] Blocked` — requires account access, credentials, dashboard config, or product decision.
-- `[ ] Requires verification` — code exists, but target-environment proof is missing.
+- `[x] Verified complete` - implemented and verified with current evidence.
+- `[ ] Requires verification` - code and partial evidence exist, but release-signoff proof is still missing.
+- `[ ] Not started` - intentionally deferred work with no execution started.
+- `[ ] Blocked` - requires external access, credentials, or a product decision.
 
-## Current product state
+## Active Phase 1 remaining work
 
-The current MVP is treated as Phase 1 complete when the following are true:
+| ID | Task | Status | Why still open | Next proof needed |
+| --- | --- | --- | --- | --- |
+| IP-P0-005 | Finish full live production browser/security sign-off | [ ] Requires verification | `npm run smoke:production` passed on 2026-06-29, but this pass did not complete a fresh manual production browser/devtools inspection for full interview -> final report -> `Practice again` -> storage/network review | Follow [docs/PHASE1_PRODUCTION_VERIFICATION.md](./PHASE1_PRODUCTION_VERIFICATION.md) and record the live browser/devtools result |
 
-- User can select role, level, interview type, and question count.
-- AI questions generate successfully.
-- User can answer every question.
-- AI feedback appears for every answer.
-- Final report renders.
-- Practice-again flow clears old state.
-- Live Vercel frontend works with live Render backend.
-- Production CORS is valid.
-- AI secrets are not exposed to the browser.
-- Desktop and mobile layouts are usable.
-- README/GitHub package is portfolio-ready.
+## Completed Phase 1 verified DONE tasks
 
-## Phase 1 — Verified MVP
-
-### P0 — Core workflow and production readiness
-
-| ID | Task | Status | Verification |
-| --- | --- | --- | --- |
-| IP-P0-001 | Interview setup flow works | [x] Verified complete | Automated checks and browser flow |
-| IP-P0-002 | Final report works, including retry/reset behavior | [x] Verified complete | Local checks, E2E, live browser verification |
-| IP-P0-003 | Answer validation works | [x] Verified complete | Empty, whitespace, short, oversized, and duplicate-submit checks |
-| IP-P0-004 | Duplicate interview actions are removed | [x] Verified complete | UI state tests and E2E flow |
-| IP-P0-005 | Production and security checks pass | [x] Verified complete | Vercel/Render/CORS/live flow/secret scan |
-| IP-P0-006 | Provider fallback and safe errors work | [x] Verified complete | Server tests and provider error handling |
-| IP-P0-007 | Production deployment wiring is aligned | [x] Verified complete | Vercel API URL and Render CORS verification |
-
-### P1 — Recruiter-ready UX
-
-| ID | Task | Status | Verification |
-| --- | --- | --- | --- |
-| IP-P1-001 | Responsive layout works on desktop, laptop, tablet, mobile, and small mobile | [x] Verified complete | Viewport matrix and browser review |
-| IP-P1-002 | Keyboard navigation works for the main flow | [x] Verified complete | Keyboard-only browser replay |
-| IP-P1-003 | Loading, empty, success, error, retry, and reset states are clear | [x] Verified complete | Manual browser checks and tests |
-| IP-P1-004 | Feedback and final-report text is readable | [x] Verified complete | UI review and text normalization checks |
-| IP-P1-005 | Setup/question/report copy is consistent | [x] Verified complete | UI review and regression checks |
-| IP-P1-006 | README, screenshots, and release docs match the product | [x] Verified complete | Docs review |
-
-### P2 — Engineering quality
-
-| ID | Task | Status | Verification |
-| --- | --- | --- | --- |
-| IP-P2-001 | Unit/API/E2E coverage exists for the core flow | [x] Verified complete | `npm run check`, Playwright suite |
-| IP-P2-002 | Prompt/evaluation data is versioned | [x] Verified complete | Eval runner and dataset checks |
-| IP-P2-003 | Real-provider eval command exists | [x] Verified complete | `npm run eval:real` available when keys exist |
-| IP-P2-004 | Secret and dependency hygiene commands exist | [x] Verified complete | Secret scan and audit commands |
-| IP-P2-005 | Rate limiting, request IDs, and safe provider errors are in place | [x] Verified complete | Middleware and server tests |
-| IP-P2-006 | Schema validation protects the AI trust boundary | [x] Verified complete | Runtime validation tests |
+| ID | Task | Completed | Files changed | Verification commands | Manual or production evidence |
+| --- | --- | --- | --- | --- | --- |
+| IP-P0-001 | Interview setup flow works | 2026-06-26 | `client/src/pages/home-page.tsx`, `client/src/App.tsx`, `tests/e2e/core-flow.spec.ts` | `npm run check`, `npm run test:e2e` | [docs/verification/2026-06-26-browser-verification.md](./verification/2026-06-26-browser-verification.md) confirms setup, generation, and restart in browser flow |
+| IP-P0-002 | Final report works, including retry/reset behavior | 2026-06-29 | `client/src/components/interview/report-flow.ts`, `client/src/components/interview/report-flow.test.ts`, `client/src/components/interview/interview-questions.tsx`, `tests/e2e/core-flow.spec.ts` | `npm run check`, `npm run test:e2e` | [docs/verification/2026-06-29-phase1-blockers-verification.md](./verification/2026-06-29-phase1-blockers-verification.md) records local report-ready coverage, retry/error handling, and end-to-end reset coverage |
+| IP-P0-003 | Answer validation works | 2026-06-29 | `client/src/components/interview/question-flow.ts`, `client/src/components/interview/question-flow.test.ts`, `client/src/components/interview/interview-questions.tsx`, `server/src/services/interviewService.ts`, `server/src/services/interviewService.test.ts` | `npm run check`, `npm run test:e2e` | [docs/verification/2026-06-29-phase1-blockers-verification.md](./verification/2026-06-29-phase1-blockers-verification.md) records empty, whitespace, short, oversized, and duplicate-submit coverage |
+| IP-P0-004 | Duplicate interview actions are removed | 2026-06-29 | `client/src/components/interview/question-flow.ts`, `client/src/components/interview/question-flow.test.ts`, `client/src/components/interview/interview-questions.tsx`, `tests/e2e/core-flow.spec.ts` | `npm run check`, `npm run test:e2e` | [docs/verification/2026-06-29-phase1-blockers-verification.md](./verification/2026-06-29-phase1-blockers-verification.md) records one-primary-action and duplicate-submit protection coverage |
+| IP-P0-006 | Provider fallback and safe errors work | 2026-06-29 | `server/src/services/interviewService.ts`, `server/src/services/interviewService.test.ts`, `server/src/app.ts`, `server/src/ai/aiService.ts` | `npm run check` | Server tests verify fallback behavior, safe AI errors, and controlled invalid-output handling |
+| IP-P0-007 | Production deployment wiring is aligned | 2026-06-29 | `render.yaml`, `vercel.json`, `server/src/config.ts`, `client/src/services/interview-api.ts`, `docs/OPERATIONS_GUIDE.md`, `docs/PHASE1_PRODUCTION_VERIFICATION.md`, `scripts/production-smoke.mjs` | `npm run check`, `npm run smoke:production` | Live smoke on 2026-06-29 confirmed `GET /api/health`, CORS preflight, create, evaluate, and frontend load against Vercel + Render |
+| IP-P1-001 | Responsive layout works on desktop, laptop, tablet, mobile, and small mobile | 2026-06-26 | `tests/e2e/responsive-keyboard-a11y.spec.ts`, related client layout files | `npm run test:e2e` | [docs/verification/2026-06-26-browser-verification.md](./verification/2026-06-26-browser-verification.md) records the viewport matrix and readable setup/question/report screens |
+| IP-P1-002 | Keyboard navigation works for the main flow | 2026-06-26 | `tests/e2e/responsive-keyboard-a11y.spec.ts`, related client focus-management files | `npm run test:e2e` | [docs/verification/2026-06-26-browser-verification.md](./verification/2026-06-26-browser-verification.md) records the keyboard-only replay and focus behavior |
+| IP-P1-003 | Loading, empty, success, error, retry, and reset states are clear | 2026-06-29 | `client/src/components/interview/interview-questions.tsx`, `client/src/components/interview/report-flow.ts`, `client/src/components/interview/report-flow.test.ts`, `tests/e2e/core-flow.spec.ts` | `npm run check`, `npm run test:e2e` | Local tests now cover evaluation loading, retry, report-loading, incomplete-feedback error, and reset behavior |
+| IP-P1-004 | Feedback and final-report text is readable | 2026-06-26 | `client/src/lib/feedback-text.ts`, `client/src/lib/feedback-text.test.ts`, report UI files | `npm run check`, `npm run test:e2e` | Browser verification notes confirm readable rendered feedback/report text without raw markdown markers |
+| IP-P1-005 | Setup/question/report copy is consistent | 2026-06-29 | `client/src/pages/home-page.tsx`, `client/src/components/interview/interview-questions.tsx`, report UI files, e2e assertions | `npm run check`, `npm run test:e2e` | Current e2e assertions and UI copy review align setup, question, completion, retry, and reset labels |
+| IP-P1-006 | README, screenshots, and release docs match the product | 2026-06-29 | `docs/OPERATIONS_GUIDE.md`, `docs/PHASE1_PRODUCTION_VERIFICATION.md`, `docs/PORTFOLIO_RELEASE.md` | Docs review, `npm run check` | Release/operations docs now include the exact production smoke and manual verification steps used in this pass |
+| IP-P2-001 | Unit/API/E2E coverage exists for the core flow | 2026-06-29 | `client/src/components/interview/*.test.ts`, `server/src/services/interviewService.test.ts`, `tests/e2e/core-flow.spec.ts` | `npm run check`, `npm run test:e2e` | Current suites cover question flow, report flow, server validation, and full mocked browser flow |
+| IP-P2-002 | Prompt/evaluation data is versioned | 2026-06-26 | `server/src/evals`, prompt/eval assets | `npm run check`, `npm run eval` | Existing eval runner and dataset remain in place; no blocker-fix regression found |
+| IP-P2-003 | Real-provider eval command exists | 2026-06-26 | `package.json`, `server/package.json`, `server/src/evals` | `npm run check` | `npm run eval:real` remains available when provider keys exist |
+| IP-P2-004 | Secret and dependency hygiene commands exist | 2026-06-29 | `scripts/scan-secrets.mjs`, `scripts/production-smoke.mjs`, `package.json` | `npm run scan:secrets`, `npm audit --omit=dev`, `npm run smoke:production` | 2026-06-29 scan found no tracked secrets and audit found `0 vulnerabilities` |
+| IP-P2-005 | Rate limiting, request IDs, and safe provider errors are in place | 2026-06-29 | `server/src/app.ts`, `server/src/middleware/requestSecurity.ts`, `server/src/ai/aiService.ts`, server tests | `npm run check` | Server tests confirm request IDs, rate limiting, and safe error responses |
+| IP-P2-006 | Schema validation protects the AI trust boundary | 2026-06-29 | `server/src/services/interviewService.ts`, `server/src/services/interviewService.test.ts` | `npm run check` | Runtime validation tests cover malformed JSON, shape drift normalization, retries, and transparent fallback feedback |
 
 ## Phase 1 maintenance tasks
 
-These are allowed after Phase 1, but should not become major feature work.
+These are allowed after the release package is stable and should stay out of MVP scope creep.
 
 | ID | Task | Status | Notes |
 | --- | --- | --- | --- |
-| IP-MAINT-001 | Keep README screenshots current | [ ] Not started | Update only when UI changes |
-| IP-MAINT-002 | Add or keep GitHub Actions for `npm run check` and `npm run eval` | [ ] Not started | High resume value if not already added |
-| IP-MAINT-003 | Save a short demo video/GIF for LinkedIn and README | [ ] Not started | Portfolio polish |
-| IP-MAINT-004 | Keep live production smoke test checklist updated | [ ] Not started | Helps before sharing repo |
+| IP-MAINT-001 | Keep README screenshots current | [ ] Not started | Update when visible UI changes |
+| IP-MAINT-002 | Add or keep GitHub Actions for `npm run check` and `npm run eval` | [ ] Not started | Good resume value, not required for MVP sign-off |
+| IP-MAINT-003 | Save a short demo video or GIF for LinkedIn and README | [ ] Not started | Portfolio polish only |
+| IP-MAINT-004 | Keep live production smoke test checklist updated | [x] Verified complete | 2026-06-29 helper script and [docs/PHASE1_PRODUCTION_VERIFICATION.md](./PHASE1_PRODUCTION_VERIFICATION.md) added |
 
-## Phase 2 — Future work only
+## Phase 2 - Future work only
 
 Do not start Phase 2 until the Phase 1 release package is stable.
 
@@ -87,15 +71,7 @@ Do not start Phase 2 until the Phase 1 release package is stable.
 | IP-F2-006 | Add voice interviews and speech analysis | [ ] Blocked | Product/privacy decision | Browser permissions and consent are clear |
 | IP-F2-007 | Add AI career coach | [ ] Blocked | Saved history | Advice is based on user-owned history and structured outputs |
 
-## External dependencies
+## Remaining blocker summary
 
-| ID | Platform | Needed |
-| --- | --- | --- |
-| EXT-001 | Supabase | Project URL, anon key, service-role key, migrations, RLS verification |
-| EXT-002 | Vercel | `VITE_API_URL`, future Supabase browser envs |
-| EXT-003 | Render | Gemini/Groq keys, future Supabase server envs |
-| EXT-004 | GitHub | Public repo state, optional Actions, clean commits |
-
-## Current recommendation
-
-The next work should be documentation/release maintenance or Phase 2 planning only. Avoid adding new product features until the portfolio package is clean and easy for recruiters to understand.
+- Phase 1 has one remaining blocker: a fresh manual production browser + devtools verification pass to confirm the full live flow and browser-side secrecy.
+- After that evidence is captured, `IP-P0-005` can move to DONE and the active Phase 1 section will be empty.

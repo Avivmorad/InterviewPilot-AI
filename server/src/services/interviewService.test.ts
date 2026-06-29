@@ -3,9 +3,11 @@ import test from 'node:test'
 
 import {
   createInterview,
+  EMPTY_ANSWER_MESSAGE,
   evaluateAnswer,
   InterviewGenerationError,
   InterviewValidationError,
+  MAX_ANSWER_MESSAGE,
   MAX_ANSWER_CHARACTERS,
   parseAnswerEvaluation,
   parseGeneratedInterview,
@@ -426,7 +428,35 @@ test('rejects an empty answer before calling AI', async () => {
         return validEvaluationText
       },
     ),
-    InterviewValidationError,
+    (error: unknown) => {
+      assert.ok(error instanceof InterviewValidationError)
+      assert.equal(error.message, EMPTY_ANSWER_MESSAGE)
+      return true
+    },
+  )
+
+  assert.equal(calls, 0)
+})
+
+test('rejects a whitespace-only answer with the required message', async () => {
+  let calls = 0
+
+  await assert.rejects(
+    evaluateAnswer(
+      {
+        question: JSON.parse(validGeneratedText).questions[0],
+        answer: '   \n\t  ',
+      },
+      async () => {
+        calls += 1
+        return validEvaluationText
+      },
+    ),
+    (error: unknown) => {
+      assert.ok(error instanceof InterviewValidationError)
+      assert.equal(error.message, EMPTY_ANSWER_MESSAGE)
+      return true
+    },
   )
 
   assert.equal(calls, 0)
@@ -446,7 +476,11 @@ test('rejects an oversized answer before calling AI', async () => {
         return validEvaluationText
       },
     ),
-    InterviewValidationError,
+    (error: unknown) => {
+      assert.ok(error instanceof InterviewValidationError)
+      assert.equal(error.message, MAX_ANSWER_MESSAGE)
+      return true
+    },
   )
 
   assert.equal(calls, 0)

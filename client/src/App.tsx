@@ -29,6 +29,7 @@ function App() {
   const interviewResultsRef = useRef(interviewResults)
   const pendingSessionFocusRef = useRef(false)
   const reportLoadingTimerRef = useRef<number | undefined>(undefined)
+  const isReportCompletionPendingRef = useRef(false)
   const sessionRef = useRef<HTMLElement | null>(null)
   const setupRef = useRef<HTMLDivElement | null>(null)
   const [isReportLoading, setIsReportLoading] = useState(false)
@@ -106,10 +107,28 @@ function App() {
   function clearReportLoadingTimer() {
     window.clearTimeout(reportLoadingTimerRef.current)
     reportLoadingTimerRef.current = undefined
+    isReportCompletionPendingRef.current = false
   }
 
   function handleCompleteInterview() {
-    if (!interview || isReportLoading || isReportVisible) {
+    if (
+      !interview ||
+      isReportLoading ||
+      isReportVisible ||
+      isReportCompletionPendingRef.current
+    ) {
+      return
+    }
+
+    const initialReportState = getFinalReportPreparationState(
+      interview,
+      interviewResultsRef.current,
+    )
+
+    if (!initialReportState.ready) {
+      setIsReportLoading(false)
+      setIsReportVisible(false)
+      setReportError(initialReportState.error)
       return
     }
 
@@ -117,9 +136,11 @@ function App() {
     setReportError('')
     setIsReportVisible(false)
     setIsReportLoading(true)
+    isReportCompletionPendingRef.current = true
 
     reportLoadingTimerRef.current = window.setTimeout(() => {
       reportLoadingTimerRef.current = undefined
+      isReportCompletionPendingRef.current = false
       setIsReportLoading(false)
 
       const reportState = getFinalReportPreparationState(
@@ -141,6 +162,7 @@ function App() {
     clearReportLoadingTimer()
     setSavedConfig(config)
     setInterview(null)
+    interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
     setIsReportVisible(false)
@@ -168,6 +190,7 @@ function App() {
     setSetupResetKey((currentKey) => currentKey + 1)
     setSavedConfig(null)
     setInterview(null)
+    interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
     setIsReportVisible(false)
@@ -198,16 +221,21 @@ function App() {
         onRetryReport={handleCompleteInterview}
         onStartNewInterview={handleStartNewInterview}
         onResultChange={(result) =>
-          setInterviewResults((currentResults) => ({
-            ...currentResults,
-            [result.question.id]: result,
-          }))
+          setInterviewResults((currentResults) => {
+            const nextResults = {
+              ...currentResults,
+              [result.question.id]: result,
+            }
+            interviewResultsRef.current = nextResults
+            return nextResults
+          })
         }
         onResultRemove={(questionId) => {
           clearReportLoadingTimer()
           setInterviewResults((currentResults) => {
             const nextResults = { ...currentResults }
             delete nextResults[questionId]
+            interviewResultsRef.current = nextResults
             return nextResults
           })
           setIsReportLoading(false)
