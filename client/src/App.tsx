@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AppLayout } from '@/components/layout/app-layout'
+import { AppShell } from '@/components/layout/app-shell'
 import { HomePage } from '@/pages/home-page'
 import { getFinalReportPreparationState } from '@/components/interview/report-flow'
 import {
@@ -177,7 +177,7 @@ function App() {
   }
 
   return (
-    <AppLayout apiConnectionStatus={apiConnectionStatus}>
+    <AppShell apiConnectionStatus={apiConnectionStatus}>
       <HomePage
         error={error}
         interview={interview}
@@ -216,7 +216,7 @@ function App() {
         sessionRef={sessionRef}
         setupRef={setupRef}
       />
-    </AppLayout>
+    </AppShell>
   )
 }
 

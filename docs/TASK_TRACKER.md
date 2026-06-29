@@ -23,6 +23,24 @@ Current source of truth: `docs/TASK_TRACKER.md`
 | --- | --- | --- | --- | --- |
 | IP-P0-005 | Finish full live production browser/security sign-off | [ ] Requires verification | `npm run smoke:production` passed on 2026-06-29, but this pass did not complete a fresh manual production browser/devtools inspection for full interview -> final report -> `Practice again` -> storage/network review | Follow [docs/verification/PHASE1_PRODUCTION_VERIFICATION.md](./verification/PHASE1_PRODUCTION_VERIFICATION.md) and record the live browser/devtools result |
 
+## Active NewUIPic UI redesign remaining work
+
+These tasks track the screenshot-driven frontend redesign from `docs/NewUIPic/`. Keep this section frontend-only unless a future request explicitly expands backend scope.
+
+| ID | Task | Status | Why still open | Next proof needed |
+| --- | --- | --- | --- | --- |
+| IP-UI-002 | Match the interview setup screen to `docs/NewUIPic/Interview Setup Page.png` | [ ] Requires verification | Existing setup form still needs the screenshot card grid, summary sidebar, selected states, and full-width generate button treatment | Browser screenshot compared against the reference image, with generate flow still working |
+| IP-UI-003 | Match the Q&A screen to `docs/NewUIPic/Q&A Page.png` | [ ] Requires verification | Existing question flow still needs the screenshot-style top progress header, metadata chips, answer panel spacing, action bar, and end-interview button treatment | Browser screenshot compared against the reference image, with answer submission still calling the same API |
+| IP-UI-004 | Match the final report screen to the current `docs/NewUIPic/Finish Screen.png` | [ ] Requires verification | User replaced the finish-screen reference; final report UI must be checked against the new image and adjusted without changing report data contracts | Browser screenshot compared against the new reference image |
+| IP-UI-005 | Add slide-left page-to-page movement plus left/right arrow navigation | [ ] Not started | Current app scrolls between sections; it does not yet use a horizontal page slider or arrow controls | Manual browser flow showing buttons advance slides left and arrows move between screens without breaking state |
+| IP-UI-006 | Complete responsive visual QA for all NewUIPic screens | [ ] Not started | Requires browser screenshots after the full redesign is implemented | Desktop and mobile screenshots saved and compared against references |
+
+## Completed NewUIPic UI redesign work
+
+| ID | Task | Completed | Files changed | Verification commands | Visual evidence |
+| --- | --- | --- | --- | --- | --- |
+| IP-UI-001 | Match the landing/about screen to `docs/NewUIPic/Landing Page.png` | 2026-06-29 | `client/src/pages/home-page.tsx`, shared shell files | `npm run typecheck --workspace client`, `npm run lint --workspace client`, `npm run test --workspace client`, `npm run build --workspace client` | Playwright screenshot at `1536x864` compared with `docs/NewUIPic/Landing Page.png`; Browser/IAB unavailable, Playwright used as fallback |
+
 ## Completed Phase 1 verified DONE tasks
 
 | ID | Task | Completed | Files changed | Verification commands | Manual or production evidence |
