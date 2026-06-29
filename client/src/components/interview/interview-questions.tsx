@@ -374,16 +374,16 @@ export function InterviewQuestions({
           <MetaPill icon={Sparkles} label={interviewTypeLabel} tone="violet" />
         </div>
 
-        <article className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.22)] sm:px-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary">
+        <article className="rounded-[1.95rem] border border-white/10 bg-[#081326]/88 px-7 py-8 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-9">
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-extrabold uppercase tracking-[0.12em] text-primary">
                 Question
               </p>
-              <h3 className="mt-4 max-w-6xl text-3xl font-extrabold leading-tight text-white sm:text-[3rem]">
+              <h3 className="mt-5 max-w-6xl text-3xl font-extrabold leading-snug text-white sm:text-4xl">
                 {normalizeFeedbackText(question.question)}
               </h3>
-              <p className="mt-5 max-w-5xl text-xl leading-10 text-slate-300">
+              <p className="mt-6 max-w-5xl text-lg leading-8 text-slate-300">
                 Give a detailed explanation and structure your thinking clearly.
               </p>
             </div>
@@ -425,15 +425,15 @@ export function InterviewQuestions({
           </div>
         </article>
 
-        <article className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.22)] sm:px-8">
-          <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <article className="rounded-[1.95rem] border border-white/10 bg-[#081326]/88 px-7 py-8 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-9">
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
             <label
-              className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary"
+              className="text-base font-extrabold uppercase tracking-[0.12em] text-primary"
               htmlFor={`answer-${question.id}`}
             >
               Your Answer
             </label>
-            <div className="flex flex-wrap items-center gap-4 text-base text-slate-300">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
               {isSavedAnswerCurrent ? (
                 <span className="inline-flex items-center gap-2 text-emerald-300">
                   <CheckCircle2 aria-hidden="true" className="size-4" />
@@ -449,7 +449,7 @@ export function InterviewQuestions({
           <textarea
             aria-describedby={`answer-help-${question.id} answer-validation-${question.id}`}
             aria-invalid={answerValidationState.isInvalid}
-            className="mt-5 min-h-[16rem] w-full resize-y rounded-[1.2rem] border border-primary/50 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-5 py-5 text-xl leading-9 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70"
+            className="mt-6 min-h-[18rem] w-full resize-y rounded-[1.35rem] border border-primary/45 bg-[linear-gradient(180deg,rgba(15,24,44,0.94),rgba(18,28,48,0.92))] px-6 py-5 text-lg leading-8 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.06)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/60"
             disabled={isEvaluatingCurrentQuestion}
             id={`answer-${question.id}`}
             maxLength={MAX_ANSWER_CHARACTERS}
@@ -459,7 +459,7 @@ export function InterviewQuestions({
             value={currentAnswer}
           />
 
-          <div className="mt-4 space-y-2">
+          <div className="mt-5 space-y-2">
             <p className="text-sm text-muted-foreground" id={`answer-help-${question.id}`}>
               Keep answers structured and concise. Adding examples usually improves feedback quality.
             </p>
@@ -559,7 +559,7 @@ export function InterviewQuestions({
           </section>
         ) : null}
 
-        <div className="grid gap-5 border-t border-white/10 pt-5 lg:grid-cols-3">
+        <div className="grid gap-4 border-t border-white/10 pt-6 sm:grid-cols-3">
           <ActionCard
             helper="You can come back later"
             icon={ArrowRight}

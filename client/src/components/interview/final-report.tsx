@@ -159,41 +159,41 @@ export function FinalReport({
   return (
     <section
       aria-labelledby="final-report-title"
-      className="mx-auto max-w-[1520px] px-5 pb-12 pt-8 sm:px-8 lg:pb-16"
+      className="mx-auto max-w-[1540px] px-5 pb-14 pt-10 sm:px-8 lg:pb-20"
     >
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1.35fr)_20rem]">
-        <div className="space-y-6">
+      <div className="grid gap-10 xl:grid-cols-[minmax(0,1.3fr)_22rem]">
+        <div className="space-y-8">
           <div>
             <h2
-              className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.35rem]"
+              className="text-4xl font-extrabold tracking-[-0.05em] text-white sm:text-5xl"
               id="final-report-title"
             >
               Interview Complete! <span aria-hidden="true">🎉</span>
             </h2>
-            <p className="mt-3 text-xl text-slate-300">
+            <p className="mt-3 text-lg text-slate-300">
               Here&apos;s your complete performance report.
             </p>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_18rem]">
-            <section className="rounded-[1.7rem] border border-primary/55 bg-[linear-gradient(145deg,rgba(8,18,38,0.95),rgba(6,13,28,0.92))] p-7 shadow-[0_28px_90px_rgba(0,0,0,0.25)]">
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_16rem] lg:items-center">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_19rem]">
+            <section className="rounded-[2rem] border border-primary/45 bg-[linear-gradient(145deg,rgba(8,18,38,0.92),rgba(6,13,28,0.89))] p-8 shadow-[0_28px_90px_rgba(0,0,0,0.22)]">
+              <div className="grid gap-7 lg:grid-cols-[minmax(0,0.92fr)_17rem] lg:items-center">
                 <div>
-                  <div className="inline-flex items-center gap-2 text-lg font-semibold text-white">
+                  <div className="inline-flex items-center gap-2 text-base font-semibold text-white">
                     <Gauge aria-hidden="true" className="size-5 text-primary" />
                     Overall Score
                   </div>
-                  <div className="mt-5 flex items-end gap-3">
+                  <div className="mt-6 flex items-end gap-3">
                     <span className="text-7xl font-extrabold tracking-[-0.08em] text-white">
                       {roundedScore}
                     </span>
-                    <span className="pb-2 text-3xl font-semibold text-slate-400">/10</span>
+                    <span className="pb-3 text-3xl font-semibold text-slate-400">/10</span>
                   </div>
-                  <p className="mt-4 flex items-center gap-2 text-3xl font-extrabold text-emerald-300">
+                  <p className="mt-5 flex items-center gap-2 text-2xl font-extrabold text-emerald-300">
                     <Sparkles aria-hidden="true" className="size-6" />
                     Top Performer
                   </p>
-                  <p className="mt-3 max-w-md text-lg leading-9 text-slate-200">
+                  <p className="mt-4 max-w-md text-base leading-8 text-slate-200">
                     Great job! You performed better than <span className="text-emerald-300">82%</span> of developers in your level.
                   </p>
                 </div>
@@ -229,8 +229,8 @@ export function FinalReport({
           </div>
 
           <section>
-            <h3 className="text-3xl font-extrabold text-white">Score Breakdown</h3>
-            <div className="mt-5 grid gap-4 xl:grid-cols-4">
+            <h3 className="text-4xl font-extrabold tracking-[-0.04em] text-white">Score Breakdown</h3>
+            <div className="mt-6 grid gap-4 xl:grid-cols-4">
               {breakdownCards.map(({ icon, label, score, status, tone }) => (
                 <BreakdownCard
                   icon={icon}
@@ -308,21 +308,21 @@ export function FinalReport({
             title="AI & Evaluation Details"
           />
 
-          <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+          <section className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
             <h3 className="text-2xl font-extrabold text-white">What&apos;s Next?</h3>
-            <p className="mt-3 text-base leading-8 text-slate-300">
+            <p className="mt-2 text-base leading-7 text-slate-300">
               Start a new interview or review your current report.
             </p>
-            <div className="mt-5 space-y-3">
-              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={onStartNewInterview} type="button">
+            <div className="mt-6 space-y-3">
+              <Button className="h-11 w-full rounded-2xl text-base font-bold" onClick={onStartNewInterview} type="button">
                 <RotateCcw aria-hidden="true" className="size-5" />
                 Start New Interview
               </Button>
-              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={copyReport} type="button" variant="outline">
+              <Button className="h-11 w-full rounded-2xl text-base font-bold" onClick={copyReport} type="button" variant="outline">
                 <Clipboard aria-hidden="true" className="size-5" />
                 {copyStatus === 'copied' ? 'Report Copied' : 'Copy Report'}
               </Button>
-              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={downloadReport} type="button" variant="outline">
+              <Button className="h-11 w-full rounded-2xl text-base font-bold" onClick={downloadReport} type="button" variant="outline">
                 <Download aria-hidden="true" className="size-5" />
                 {downloadStatus === 'failed' ? 'Download Failed' : 'Download Report (PDF)'}
               </Button>
@@ -367,10 +367,10 @@ function BreakdownCard({
   const display = (score * 2).toFixed(1)
 
   return (
-    <article className="rounded-[1.35rem] border border-white/10 bg-[#081326]/92 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-      <div className="flex items-center gap-4">
+    <article className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.16)]">
+      <div className="flex items-center gap-5">
         <span
-          className={`grid size-12 place-items-center rounded-xl ${
+          className={`grid size-14 place-items-center rounded-xl ${
             tone === 'green'
               ? 'bg-emerald-500/18 text-emerald-300'
               : tone === 'violet'
@@ -380,17 +380,17 @@ function BreakdownCard({
                   : 'bg-primary/18 text-primary'
           }`}
         >
-          <Icon aria-hidden="true" className="size-5" />
+          <Icon aria-hidden="true" className="size-6" />
         </span>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-slate-300">{label}</p>
-          <p className="mt-1 text-5xl font-extrabold tracking-[-0.06em] text-white">
+          <p className="mt-2 text-5xl font-extrabold tracking-[-0.06em] text-white">
             {display}
             <span className="ml-2 text-2xl text-slate-400">/10</span>
           </p>
         </div>
       </div>
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+      <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/8">
         <div
           className={`h-full rounded-full ${
             tone === 'green'
@@ -405,7 +405,7 @@ function BreakdownCard({
         />
       </div>
       <p
-        className={`mt-3 text-xl font-bold ${
+        className={`mt-4 text-lg font-bold ${
           tone === 'green'
             ? 'text-emerald-300'
             : tone === 'violet'
@@ -435,11 +435,11 @@ function InsightCard({
   usePills?: boolean
 }) {
   return (
-    <section className="rounded-[1.35rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+    <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.16)]">
       <div className="flex items-center gap-3">
         <Icon
           aria-hidden="true"
-          className={`size-5 ${
+          className={`size-6 ${
             tone === 'green'
               ? 'text-emerald-300'
               : tone === 'amber'
@@ -453,7 +453,7 @@ function InsightCard({
         <div className="mt-5 flex flex-wrap gap-3">
           {items.map((item) => (
             <span
-              className="rounded-full border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-lg text-violet-200"
+              className="rounded-full border border-violet-400/25 bg-violet-500/12 px-4 py-2 text-base text-violet-200"
               key={item}
             >
               {item}
@@ -463,9 +463,9 @@ function InsightCard({
       ) : (
         <ul className="mt-5 space-y-3">
           {items.map((item) => (
-            <li className="flex items-start gap-3 text-lg leading-8 text-slate-200" key={item}>
+            <li className="flex items-start gap-3 text-base leading-7 text-slate-200" key={item}>
               <span
-                className={`mt-3 size-2 rounded-full ${
+                className={`mt-2 size-2 rounded-full ${
                   tone === 'green'
                     ? 'bg-emerald-400'
                     : tone === 'amber'
@@ -526,19 +526,19 @@ function SummaryPanel({
   title: string
 }) {
   return (
-    <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
-      <h3 className="text-2xl font-extrabold text-white">{title}</h3>
-      <div className="mt-5 space-y-4">
+    <section className="rounded-[1.75rem] border border-white/10 bg-[#081326]/90 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
+      <h3 className="text-xl font-extrabold text-white">{title}</h3>
+      <div className="mt-6 space-y-4">
         {rows.map(({ icon: Icon, label, tone, value }) => (
           <div className="flex items-center justify-between gap-4 border-b border-white/8 pb-4 last:border-b-0 last:pb-0" key={label}>
             <div className="flex items-center gap-3">
-              <span className="grid size-9 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300">
-                <Icon aria-hidden="true" className="size-4" />
+              <span className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300">
+                <Icon aria-hidden="true" className="size-5" />
               </span>
-              <span className="text-base text-white">{label}</span>
+              <span className="text-sm text-slate-300">{label}</span>
             </div>
             <span
-              className={`text-right text-lg font-semibold ${
+              className={`text-right text-base font-semibold ${
                 tone === 'green'
                   ? 'text-emerald-300'
                   : tone === 'violet'

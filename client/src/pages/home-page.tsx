@@ -116,39 +116,39 @@ const topicPills = [
 
 function LandingScorePreview() {
   return (
-    <div className="glass-panel relative overflow-hidden rounded-[1.35rem] border-primary/55 p-4 shadow-[0_0_60px_rgb(47_107_255_/_0.18)]">
+    <div className="glass-panel relative overflow-hidden rounded-[1.5rem] border border-primary/45 p-5 shadow-[0_0_70px_rgb(47_107_255_/_0.15)]">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-primary/20 blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-primary/15 blur-3xl"
       />
-      <div className="relative z-10 grid gap-4">
-        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.8fr]">
-          <div className="rounded-2xl border border-white/8 bg-[#071225]/80 p-4">
-            <h2 className="text-base font-extrabold text-white">Overall Score</h2>
-            <div className="mx-auto mt-3 grid size-32 place-items-center rounded-full bg-[conic-gradient(from_8deg,#7b35ff_0_34%,#2f6bff_34%_82%,#15223c_82%_100%)] p-3 shadow-[0_0_38px_rgb(47_107_255_/_0.2)]">
+      <div className="relative z-10 grid gap-5">
+        <div className="grid gap-5 lg:grid-cols-[0.85fr_1.85fr]">
+          <div className="rounded-3xl border border-white/10 bg-[#071225]/75 p-5">
+            <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-primary">Overall Score</h2>
+            <div className="mx-auto mt-4 grid size-32 place-items-center rounded-full bg-[conic-gradient(from_8deg,#7b35ff_0_34%,#2f6bff_34%_82%,#15223c_82%_100%)] p-3 shadow-[0_0_40px_rgb(47_107_255_/_0.25)]">
               <div className="grid size-full place-items-center rounded-full bg-[#071225]">
                 <div className="text-center">
                   <p className="text-4xl font-extrabold tracking-[-0.06em] text-white">8.2</p>
-                  <p className="-mt-1 text-xl font-semibold text-muted-foreground">/10</p>
+                  <p className="-mt-1 text-lg font-semibold text-slate-400">/10</p>
                 </div>
               </div>
             </div>
-            <p className="mt-3 flex items-center justify-center gap-2 text-base font-extrabold text-emerald-300">
+            <p className="mt-4 flex items-center justify-center gap-2 text-base font-extrabold text-emerald-300">
               <Sparkles aria-hidden="true" className="size-5" />
               Top Performer
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/8 bg-[#071225]/80 p-4">
-            <h2 className="text-base font-extrabold text-white">Score Breakdown</h2>
-            <div className="mt-4 space-y-2.5">
+          <div className="rounded-3xl border border-white/10 bg-[#071225]/75 p-5">
+            <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-primary">Score Breakdown</h2>
+            <div className="mt-5 space-y-3">
               {scoreRows.map(([label, score, width]) => (
                 <div className="space-y-2" key={label}>
                   <div className="flex items-center justify-between gap-4 text-sm">
-                    <span className="text-slate-200">{label}</span>
-                    <span className="font-semibold text-slate-300">{score}</span>
+                    <span className="text-slate-300">{label}</span>
+                    <span className="font-semibold text-white">{score}</span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/8">
+                  <div className="h-2 overflow-hidden rounded-full bg-white/8">
                     <div
                       aria-hidden="true"
                       className="h-full rounded-full bg-[linear-gradient(90deg,#2f6bff,#6548ff)]"
@@ -161,12 +161,12 @@ function LandingScorePreview() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-[#071225]/80 p-4">
-          <h2 className="text-base font-extrabold text-white">Topic Breakdown</h2>
-          <div className="mt-4 flex flex-wrap gap-2.5">
+        <div className="rounded-3xl border border-white/10 bg-[#071225]/75 p-5">
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-primary">Topic Breakdown</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
             {topicPills.map(({ className, label, level }) => (
               <span
-                className={`inline-flex items-center gap-3 rounded-full px-3 py-2 text-xs font-extrabold ${className}`}
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-extrabold ${className}`}
                 key={label}
               >
                 <span>{label}</span>
@@ -176,9 +176,9 @@ function LandingScorePreview() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-[#071225]/80 p-4">
+        <div className="rounded-3xl border border-white/10 bg-[#071225]/75 p-5">
           <div className="flex items-center justify-between gap-4 text-sm">
-            <h2 className="text-base font-extrabold text-white">Interview Progress</h2>
+            <h2 className="text-sm font-extrabold uppercase tracking-[0.1em] text-primary">Interview Progress</h2>
             <span className="text-slate-300">4 / 5 Completed</span>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/8">
@@ -195,15 +195,15 @@ function LandingScorePreview() {
 
 function LandingStage({ onNext }: { onNext: () => void }) {
   return (
-    <section className="relative mx-auto flex min-h-[calc(100svh-9rem)] max-w-[1348px] flex-col justify-between gap-7 px-5 py-9 sm:px-8 lg:px-0 lg:py-10">
-      <div className="grid items-start gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
-        <div className="relative z-10 max-w-[650px]">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)]">
+    <section className="relative mx-auto flex min-h-[calc(100svh-9rem)] max-w-[1380px] flex-col justify-between gap-8 px-5 py-10 sm:px-8 lg:px-8 lg:py-12">
+      <div className="grid items-start gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:gap-16">
+        <div className="relative z-10 max-w-[680px]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)]">
             <Sparkles aria-hidden="true" className="size-5 text-primary" />
             AI-Powered Interview Preparation
           </div>
 
-          <h1 className="font-display mt-5 text-5xl font-extrabold leading-[1.08] tracking-[-0.055em] text-white sm:text-6xl lg:text-[3.95rem] xl:text-[4.05rem]">
+          <h1 className="font-display mt-6 text-5xl font-extrabold leading-[1.1] tracking-[-0.06em] text-white sm:text-6xl lg:text-[4.1rem] xl:text-[4.25rem]">
             Ace Your Next
             <br />
             <span className="whitespace-nowrap bg-[linear-gradient(110deg,#2f6bff_0%,#4b7cff_52%,#8a5cff_100%)] bg-clip-text text-transparent">
@@ -213,30 +213,30 @@ function LandingStage({ onNext }: { onNext: () => void }) {
             with AI
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
             Practice realistic technical interviews, receive detailed AI feedback,
             identify weak areas, and improve with personalized recommendations.
           </p>
 
           <button
-            className="mt-8 inline-flex w-full max-w-[620px] items-center justify-center gap-6 rounded-2xl border border-white/18 bg-[linear-gradient(105deg,#2f6bff_0%,#4b68ff_48%,#7b35ff_100%)] px-8 py-6 text-3xl font-extrabold tracking-[-0.03em] text-white shadow-[0_0_40px_rgb(47_107_255_/_0.48)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_60px_rgb(47_107_255_/_0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80"
+            className="mt-9 inline-flex w-full max-w-[620px] items-center justify-center gap-6 rounded-3xl border border-white/12 bg-[linear-gradient(105deg,#2f6bff_0%,#4b68ff_48%,#7b35ff_100%)] px-8 py-6 text-2xl font-extrabold tracking-[-0.02em] text-white shadow-[0_0_50px_rgb(47_107_255_/_0.5)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_0_70px_rgb(47_107_255_/_0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
             onClick={onNext}
             type="button"
           >
-            <Sparkles aria-hidden="true" className="size-9 text-blue-100" />
+            <Sparkles aria-hidden="true" className="size-8 text-blue-100" />
             Start Interview
-            <ArrowRight aria-hidden="true" className="size-10" />
+            <ArrowRight aria-hidden="true" className="size-9" />
           </button>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {proofPoints.map(({ description, icon: Icon, title }) => (
               <div className="flex items-center gap-3" key={title}>
                 <span className="grid size-10 place-items-center rounded-full text-primary">
                   <Icon aria-hidden="true" className="size-7 stroke-[2.2]" />
                 </span>
                 <div>
-                  <p className="whitespace-nowrap text-sm font-extrabold text-white">{title}</p>
-                  <p className="whitespace-nowrap text-sm text-muted-foreground">{description}</p>
+                  <p className="text-sm font-extrabold text-white">{title}</p>
+                  <p className="text-sm text-muted-foreground">{description}</p>
                 </div>
               </div>
             ))}
@@ -249,7 +249,7 @@ function LandingStage({ onNext }: { onNext: () => void }) {
       <div className="grid gap-4 lg:grid-cols-4">
         {benefits.map(({ accent, description, icon: Icon, tags, title }) => (
           <article
-            className="rounded-2xl border border-white/10 bg-[#071225]/78 p-4 shadow-[0_22px_70px_rgb(0_0_0_/_0.25)] backdrop-blur-xl"
+            className="rounded-3xl border border-white/10 bg-[#071225]/75 p-5 shadow-[0_22px_70px_rgb(0_0_0_/_0.25)] backdrop-blur-sm transition hover:border-white/15 hover:bg-[#081428]/80"
             key={title}
           >
             <div className="flex items-start gap-4">
@@ -268,13 +268,13 @@ function LandingStage({ onNext }: { onNext: () => void }) {
               </span>
               <div>
                 <h2 className="text-base font-extrabold text-white">{title}</h2>
-                <p className="mt-1 text-sm leading-5 text-slate-300">{description}</p>
+                <p className="mt-1.5 text-sm leading-5 text-slate-300">{description}</p>
               </div>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <span
-                  className={`rounded-lg px-2.5 py-1 text-[0.68rem] font-extrabold ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-extrabold ${
                     accent === 'green'
                       ? 'bg-emerald-500/12 text-emerald-300'
                       : accent === 'amber'
