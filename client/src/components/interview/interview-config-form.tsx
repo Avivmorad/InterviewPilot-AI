@@ -5,14 +5,12 @@ import {
   GraduationCap,
   Layers3,
   LoaderCircle,
-  Info,
   MessageSquareText,
-  Play,
   ShieldCheck,
   Sparkles,
   UserRound,
 } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 
 import { OptionGroup } from '@/components/interview/option-group'
 import { Button } from '@/components/ui/button'
@@ -32,6 +30,7 @@ import {
 
 type InterviewConfigFormProps = {
   isLoading: boolean
+  onConfigChange?: (config: InterviewConfig) => void
   onSubmit: (config: InterviewConfig) => void | Promise<void>
 }
 
@@ -56,13 +55,54 @@ const interviewTypeIcons = {
   Mixed: Layers3,
 } satisfies Record<InterviewType, typeof Code2>
 
-const setupHelpText =
-  'Pick the role, level, interview type, and question count so the practice session matches your goal.'
-const startHelpText =
-  'Starts the interview right away using the selections you made above.'
+const roleDescriptions = {
+  'frontend-developer': 'React, JavaScript, TypeScript, HTML, CSS, Performance',
+  'backend-developer': 'Node.js, Python, databases, APIs, system design',
+  'full-stack-developer': 'Frontend + Backend, databases, APIs, DevOps basics',
+  'ai-engineer': 'Machine Learning, LLMs, Python, Data Science',
+  'generative-ai-engineer': 'Prompting, agents, evaluation, model integration',
+} satisfies Record<Role, string>
+
+const levelDescriptions = {
+  intern: 'Learning the basics and getting started',
+  junior: '1-2 years of hands-on experience',
+  'mid-level': '2-5 years of professional experience',
+  senior: '5+ years of expert-level experience',
+} satisfies Record<Level, string>
+
+const interviewTypeDescriptions = {
+  Technical: 'Focus on coding, algorithms, system design and problem solving',
+  Behavioral: 'Focus on soft skills, leadership, teamwork and culture fit',
+  Mixed: 'Combination of technical and behavioral questions',
+} satisfies Record<InterviewType, string>
+
+function SetupCardIcon({
+  children,
+  tone = 'blue',
+}: {
+  children: ReactNode
+  tone?: 'blue' | 'green' | 'orange' | 'violet'
+}) {
+  return (
+    <span
+      className={`grid size-12 place-items-center rounded-xl shadow-[0_16px_36px_rgba(0,0,0,0.16)] ${
+        tone === 'green'
+          ? 'bg-[linear-gradient(145deg,rgba(30,110,66,0.94),rgba(11,43,32,0.98))] text-emerald-200'
+          : tone === 'orange'
+            ? 'bg-[linear-gradient(145deg,rgba(170,87,18,0.96),rgba(72,33,10,0.98))] text-orange-100'
+            : tone === 'violet'
+              ? 'bg-[linear-gradient(145deg,rgba(87,56,175,0.96),rgba(43,28,85,0.98))] text-violet-100'
+              : 'bg-[linear-gradient(145deg,rgba(40,88,200,0.96),rgba(20,36,88,0.98))] text-blue-100'
+      }`}
+    >
+      {children}
+    </span>
+  )
+}
 
 export function InterviewConfigForm({
   isLoading,
+  onConfigChange,
   onSubmit,
 }: InterviewConfigFormProps) {
   const [role, setRole] = useState<Role>('frontend-developer')
@@ -70,128 +110,139 @@ export function InterviewConfigForm({
   const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
   const [questionCount, setQuestionCount] = useState<QuestionCount>(3)
 
+  useEffect(() => {
+    onConfigChange?.({ role, level, interviewType, questionCount })
+  }, [interviewType, level, onConfigChange, questionCount, role])
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onSubmit({ role, level, interviewType, questionCount })
   }
 
   return (
-    <form
-      className="glass-panel neon-panel reveal-in relative flex flex-col gap-5 overflow-hidden rounded-lg p-5 pb-24 sm:gap-6 sm:p-8 sm:pb-8"
-      onSubmit={handleSubmit}
-    >
-      <div className="relative z-10 flex items-start gap-4">
-        <Sparkles
-          aria-hidden="true"
-          className="mt-1 size-5 shrink-0 text-primary drop-shadow-[0_0_18px_rgb(47_107_255_/_0.8)] sm:size-6"
-        />
-        <div className="flex-1">
-          <div className="flex items-start gap-2">
-            <h2 className="font-display text-2xl font-extrabold text-white sm:text-[2.15rem]">
-              Set up your interview
-            </h2>
-            <button
-              aria-describedby="setup-help"
-              aria-label="Setup help"
-              className="group relative mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-300 transition hover:border-primary/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-              title={setupHelpText}
-              type="button"
-            >
-              <Info aria-hidden="true" className="size-3.5" />
-              <span
-                className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-950/95 px-3 py-2 text-left text-xs font-medium leading-5 text-slate-200 opacity-0 shadow-[0_18px_30px_rgba(0,0,0,0.35)] transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
-                id="setup-help"
-                role="tooltip"
-              >
-                {setupHelpText}
-              </span>
-            </button>
-          </div>
-          <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:mt-2 sm:text-base sm:leading-7">
-            Choose a focus for this practice session.
+    <form className="relative flex flex-col gap-4" onSubmit={handleSubmit}>
+      <div className="flex items-start gap-4 px-2">
+        <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[linear-gradient(145deg,rgba(40,53,112,0.96),rgba(16,25,47,0.98))] text-primary shadow-[0_0_34px_rgba(47,107,255,0.16)]">
+          <Sparkles aria-hidden="true" className="size-7" />
+        </span>
+        <div>
+          <h2 className="font-display text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.1rem]">
+            Create Your Interview
+          </h2>
+          <p className="mt-1 text-lg text-muted-foreground">
+            Configure your interview session.
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 grid gap-6">
-        <OptionGroup
-          description="Choose the role you want to practice for."
-          disabled={isLoading}
-          helpText="This sets the interview focus so the questions match the job you want."
-          name="role"
-          onChange={setRole}
-          options={ROLES}
-          renderLabel={(option) => {
-            const Icon = roleIcons[option]
+      <OptionGroup
+        columnsClassName="grid-cols-1 md:grid-cols-2 xl:grid-cols-5"
+        description="Choose the role you want to practice for."
+        disabled={isLoading}
+        name="role"
+        onChange={setRole}
+        options={ROLES}
+        renderDescription={(option) => roleDescriptions[option]}
+        renderLabel={(option) => getRoleLabel(option)}
+        renderLeading={(option) => {
+          const Icon = roleIcons[option]
+          const tone =
+            option === 'backend-developer'
+              ? 'green'
+              : option === 'full-stack-developer'
+                ? 'orange'
+                : option === 'ai-engineer' || option === 'generative-ai-engineer'
+                  ? 'violet'
+                  : 'blue'
 
-            return (
-              <>
-                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
-                <span>{getRoleLabel(option)}</span>
-              </>
-            )
-          }}
-          title="Role"
-          value={role}
-        />
+          return (
+            <SetupCardIcon tone={tone}>
+              <Icon aria-hidden="true" className="size-7" />
+            </SetupCardIcon>
+          )
+        }}
+        showSelectedIndicator
+        size="feature"
+        title="1. Select Role"
+        value={role}
+      />
 
-        <OptionGroup
-          description="Select your current experience level."
-          disabled={isLoading}
-          helpText="Pick the difficulty that best matches your current experience."
-          name="level"
-          onChange={setLevel}
-          options={LEVELS}
-          renderLabel={(option) => {
-            const Icon = levelIcons[option]
+      <OptionGroup
+        columnsClassName="grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
+        description="Choose your current experience level."
+        disabled={isLoading}
+        name="level"
+        onChange={setLevel}
+        options={LEVELS}
+        renderDescription={(option) => levelDescriptions[option]}
+        renderLabel={(option) => getLevelLabel(option)}
+        renderLeading={(option) => {
+          const Icon = levelIcons[option]
+          const tone =
+            option === 'intern'
+              ? 'blue'
+              : option === 'junior'
+                ? 'green'
+                : option === 'senior'
+                  ? 'violet'
+                  : 'blue'
 
-            return (
-              <>
-                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
-                <span>{getLevelLabel(option)}</span>
-              </>
-            )
-          }}
-          title="Level"
-          value={level}
-        />
+          return (
+            <SetupCardIcon tone={tone}>
+              <Icon aria-hidden="true" className="size-7" />
+            </SetupCardIcon>
+          )
+        }}
+        showSelectedIndicator
+        size="feature"
+        title="2. Select Experience Level"
+        value={level}
+      />
 
-        <OptionGroup
-          description="Choose the style of questions for this interview."
-          disabled={isLoading}
-          helpText="Technical, behavioral, or mixed changes the kind of questions you will get."
-          name="interviewType"
-          onChange={setInterviewType}
-          options={INTERVIEW_TYPES}
-          renderLabel={(option) => {
-            const Icon = interviewTypeIcons[option]
+      <OptionGroup
+        columnsClassName="grid-cols-1 lg:grid-cols-3"
+        description="Choose the style of questions for this interview."
+        disabled={isLoading}
+        name="interviewType"
+        onChange={setInterviewType}
+        options={INTERVIEW_TYPES}
+        renderDescription={(option) => interviewTypeDescriptions[option]}
+        renderLabel={(option) => option}
+        renderLeading={(option) => {
+          const Icon = interviewTypeIcons[option]
+          const tone =
+            option === 'Behavioral'
+              ? 'violet'
+              : option === 'Mixed'
+                ? 'orange'
+                : 'blue'
 
-            return (
-              <>
-                <Icon aria-hidden="true" className="hidden size-5 text-primary min-[520px]:block" />
-                <span>{option}</span>
-              </>
-            )
-          }}
-          title="Interview type"
-          value={interviewType}
-        />
+          return (
+            <SetupCardIcon tone={tone}>
+              <Icon aria-hidden="true" className="size-7" />
+            </SetupCardIcon>
+          )
+        }}
+        showSelectedIndicator
+        size="feature"
+        title="3. Select Interview Type"
+        value={interviewType}
+      />
 
-        <OptionGroup
-          description="Use the stable MVP-length interview."
-          disabled={isLoading}
-          helpText="The MVP keeps this short at 3 questions so the flow stays focused."
-          name="questionCount"
-          onChange={setQuestionCount}
-          options={QUESTION_COUNTS}
-          renderLabel={(count) => `${count}`}
-          title="Question count"
-          value={questionCount}
-        />
-      </div>
+      <OptionGroup
+        columnsClassName="grid-cols-1"
+        description="The MVP keeps this stable at 3 questions."
+        disabled={isLoading}
+        name="questionCount"
+        onChange={setQuestionCount}
+        options={QUESTION_COUNTS}
+        renderLabel={(count) => `${count} questions`}
+        title="Question Count"
+        value={questionCount}
+      />
 
       <Button
-        className="relative z-10 mt-1 h-14 w-full text-lg font-extrabold"
+        className="mt-0.5 h-14 rounded-[1.3rem] text-xl font-extrabold tracking-[-0.03em] shadow-[0_0_44px_rgba(47,107,255,0.28)]"
         disabled={isLoading}
         size="lg"
         type="submit"
@@ -199,35 +250,14 @@ export function InterviewConfigForm({
         {isLoading ? (
           <LoaderCircle aria-hidden="true" className="animate-spin" />
         ) : (
-          <Play aria-hidden="true" />
+          <Sparkles aria-hidden="true" className="size-7" />
         )}
-        {isLoading ? 'Generating questions...' : 'Start interview'}
+        {isLoading ? 'Generating questions...' : 'Generate Interview'}
       </Button>
-      <div className="relative z-10 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-xs font-medium leading-5 text-muted-foreground">
-        <button
-          aria-describedby="start-help"
-          aria-label="Start interview help"
-          className="group relative mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-300 transition hover:border-primary/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-          title={startHelpText}
-          type="button"
-        >
-          <Info aria-hidden="true" className="size-3.5" />
-          <span
-            className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-950/95 px-3 py-2 text-left text-xs font-medium leading-5 text-slate-200 opacity-0 shadow-[0_18px_30px_rgba(0,0,0,0.35)] transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
-            id="start-help"
-            role="tooltip"
-          >
-            {startHelpText}
-          </span>
-        </button>
-        <div className="space-y-1">
-          <p className="text-slate-200">Quick start tip</p>
-          <p>Use this when you&apos;re ready to generate question 1 from the settings above.</p>
-        </div>
-      </div>
-      <p className="relative z-10 flex items-center justify-center gap-2 text-center text-xs font-medium text-muted-foreground">
+
+      <p className="flex items-center justify-center gap-2 text-center text-sm font-medium text-muted-foreground">
         <ShieldCheck aria-hidden="true" className="size-4 text-slate-400" />
-        Your answers are private and used only for feedback.
+        All selections are required to generate your interview.
       </p>
     </form>
   )

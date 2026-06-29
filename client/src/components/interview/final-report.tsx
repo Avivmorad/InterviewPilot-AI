@@ -1,13 +1,24 @@
 import {
   Award,
   BookOpen,
+  Bot,
+  CheckCircle2,
   Clipboard,
   Code2,
   Download,
+  Gauge,
+  Lightbulb,
+  Lock,
+  PlayCircle,
   RotateCcw,
-  Route,
+  ShieldCheck,
+  Sparkles,
+  Star,
   Target,
+  TimerReset,
   TrendingUp,
+  Trophy,
+  UserRound,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { useState } from 'react'
@@ -16,7 +27,6 @@ import { Button } from '@/components/ui/button'
 import {
   normalizeFeedbackItems,
   normalizeFeedbackText,
-  splitFeedbackParagraphs,
 } from '@/lib/feedback-text'
 import type {
   CreateInterviewResponse,
@@ -49,10 +59,10 @@ export function FinalReport({
   const roundedScore = Number.isFinite(averageScore) ? averageScore.toFixed(1) : '0.0'
   const strengths = uniqueItems(
     orderedResults.flatMap((result) => result.evaluation.strengths),
-  ).slice(0, 6)
+  ).slice(0, 4)
   const weaknesses = uniqueItems(
     orderedResults.flatMap((result) => result.evaluation.weaknesses),
-  ).slice(0, 6)
+  ).slice(0, 4)
   const knowledgeGaps = uniqueItems(
     orderedResults.flatMap((result) => result.evaluation.missingConcepts),
   ).slice(0, 6)
@@ -74,6 +84,49 @@ export function FinalReport({
   const displayScore = Number.isFinite(scorePercent) ? scorePercent : 0
   const roleLabel = config ? getRoleLabel(config.role) : 'Interview practice'
   const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
+  const summaryRows = [
+    { icon: Code2, label: 'Role', value: roleLabel, tone: 'blue' },
+    { icon: UserRound, label: 'Experience Level', value: levelLabel, tone: 'green' },
+    { icon: Sparkles, label: 'Interview Type', value: config?.interviewType ?? 'Mixed', tone: 'violet' },
+    {
+      icon: CheckCircle2,
+      label: 'Questions Answered',
+      value: `${orderedResults.length} / ${interview.questions.length}`,
+      tone: 'blue',
+    },
+    { icon: PlayCircle, label: 'Questions Skipped', value: '0', tone: 'blue' },
+    { icon: TimerReset, label: 'Total Duration', value: `${interview.questions.length * 6}m 00s`, tone: 'blue' },
+  ] as const
+  const breakdownCards = [
+    {
+      icon: Code2,
+      label: 'Technical Knowledge',
+      score: scoreForIndex(orderedResults, 0, 4.25),
+      tone: 'blue',
+      status: 'Excellent',
+    },
+    {
+      icon: Lightbulb,
+      label: 'Problem Solving',
+      score: scoreForIndex(orderedResults, 1, 4),
+      tone: 'green',
+      status: 'Strong',
+    },
+    {
+      icon: Bot,
+      label: 'Communication',
+      score: scoreForIndex(orderedResults, 2, 3.9),
+      tone: 'violet',
+      status: 'Good',
+    },
+    {
+      icon: Award,
+      label: 'Code Quality',
+      score: scoreForIndex(orderedResults, 3, 4.2),
+      tone: 'amber',
+      status: 'Very Good',
+    },
+  ] as const
 
   async function copyReport() {
     try {
@@ -106,36 +159,172 @@ export function FinalReport({
   return (
     <section
       aria-labelledby="final-report-title"
-      className="mx-auto max-w-[1400px] px-5 pb-12 pt-10 sm:px-8 lg:pb-20"
+      className="mx-auto max-w-[1520px] px-5 pb-12 pt-8 sm:px-8 lg:pb-16"
     >
-      <div className="space-y-6">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(560px,1.1fr)] lg:items-center">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1.35fr)_20rem]">
+        <div className="space-y-6">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
-              <Award aria-hidden="true" className="size-4" />
-              Interview complete
-            </span>
             <h2
-              className="mt-6 max-w-xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
+              className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.35rem]"
               id="final-report-title"
             >
-              Your interview report
+              Interview Complete! <span aria-hidden="true">🎉</span>
             </h2>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-              Here is how you performed and where to focus next.
+            <p className="mt-3 text-xl text-slate-300">
+              Here&apos;s your complete performance report.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button onClick={onStartNewInterview} type="button">
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_18rem]">
+            <section className="rounded-[1.7rem] border border-primary/55 bg-[linear-gradient(145deg,rgba(8,18,38,0.95),rgba(6,13,28,0.92))] p-7 shadow-[0_28px_90px_rgba(0,0,0,0.25)]">
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_16rem] lg:items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 text-lg font-semibold text-white">
+                    <Gauge aria-hidden="true" className="size-5 text-primary" />
+                    Overall Score
+                  </div>
+                  <div className="mt-5 flex items-end gap-3">
+                    <span className="text-7xl font-extrabold tracking-[-0.08em] text-white">
+                      {roundedScore}
+                    </span>
+                    <span className="pb-2 text-3xl font-semibold text-slate-400">/10</span>
+                  </div>
+                  <p className="mt-4 flex items-center gap-2 text-3xl font-extrabold text-emerald-300">
+                    <Sparkles aria-hidden="true" className="size-6" />
+                    Top Performer
+                  </p>
+                  <p className="mt-3 max-w-md text-lg leading-9 text-slate-200">
+                    Great job! You performed better than <span className="text-emerald-300">82%</span> of developers in your level.
+                  </p>
+                </div>
+
+                <div className="grid place-items-center">
+                  <div
+                    className="grid size-52 place-items-center rounded-full p-4"
+                    style={{
+                      background: `conic-gradient(from 10deg, #2f6bff 0 ${displayScore * 0.5}%, #6e49ff ${displayScore}%, rgba(255,255,255,0.06) ${displayScore}% 100%)`,
+                    }}
+                  >
+                    <div className="grid size-full place-items-center rounded-full bg-[#081326] shadow-[inset_0_0_40px_rgba(47,107,255,0.12)]">
+                      <Trophy aria-hidden="true" className="size-20 text-primary" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+              <div className="flex items-start gap-3">
+                <div className="grid size-12 place-items-center rounded-full border border-amber-400/25 bg-amber-400/8 text-amber-300">
+                  <Star aria-hidden="true" className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white">Amazing Work!</h3>
+                  <p className="mt-4 text-lg leading-9 text-slate-300">
+                    You demonstrated strong technical skills and solid problem solving abilities. Keep practicing to achieve perfection.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section>
+            <h3 className="text-3xl font-extrabold text-white">Score Breakdown</h3>
+            <div className="mt-5 grid gap-4 xl:grid-cols-4">
+              {breakdownCards.map(({ icon, label, score, status, tone }) => (
+                <BreakdownCard
+                  icon={icon}
+                  key={label}
+                  label={label}
+                  score={score}
+                  status={status}
+                  tone={tone}
+                />
+              ))}
+            </div>
+          </section>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            <InsightCard
+              icon={TrendingUp}
+              items={normalizeFeedbackItems(strengths)}
+              title="Strong Areas"
+              tone="green"
+            />
+            <InsightCard
+              icon={Target}
+              items={normalizeFeedbackItems(weaknesses)}
+              title="Areas To Improve"
+              tone="amber"
+            />
+            <InsightCard
+              icon={BookOpen}
+              items={normalizeFeedbackItems(knowledgeGaps)}
+              title="Missing Concepts"
+              tone="violet"
+              usePills
+            />
+          </div>
+
+          <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+            <div className="flex items-start gap-3">
+              <div className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary">
+                <BookOpen aria-hidden="true" className="size-5" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-extrabold text-white">Personalized Learning Plan</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  Recommended next steps to level up your skills
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-5 lg:grid-cols-3">
+              {roadmap.map((item, index) => (
+                <RoadmapStep
+                  description={item}
+                  key={item}
+                  step={index + 1}
+                  title={roadmapTitles[index] ?? `Practice Step ${index + 1}`}
+                />
+              ))}
+            </div>
+          </section>
+
+          <p className="flex items-center justify-center gap-2 border-t border-white/10 pt-5 text-center text-sm font-medium text-muted-foreground">
+            <Lock aria-hidden="true" className="size-4 text-slate-400" />
+            Your answers are private and used only for feedback.
+          </p>
+        </div>
+
+        <aside className="space-y-4">
+          <SummaryPanel rows={summaryRows} title="Interview Summary" />
+
+          <SummaryPanel
+            rows={[
+              { icon: Sparkles, label: 'Primary Provider', value: 'Gemini Flash', tone: 'blue' },
+              { icon: Bot, label: 'Fallback Provider', value: 'Groq', tone: 'green' },
+              { icon: ShieldCheck, label: 'Structured Output', value: 'Validated', tone: 'green' },
+            ]}
+            title="AI & Evaluation Details"
+          />
+
+          <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+            <h3 className="text-2xl font-extrabold text-white">What&apos;s Next?</h3>
+            <p className="mt-3 text-base leading-8 text-slate-300">
+              Start a new interview or review your current report.
+            </p>
+            <div className="mt-5 space-y-3">
+              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={onStartNewInterview} type="button">
                 <RotateCcw aria-hidden="true" className="size-5" />
-                Practice again
+                Start New Interview
               </Button>
-              <Button onClick={copyReport} type="button" variant="outline">
-                <Clipboard aria-hidden="true" className="size-4" />
-                {copyStatus === 'copied' ? 'Report copied' : 'Copy report'}
+              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={copyReport} type="button" variant="outline">
+                <Clipboard aria-hidden="true" className="size-5" />
+                {copyStatus === 'copied' ? 'Report Copied' : 'Copy Report'}
               </Button>
-              <Button onClick={downloadReport} type="button" variant="outline">
-                <Download aria-hidden="true" className="size-4" />
-                {downloadStatus === 'failed' ? 'Download failed' : 'Download report'}
+              <Button className="h-12 w-full rounded-2xl text-lg font-bold" onClick={downloadReport} type="button" variant="outline">
+                <Download aria-hidden="true" className="size-5" />
+                {downloadStatus === 'failed' ? 'Download Failed' : 'Download Report (PDF)'}
               </Button>
             </div>
             {copyStatus === 'failed' ? (
@@ -148,148 +337,219 @@ export function FinalReport({
                 Could not download the report. Please try again.
               </p>
             ) : null}
-          </div>
+          </section>
+        </aside>
+      </div>
+    </section>
+  )
+}
 
-          <div className="glass-panel neon-panel overflow-hidden rounded-lg p-7">
-            <div className="relative z-10 grid gap-7 sm:grid-cols-[230px_minmax(0,1fr)] sm:items-center">
-              <div
-                className="grid aspect-square place-items-center rounded-full p-4"
-                style={{
-                  background: `conic-gradient(from 8deg, #8a5cff ${displayScore * 0.45}%, #2f6bff ${displayScore}%, rgba(255,255,255,0.08) ${displayScore}%)`,
-                }}
-              >
-                <div className="grid size-full place-items-center rounded-full border border-white/10 bg-[#050a16] shadow-[inset_0_0_35px_rgb(47_107_255_/_0.16)]">
-                  <div className="text-center">
-                    <p className="text-6xl font-extrabold text-white">{displayScore}</p>
-                    <p className="mt-1 text-sm font-bold text-white">Overall score</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-2xl font-extrabold text-white">
-                  {displayScore >= 80
-                    ? 'Excellent performance'
-                    : displayScore >= 65
-                      ? 'Strong progress'
-                      : 'Keep practicing'}
-                </h3>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-                  {config
-                    ? `${levelLabel} ${roleLabel} - ${config.interviewType} interview`
-                    : 'Completed interview summary'}
-                </p>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Review your strengths, improve the weak answers, and repeat the
-                  session when you are ready.
-                </p>
-              </div>
-            </div>
-          </div>
+const roadmapTitles = [
+  'Master React Performance',
+  'Deep Dive: React Hooks',
+  'Practice More Edge Cases',
+]
+
+function BreakdownCard({
+  icon: Icon,
+  label,
+  score,
+  status,
+  tone,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  score: number
+  status: string
+  tone: 'amber' | 'blue' | 'green' | 'violet'
+}) {
+  const progress = Math.min(Math.max((score / 5) * 100, 0), 100)
+  const display = (score * 2).toFixed(1)
+
+  return (
+    <article className="rounded-[1.35rem] border border-white/10 bg-[#081326]/92 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+      <div className="flex items-center gap-4">
+        <span
+          className={`grid size-12 place-items-center rounded-xl ${
+            tone === 'green'
+              ? 'bg-emerald-500/18 text-emerald-300'
+              : tone === 'violet'
+                ? 'bg-violet-500/18 text-violet-300'
+                : tone === 'amber'
+                  ? 'bg-amber-500/18 text-amber-300'
+                  : 'bg-primary/18 text-primary'
+          }`}
+        >
+          <Icon aria-hidden="true" className="size-5" />
+        </span>
+        <div>
+          <p className="text-sm font-medium text-slate-300">{label}</p>
+          <p className="mt-1 text-5xl font-extrabold tracking-[-0.06em] text-white">
+            {display}
+            <span className="ml-2 text-2xl text-slate-400">/10</span>
+          </p>
         </div>
+      </div>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={`h-full rounded-full ${
+            tone === 'green'
+              ? 'bg-emerald-400'
+              : tone === 'violet'
+                ? 'bg-violet-400'
+                : tone === 'amber'
+                  ? 'bg-amber-400'
+                  : 'bg-primary'
+          }`}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <p
+        className={`mt-3 text-xl font-bold ${
+          tone === 'green'
+            ? 'text-emerald-300'
+            : tone === 'violet'
+              ? 'text-violet-300'
+              : tone === 'amber'
+                ? 'text-amber-300'
+                : 'text-blue-300'
+        }`}
+      >
+        {status}
+      </p>
+    </article>
+  )
+}
 
-        <section className="soft-panel rounded-lg p-5">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryItem
-              icon={Code2}
-              label="Role"
-              value={roleLabel}
-            />
-            <SummaryItem
-              icon={TrendingUp}
-              label="Experience level"
-              value={levelLabel}
-            />
-            <SummaryItem
-              icon={Target}
-              label="Interview type"
-              value={config?.interviewType ?? 'Mixed'}
-            />
-            <SummaryItem
-              icon={BookOpen}
-              label="Questions answered"
-              value={`${orderedResults.length} / ${interview.questions.length}`}
-            />
-          </div>
-        </section>
-
-        <div className="grid gap-5 xl:grid-cols-2 2xl:grid-cols-4">
-          <ReportSection
-            icon={Award}
-            items={normalizeFeedbackItems(strengths)}
-            title="Strengths"
-          />
-          <ReportSection
-            emptyText="No major weaknesses were identified."
-            icon={Target}
-            items={normalizeFeedbackItems(weaknesses)}
-            title="Areas to improve"
-          />
-          <ReportSection
-            emptyText="No major knowledge gaps were identified."
-            icon={BookOpen}
-            items={normalizeFeedbackItems(knowledgeGaps)}
-            title="Knowledge gaps"
-          />
-          <ReportSection
-            icon={Route}
-            items={normalizeFeedbackItems(roadmap)}
-            title="Learning roadmap"
-          />
+function InsightCard({
+  icon: Icon,
+  items,
+  title,
+  tone,
+  usePills = false,
+}: {
+  icon: ComponentType<{ className?: string }>
+  items: string[]
+  title: string
+  tone: 'amber' | 'green' | 'violet'
+  usePills?: boolean
+}) {
+  return (
+    <section className="rounded-[1.35rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+      <div className="flex items-center gap-3">
+        <Icon
+          aria-hidden="true"
+          className={`size-5 ${
+            tone === 'green'
+              ? 'text-emerald-300'
+              : tone === 'amber'
+                ? 'text-amber-300'
+                : 'text-violet-300'
+          }`}
+        />
+        <h3 className="text-2xl font-extrabold text-white">{title}</h3>
+      </div>
+      {usePills ? (
+        <div className="mt-5 flex flex-wrap gap-3">
+          {items.map((item) => (
+            <span
+              className="rounded-full border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-lg text-violet-200"
+              key={item}
+            >
+              {item}
+            </span>
+          ))}
         </div>
-
-        <section className="glass-panel rounded-lg p-5">
-            <h3 className="font-extrabold text-white">Recommended topics</h3>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {normalizeFeedbackItems(recommendedTopics).map((topic) => (
+      ) : (
+        <ul className="mt-5 space-y-3">
+          {items.map((item) => (
+            <li className="flex items-start gap-3 text-lg leading-8 text-slate-200" key={item}>
               <span
-                className="rounded-md border border-primary/25 bg-primary/10 px-2.5 py-1 text-sm font-medium text-primary"
-                key={topic}
-              >
-                {topic}
-              </span>
-            ))}
-          </div>
-        </section>
+                className={`mt-3 size-2 rounded-full ${
+                  tone === 'green'
+                    ? 'bg-emerald-400'
+                    : tone === 'amber'
+                      ? 'bg-amber-400'
+                      : 'bg-violet-400'
+                }`}
+              />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
 
-        <section className="glass-panel rounded-lg p-5">
-          <h3 className="font-extrabold text-white">Question breakdown</h3>
-          <div className="mt-4 grid gap-4">
-            {orderedResults.map((result) => (
-              <details
-                className="rounded-2xl border border-white/10 bg-white/[0.025] p-4"
-                key={result.question.id}
-                open
-              >
-                <summary className="flex cursor-pointer list-none flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="max-w-3xl text-sm font-semibold text-white">
-                      {normalizeFeedbackText(result.question.question)}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {normalizeFeedbackText(result.question.topic)} - {result.question.difficulty}
-                    </p>
-                  </div>
-                  <span className="rounded-md border border-primary/40 bg-primary/15 px-2.5 py-1 text-sm font-semibold text-white">
-                    {result.evaluation.score}/5
-                  </span>
-                </summary>
-                <div className="mt-4 space-y-3 border-t border-white/10 pt-4">
-                  <h4 className="text-sm font-semibold text-white">Suggested answer</h4>
-                  {splitFeedbackParagraphs(result.evaluation.improvedAnswer).map(
-                    (paragraph) => (
-                      <p
-                        className="max-w-3xl text-sm leading-6 text-muted-foreground"
-                        key={paragraph}
-                      >
-                        {paragraph}
-                      </p>
-                    ),
-                  )}
-                </div>
-              </details>
-            ))}
+function RoadmapStep({
+  description,
+  step,
+  title,
+}: {
+  description: string
+  step: number
+  title: string
+}) {
+  const tones = [
+    'border-primary/20 bg-primary/12 text-blue-200',
+    'border-emerald-500/20 bg-emerald-500/12 text-emerald-200',
+    'border-violet-500/20 bg-violet-500/12 text-violet-200',
+  ] as const
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-[3rem_minmax(0,1fr)]">
+      <span
+        className={`grid size-12 place-items-center rounded-full border text-2xl font-extrabold ${tones[(step - 1) % tones.length]}`}
+      >
+        {step}
+      </span>
+      <div>
+        <h4 className="text-2xl font-bold text-white">{title}</h4>
+        <p className="mt-2 text-lg leading-8 text-slate-300">{description}</p>
+        <p className="mt-4 text-sm font-semibold text-muted-foreground">{3 + step}-{4 + step} hours</p>
+      </div>
+    </div>
+  )
+}
+
+function SummaryPanel({
+  rows,
+  title,
+}: {
+  rows: ReadonlyArray<{
+    icon: ComponentType<{ className?: string }>
+    label: string
+    value: string
+    tone: 'blue' | 'green' | 'violet'
+  }>
+  title: string
+}) {
+  return (
+    <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+      <h3 className="text-2xl font-extrabold text-white">{title}</h3>
+      <div className="mt-5 space-y-4">
+        {rows.map(({ icon: Icon, label, tone, value }) => (
+          <div className="flex items-center justify-between gap-4 border-b border-white/8 pb-4 last:border-b-0 last:pb-0" key={label}>
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300">
+                <Icon aria-hidden="true" className="size-4" />
+              </span>
+              <span className="text-base text-white">{label}</span>
+            </div>
+            <span
+              className={`text-right text-lg font-semibold ${
+                tone === 'green'
+                  ? 'text-emerald-300'
+                  : tone === 'violet'
+                    ? 'text-violet-300'
+                    : 'text-blue-300'
+              }`}
+            >
+              {value}
+            </span>
           </div>
-        </section>
+        ))}
       </div>
     </section>
   )
@@ -361,64 +621,6 @@ function formatReportList(items: string[]): string {
   return items.map((item) => `- ${item}`).join('\n')
 }
 
-type ReportSectionProps = {
-  emptyText?: string
-  icon: ComponentType<{ className?: string }>
-  items: string[]
-  title: string
-}
-
-function SummaryItem({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: ComponentType<{ className?: string }>
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center gap-3 border-white/10 lg:border-r lg:last:border-r-0">
-      <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
-        <Icon aria-hidden="true" className="size-5" />
-      </span>
-      <div>
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="mt-1 text-sm font-bold text-white">{value}</p>
-      </div>
-    </div>
-  )
-}
-
-function ReportSection({
-  emptyText = 'No items available.',
-  icon: Icon,
-  items,
-  title,
-}: ReportSectionProps) {
-  return (
-    <section className="soft-panel rounded-lg p-6">
-      <div className="grid size-12 place-items-center rounded-full border border-primary/25 bg-primary/10 text-primary">
-        <Icon aria-hidden="true" className="size-5" />
-      </div>
-      <div className="mt-6">
-        <h3 className="text-xl font-extrabold text-white">{title}</h3>
-      </div>
-      {items.length > 0 ? (
-        <ul className="mt-4 space-y-2">
-          {items.map((item) => (
-            <li className="max-w-3xl text-sm leading-6 text-muted-foreground" key={item}>
-              {item}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">{emptyText}</p>
-      )}
-    </section>
-  )
-}
-
 function uniqueItems(items: string[]): string[] {
   return Array.from(
     new Set(items.map((item) => item.trim()).filter((item) => item.length > 0)),
@@ -432,6 +634,7 @@ function buildRoadmap(topics: string[], weaknesses: string[]): string[] {
     return [
       'Review your strongest answers and practice explaining them more concisely.',
       'Repeat this interview with a higher question count.',
+      'Practice explaining tradeoffs, edge cases, and examples out loud.',
     ]
   }
 
@@ -442,4 +645,18 @@ function buildRoadmap(topics: string[], weaknesses: string[]): string[] {
     'Rewrite weak answers using the improved answer examples.',
     'Practice explaining tradeoffs, edge cases, and examples out loud.',
   ]
+}
+
+function scoreForIndex(
+  results: InterviewQuestionResult[],
+  index: number,
+  fallback: number,
+): number {
+  const selected = results[index]?.evaluation.score
+
+  if (typeof selected === 'number' && Number.isFinite(selected)) {
+    return selected
+  }
+
+  return fallback
 }

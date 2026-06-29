@@ -1,124 +1,118 @@
 import {
   AlertCircle,
+  ArrowLeft,
   ArrowRight,
   BookOpen,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   FileText,
   LockKeyhole,
   LoaderCircle,
+  RotateCcw,
   Shield,
   Sparkles,
-  RotateCcw,
   Star,
   UsersRound,
-} from "lucide-react";
-import type { RefObject } from "react";
+} from 'lucide-react'
+import { useState, type ReactNode, type RefObject } from 'react'
 
-import { FinalReport } from "@/components/interview/final-report";
-import { InterviewConfigForm } from "@/components/interview/interview-config-form";
-import { InterviewQuestions } from "@/components/interview/interview-questions";
-import { SavedConfigSummary } from "@/components/interview/saved-config-summary";
-import { Button } from "@/components/ui/button";
+import { FinalReport } from '@/components/interview/final-report'
+import { InterviewConfigForm } from '@/components/interview/interview-config-form'
+import { InterviewQuestions } from '@/components/interview/interview-questions'
+import { SavedConfigSummary } from '@/components/interview/saved-config-summary'
+import { Button } from '@/components/ui/button'
 import type {
   CreateInterviewResponse,
   InterviewConfig,
   InterviewQuestionResult,
-} from "@/types/interview";
+} from '@/types/interview'
+import { getLevelLabel, getRoleLabel } from '@/types/interview'
 
 type HomePageProps = {
-  error: string;
-  interview: CreateInterviewResponse | null;
-  interviewResults: Record<string, InterviewQuestionResult>;
-  isReportLoading: boolean;
-  isReportVisible: boolean;
-  isLoading: boolean;
-  onCompleteInterview: () => void;
-  onRetryReport: () => void;
-  onResultChange: (result: InterviewQuestionResult) => void;
-  onResultRemove: (questionId: string) => void;
-  onStartNewInterview: () => void;
-  onStartInterview: (config: InterviewConfig) => void | Promise<void>;
-  savedConfig: InterviewConfig | null;
-  reportError: string;
-  setupResetKey: number;
-  sessionRef: RefObject<HTMLElement | null>;
-  setupRef: RefObject<HTMLDivElement | null>;
-};
+  error: string
+  interview: CreateInterviewResponse | null
+  interviewResults: Record<string, InterviewQuestionResult>
+  isReportLoading: boolean
+  isReportVisible: boolean
+  isLoading: boolean
+  onCompleteInterview: () => void
+  onRetryReport: () => void
+  onResultChange: (result: InterviewQuestionResult) => void
+  onResultRemove: (questionId: string) => void
+  onStartNewInterview: () => void
+  onStartInterview: (config: InterviewConfig) => void | Promise<void>
+  savedConfig: InterviewConfig | null
+  reportError: string
+  setupResetKey: number
+  sessionRef: RefObject<HTMLElement | null>
+  setupRef: RefObject<HTMLDivElement | null>
+}
+
+type StageId = 'landing' | 'setup' | 'interview' | 'report'
 
 const benefits = [
   {
-    accent: "blue",
+    accent: 'blue',
     icon: UsersRound,
-    title: "Role-Based Interviews",
-    description: "Choose from Frontend, Backend, Full Stack, or AI Engineer roles.",
-    tags: ["Frontend", "Backend", "Full Stack", "AI Engineer"],
+    title: 'Role-Based Interviews',
+    description: 'Choose from Frontend, Backend, Full Stack, or AI Engineer roles.',
+    tags: ['Frontend', 'Backend', 'Full Stack', 'AI Engineer'],
   },
   {
-    accent: "violet",
+    accent: 'violet',
     icon: FileText,
-    title: "Realistic Questions",
-    description: "Practice Technical, Behavioral, or Mixed interviews tailored to you.",
-    tags: ["Technical", "Behavioral", "Mixed"],
+    title: 'Realistic Questions',
+    description: 'Practice Technical, Behavioral, or Mixed interviews tailored to you.',
+    tags: ['Technical', 'Behavioral', 'Mixed'],
   },
   {
-    accent: "green",
+    accent: 'green',
     icon: Star,
-    title: "AI Evaluation",
-    description: "Get feedback on strengths, weaknesses, and missing concepts.",
-    tags: ["Strengths", "Weaknesses", "Missing Concepts"],
+    title: 'AI Evaluation',
+    description: 'Get feedback on strengths, weaknesses, and missing concepts.',
+    tags: ['Strengths', 'Weaknesses', 'Missing Concepts'],
   },
   {
-    accent: "amber",
+    accent: 'amber',
     icon: BookOpen,
-    title: "Learning Plan",
-    description: "Receive personalized recommendations to improve.",
-    tags: ["Recommendations", "Roadmap", "Growth"],
+    title: 'Learning Plan',
+    description: 'Receive personalized recommendations to improve.',
+    tags: ['Recommendations', 'Roadmap', 'Growth'],
   },
 ]
 
 const proofPoints = [
   {
     icon: Shield,
-    title: "AI-Powered",
-    description: "Gemini + Groq",
+    title: 'AI-Powered',
+    description: 'Gemini + Groq',
   },
   {
     icon: CheckCircle2,
-    title: "Structured Feedback",
-    description: "Detailed & Actionable",
+    title: 'Structured Feedback',
+    description: 'Detailed & Actionable',
   },
   {
     icon: LockKeyhole,
-    title: "Private & Secure",
-    description: "Your data is safe",
+    title: 'Private & Secure',
+    description: 'Your data is safe',
   },
 ]
 
 const scoreRows = [
-  ["Technical Knowledge", "8.5", "82%"],
-  ["Problem Solving", "8.0", "74%"],
-  ["Communication", "7.8", "69%"],
-  ["Code Quality", "8.4", "81%"],
+  ['Technical Knowledge', '8.5', '82%'],
+  ['Problem Solving', '8.0', '74%'],
+  ['Communication', '7.8', '69%'],
+  ['Code Quality', '8.4', '81%'],
 ] as const
 
 const topicPills = [
-  { label: "React", level: "High", className: "bg-emerald-500/12 text-emerald-300" },
-  { label: "JavaScript", level: "High", className: "bg-emerald-500/12 text-emerald-300" },
-  { label: "CSS", level: "Medium", className: "bg-primary/12 text-blue-300" },
-  { label: "System Design", level: "Low", className: "bg-amber-500/12 text-amber-300" },
+  { label: 'React', level: 'High', className: 'bg-emerald-500/12 text-emerald-300' },
+  { label: 'JavaScript', level: 'High', className: 'bg-emerald-500/12 text-emerald-300' },
+  { label: 'CSS', level: 'Medium', className: 'bg-primary/12 text-blue-300' },
+  { label: 'System Design', level: 'Low', className: 'bg-amber-500/12 text-amber-300' },
 ] as const
-
-function scrollToSetup(setupRef: RefObject<HTMLDivElement | null>) {
-  setupRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  window.requestAnimationFrame(() => {
-    const setupHelpButton =
-      setupRef.current?.querySelector<HTMLButtonElement>(
-        'button[aria-label="Setup help"]',
-      )
-
-    setupHelpButton?.focus({ preventScroll: true })
-  })
-}
 
 function LandingScorePreview() {
   return (
@@ -199,16 +193,9 @@ function LandingScorePreview() {
   )
 }
 
-function LandingPageIntro({
-  setupRef,
-}: {
-  setupRef: RefObject<HTMLDivElement | null>
-}) {
+function LandingStage({ onNext }: { onNext: () => void }) {
   return (
-    <section
-      className="relative mx-auto flex min-h-[calc(100svh-4.75rem)] max-w-[1348px] flex-col justify-between gap-7 px-5 py-9 sm:px-8 lg:px-0 lg:py-10"
-      id="home"
-    >
+    <section className="relative mx-auto flex min-h-[calc(100svh-9rem)] max-w-[1348px] flex-col justify-between gap-7 px-5 py-9 sm:px-8 lg:px-0 lg:py-10">
       <div className="grid items-start gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
         <div className="relative z-10 max-w-[650px]">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)]">
@@ -233,7 +220,7 @@ function LandingPageIntro({
 
           <button
             className="mt-8 inline-flex w-full max-w-[620px] items-center justify-center gap-6 rounded-2xl border border-white/18 bg-[linear-gradient(105deg,#2f6bff_0%,#4b68ff_48%,#7b35ff_100%)] px-8 py-6 text-3xl font-extrabold tracking-[-0.03em] text-white shadow-[0_0_40px_rgb(47_107_255_/_0.48)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_60px_rgb(47_107_255_/_0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80"
-            onClick={() => scrollToSetup(setupRef)}
+            onClick={onNext}
             type="button"
           >
             <Sparkles aria-hidden="true" className="size-9 text-blue-100" />
@@ -268,13 +255,13 @@ function LandingPageIntro({
             <div className="flex items-start gap-4">
               <span
                 className={`grid size-12 shrink-0 place-items-center rounded-xl text-white shadow-[0_0_28px_rgb(47_107_255_/_0.18)] ${
-                  accent === "green"
-                    ? "bg-emerald-500/25 text-emerald-200"
-                    : accent === "amber"
-                      ? "bg-amber-500/25 text-amber-200"
-                      : accent === "violet"
-                        ? "bg-violet-500/30 text-violet-100"
-                        : "bg-primary/35 text-blue-100"
+                  accent === 'green'
+                    ? 'bg-emerald-500/25 text-emerald-200'
+                    : accent === 'amber'
+                      ? 'bg-amber-500/25 text-amber-200'
+                      : accent === 'violet'
+                        ? 'bg-violet-500/30 text-violet-100'
+                        : 'bg-primary/35 text-blue-100'
                 }`}
               >
                 <Icon aria-hidden="true" className="size-6" />
@@ -288,13 +275,13 @@ function LandingPageIntro({
               {tags.map((tag) => (
                 <span
                   className={`rounded-lg px-2.5 py-1 text-[0.68rem] font-extrabold ${
-                    accent === "green"
-                      ? "bg-emerald-500/12 text-emerald-300"
-                      : accent === "amber"
-                        ? "bg-amber-500/12 text-amber-300"
-                        : accent === "violet"
-                          ? "bg-violet-500/14 text-violet-200"
-                          : "bg-primary/12 text-blue-300"
+                    accent === 'green'
+                      ? 'bg-emerald-500/12 text-emerald-300'
+                      : accent === 'amber'
+                        ? 'bg-amber-500/12 text-amber-300'
+                        : accent === 'violet'
+                          ? 'bg-violet-500/14 text-violet-200'
+                          : 'bg-primary/12 text-blue-300'
                   }`}
                   key={tag}
                 >
@@ -311,6 +298,195 @@ function LandingPageIntro({
         Your answers are private and used only for feedback.
       </p>
     </section>
+  )
+}
+
+function SetupStage({
+  error,
+  isLoading,
+  onStartInterview,
+  savedConfig,
+  setupPreviewConfig,
+  setupRef,
+  setupResetKey,
+  setSetupPreviewConfig,
+}: {
+  error: string
+  isLoading: boolean
+  onStartInterview: (config: InterviewConfig) => void | Promise<void>
+  savedConfig: InterviewConfig | null
+  setupPreviewConfig: InterviewConfig
+  setupRef: RefObject<HTMLDivElement | null>
+  setupResetKey: number
+  setSetupPreviewConfig: (config: InterviewConfig) => void
+}) {
+  return (
+    <section className="relative mx-auto grid min-h-[calc(100svh-9rem)] max-w-[1488px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start lg:gap-10 lg:px-8 lg:py-10 xl:px-12 2xl:px-0">
+      <div className="flex flex-col gap-5" ref={setupRef} tabIndex={-1}>
+        <InterviewConfigForm
+          isLoading={isLoading}
+          key={setupResetKey}
+          onConfigChange={setSetupPreviewConfig}
+          onSubmit={onStartInterview}
+        />
+        {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
+        {isLoading ? (
+          <section
+            aria-live="polite"
+            className="soft-panel flex items-center gap-3 rounded-lg p-5"
+          >
+            <LoaderCircle aria-hidden="true" className="size-5 animate-spin text-primary" />
+            <div>
+              <h2 className="font-semibold">Generating interview questions</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The AI is preparing a focused question set.
+              </p>
+            </div>
+          </section>
+        ) : null}
+
+        {error ? (
+          <section
+            className="rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100 shadow-[0_18px_40px_rgb(185_28_28_/_0.1)]"
+            role="alert"
+          >
+            <h2 className="font-semibold">Could not generate the interview</h2>
+            <p className="mt-1 text-sm leading-6">{error}</p>
+          </section>
+        ) : null}
+      </div>
+
+      <aside className="hidden rounded-[1.9rem] border border-white/10 bg-[#081326]/92 p-7 shadow-[0_28px_80px_rgba(0,0,0,0.24)] lg:sticky lg:top-28 lg:block">
+        <h2 className="text-2xl font-extrabold text-white">Your Interview Summary</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Review your selections before generating the interview.
+        </p>
+        <div className="mt-6 space-y-5 border-t border-white/10 pt-6 text-sm">
+          {[
+            ['Role', getRoleLabel(setupPreviewConfig.role)],
+            ['Experience Level', getLevelLabel(setupPreviewConfig.level)],
+            ['Interview Type', setupPreviewConfig.interviewType],
+            ['Question Count', `${setupPreviewConfig.questionCount} questions`],
+          ].map(([label, value]) => (
+            <div className="flex items-center justify-between gap-4" key={label}>
+              <span className="text-muted-foreground">{label}</span>
+              <span className="text-right font-extrabold text-blue-300">{value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 space-y-5 border-t border-white/10 pt-6">
+          {[
+            'Questions are generated by Gemini Flash with Groq as backup.',
+            'Your answers will be evaluated with detailed AI feedback.',
+            'Your answers are private and used only for feedback.',
+          ].map((description, index) => (
+            <div className="flex gap-3" key={description}>
+              <span className="mt-1 grid size-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-primary">
+                <Shield aria-hidden="true" className="size-4" />
+              </span>
+              <div>
+                <h3 className="text-base font-bold text-white">
+                  {index === 0
+                    ? 'AI-Powered Questions'
+                    : index === 1
+                      ? 'Structured Evaluation'
+                      : 'Private & Secure'}
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </aside>
+    </section>
+  )
+}
+
+function ReportLoadingStage() {
+  return (
+    <section aria-live="polite" className="mx-auto max-w-7xl px-5 pb-12 pt-12 sm:px-8 lg:pb-20">
+      <div className="soft-panel flex items-start gap-3 rounded-lg p-5">
+        <LoaderCircle aria-hidden="true" className="mt-0.5 size-5 animate-spin text-primary" />
+        <div>
+          <h2 className="font-semibold">Generating final report</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The app is summarizing your scores, gaps, and recommended topics.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ReportErrorStage({
+  onRetryReport,
+  reportError,
+}: {
+  onRetryReport: () => void
+  reportError: string
+}) {
+  return (
+    <section
+      aria-live="assertive"
+      className="mx-auto max-w-7xl px-5 pb-12 pt-12 sm:px-8 lg:pb-20"
+      role="alert"
+    >
+      <div className="flex items-start justify-between gap-4 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100">
+        <div className="flex items-start gap-3">
+          <AlertCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+          <div>
+            <h2 className="font-semibold">Final report unavailable</h2>
+            <p className="mt-1 text-sm leading-6">{reportError}</p>
+          </div>
+        </div>
+        <Button onClick={onRetryReport} type="button" variant="outline">
+          <RotateCcw aria-hidden="true" className="size-4" />
+          Retry final report
+        </Button>
+      </div>
+    </section>
+  )
+}
+
+function StageFrame({
+  children,
+  isActive,
+}: {
+  children: ReactNode
+  isActive: boolean
+}) {
+  return (
+    <div
+      aria-hidden={!isActive}
+      className="min-w-full shrink-0 transition-opacity duration-300"
+      inert={!isActive}
+    >
+      {children}
+    </div>
+  )
+}
+
+function StageArrow({
+  direction,
+  disabled,
+  onClick,
+}: {
+  direction: 'left' | 'right'
+  disabled: boolean
+  onClick: () => void
+}) {
+  const Icon = direction === 'left' ? ChevronLeft : ChevronRight
+
+  return (
+    <button
+      aria-label={direction === 'left' ? 'Previous page' : 'Next page'}
+      className="grid size-12 place-items-center rounded-2xl border border-white/12 bg-[#091429]/88 text-white shadow-[0_12px_40px_rgba(0,0,0,0.2)] transition hover:border-primary/45 hover:bg-primary/10 disabled:opacity-35"
+      disabled={disabled}
+      onClick={onClick}
+      type="button"
+    >
+      <Icon aria-hidden="true" className="size-5" />
+    </button>
   )
 }
 
@@ -333,144 +509,162 @@ export function HomePage({
   sessionRef,
   setupRef,
 }: HomePageProps) {
+  const [setupPreviewConfig, setSetupPreviewConfig] = useState<InterviewConfig>({
+    role: 'frontend-developer',
+    level: 'mid-level',
+    interviewType: 'Technical',
+    questionCount: 3,
+  })
+  const [manualStage, setManualStage] = useState<StageId | null>(null)
+
+  const stageOrder: StageId[] = !interview
+    ? ['landing', 'setup']
+    : isReportVisible || isReportLoading || Boolean(reportError)
+      ? ['setup', 'interview', 'report']
+      : ['setup', 'interview']
+  const automaticStage: StageId = !interview
+    ? savedConfig
+      ? 'setup'
+      : 'landing'
+    : isReportVisible || isReportLoading || Boolean(reportError)
+      ? 'report'
+      : 'interview'
+  const activeStage =
+    manualStage && stageOrder.includes(manualStage) ? manualStage : automaticStage
+
+  const activeIndex = Math.max(stageOrder.indexOf(activeStage), 0)
+
+  function focusSetupSubmit() {
+    window.requestAnimationFrame(() => {
+      const setupSubmitButton =
+        setupRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')
+      setupSubmitButton?.focus({ preventScroll: true })
+    })
+  }
+
+  function goToStage(nextStage: StageId) {
+    setManualStage(nextStage)
+
+    if (nextStage === 'setup') {
+      focusSetupSubmit()
+    }
+
+    if (nextStage === 'interview') {
+      window.requestAnimationFrame(() => {
+        const firstQuestionControl =
+          sessionRef.current?.querySelector<HTMLTextAreaElement>('textarea')
+        firstQuestionControl?.focus({ preventScroll: true })
+      })
+    }
+  }
+
   return (
-    <>
-      {!interview ? <LandingPageIntro setupRef={setupRef} /> : null}
-
-      {!interview ? (
-        <section
-          className="relative mx-auto grid max-w-[1488px] gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start lg:gap-10 lg:px-8 lg:py-12 xl:px-12 2xl:px-0"
-          id="setup"
-        >
-          <div
-            className="flex flex-col gap-5"
-            ref={setupRef}
-            tabIndex={-1}
-          >
-          <InterviewConfigForm
-            isLoading={isLoading}
-            key={setupResetKey}
-            onSubmit={onStartInterview}
+    <div className="relative overflow-hidden pb-10">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-8 sm:px-8 lg:px-10">
+        <div className="pointer-events-auto">
+          <StageArrow
+            direction="left"
+            disabled={activeIndex === 0}
+            onClick={() => goToStage(stageOrder[Math.max(activeIndex - 1, 0)])}
           />
-          {savedConfig ? <SavedConfigSummary config={savedConfig} /> : null}
-          {isLoading ? (
-            <section
-              aria-live="polite"
-              className="soft-panel flex items-center gap-3 rounded-lg p-5"
-            >
-              <LoaderCircle
-                aria-hidden="true"
-                className="size-5 animate-spin text-primary"
-              />
-              <div>
-                <h2 className="font-semibold">
-                  Generating interview questions
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  The AI is preparing a focused question set.
-                </p>
-              </div>
-            </section>
-          ) : null}
+        </div>
+        <div className="pointer-events-auto">
+          <StageArrow
+            direction="right"
+            disabled={activeIndex === stageOrder.length - 1}
+            onClick={() =>
+              goToStage(stageOrder[Math.min(activeIndex + 1, stageOrder.length - 1)])
+            }
+          />
+        </div>
+      </div>
 
-          {error ? (
-            <section
-              className="rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100 shadow-[0_18px_40px_rgb(185_28_28_/_0.1)]"
-              role="alert"
-            >
-              <h2 className="font-semibold">
-                Could not generate the interview
-              </h2>
-              <p className="mt-1 text-sm leading-6">{error}</p>
-            </section>
-          ) : null}
-          </div>
-          <aside className="soft-panel hidden rounded-2xl p-6 lg:block">
-            <h2 className="text-2xl font-extrabold text-white">Your Interview Summary</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Review your selections before generating the interview.
-            </p>
-            <div className="mt-6 space-y-4 border-t border-white/10 pt-6 text-sm">
-              {[
-                ["Role", "Frontend Developer"],
-                ["Experience Level", "Mid-Level"],
-                ["Interview Type", "Technical"],
-                ["Question Count", "3 questions"],
-              ].map(([label, value]) => (
-                <div className="flex items-center justify-between gap-4" key={label}>
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-extrabold text-blue-300">{value}</span>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </section>
-      ) : null}
+      <div className="mx-auto flex max-w-[100vw] items-center justify-center gap-3 pt-4">
+        {stageOrder.map((stage, index) => (
+          <span
+            className={`h-1.5 rounded-full transition-all ${
+              index === activeIndex ? 'w-12 bg-primary' : 'w-5 bg-white/15'
+            }`}
+            key={stage}
+          />
+        ))}
+      </div>
 
-      {interview && !isReportVisible && !reportError ? (
-        <InterviewQuestions
-          interview={interview}
-          key={interview.interviewId}
-          isReportLoading={isReportLoading}
-          onCompleteInterview={onCompleteInterview}
-          onResultChange={onResultChange}
-          onResultRemove={onResultRemove}
-          results={interviewResults}
-          sessionRef={sessionRef}
-        />
-      ) : null}
-
-      {interview && isReportLoading ? (
-        <section
-          aria-live="polite"
-          className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
+      <div className="mt-4 overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          <div className="soft-panel flex items-start gap-3 rounded-lg p-5">
-            <LoaderCircle
-              aria-hidden="true"
-              className="mt-0.5 size-5 animate-spin text-primary"
-            />
-            <div>
-              <h2 className="font-semibold">Generating final report</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                The app is summarizing your scores, gaps, and recommended
-                topics.
-              </p>
-            </div>
-          </div>
-        </section>
-      ) : null}
+          {stageOrder.map((stage) => (
+            <StageFrame isActive={stage === activeStage} key={stage}>
+              {stage === 'landing' ? (
+                <LandingStage onNext={() => goToStage('setup')} />
+              ) : null}
 
-      {interview && reportError ? (
-        <section
-          aria-live="assertive"
-          className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 lg:pb-20"
-          role="alert"
-        >
-          <div className="flex items-start justify-between gap-4 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100">
-            <div className="flex items-start gap-3">
-              <AlertCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
-              <div>
-                <h2 className="font-semibold">Final report unavailable</h2>
-                <p className="mt-1 text-sm leading-6">{reportError}</p>
-              </div>
-            </div>
-            <Button onClick={onRetryReport} type="button" variant="outline">
-              <RotateCcw aria-hidden="true" className="size-4" />
-              Retry final report
-            </Button>
-          </div>
-        </section>
-      ) : null}
+              {stage === 'setup' ? (
+                <SetupStage
+                  error={error}
+                  isLoading={isLoading}
+                  onStartInterview={onStartInterview}
+                  savedConfig={savedConfig}
+                  setupPreviewConfig={setupPreviewConfig}
+                  setupRef={setupRef}
+                  setupResetKey={setupResetKey}
+                  setSetupPreviewConfig={setSetupPreviewConfig}
+                />
+              ) : null}
+
+              {stage === 'interview' && interview ? (
+                <InterviewQuestions
+                  config={savedConfig}
+                  interview={interview}
+                  key={interview.interviewId}
+                  isReportLoading={isReportLoading}
+                  onCompleteInterview={onCompleteInterview}
+                  onResultChange={onResultChange}
+                  onResultRemove={onResultRemove}
+                  results={interviewResults}
+                  sessionRef={sessionRef}
+                />
+              ) : null}
+
+              {stage === 'report' && interview ? (
+                <>
+                  {isReportLoading ? <ReportLoadingStage /> : null}
+                  {!isReportLoading && reportError ? (
+                    <ReportErrorStage onRetryReport={onRetryReport} reportError={reportError} />
+                  ) : null}
+                  {!isReportLoading && isReportVisible ? (
+                    <FinalReport
+                      config={savedConfig}
+                      interview={interview}
+                      onStartNewInterview={onStartNewInterview}
+                      results={interviewResults}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+            </StageFrame>
+          ))}
+        </div>
+      </div>
 
       {interview && isReportVisible ? (
-        <FinalReport
-          config={savedConfig}
-          interview={interview}
-          onStartNewInterview={onStartNewInterview}
-          results={interviewResults}
-        />
+        <div className="mx-auto mt-6 flex max-w-7xl justify-center">
+          <Button
+            className="rounded-2xl px-6"
+            onClick={() => {
+              onStartNewInterview()
+              goToStage('setup')
+            }}
+            type="button"
+            variant="outline"
+          >
+            <ArrowLeft aria-hidden="true" className="size-4" />
+            Back to Setup
+          </Button>
+        </div>
       ) : null}
-    </>
-  );
+    </div>
+  )
 }

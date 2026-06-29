@@ -168,9 +168,7 @@ function App() {
     window.requestAnimationFrame(() => {
       setupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       const setupHelpButton =
-        setupRef.current?.querySelector<HTMLButtonElement>(
-          'button[aria-label="Setup help"]',
-        )
+        setupRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')
 
       setupHelpButton?.focus({ preventScroll: true })
     })
