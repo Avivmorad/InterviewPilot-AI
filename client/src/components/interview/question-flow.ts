@@ -2,6 +2,10 @@ import type { AnswerEvaluation } from '@/types/interview'
 
 export const MAX_ANSWER_CHARACTERS = 75_000
 export const SHORT_ANSWER_WARNING_CHARACTERS = 80
+export const EMPTY_ANSWER_MESSAGE = 'Please enter your answer before submitting.'
+export const SHORT_ANSWER_WARNING_MESSAGE =
+  'This answer is quite short. Adding one more sentence usually improves feedback.'
+export const MAX_ANSWER_MESSAGE = `Your answer is too long. Please keep it under ${MAX_ANSWER_CHARACTERS.toLocaleString()} characters.`
 
 export type AnswerValidationState = {
   isInvalid: boolean
@@ -15,7 +19,7 @@ export function getAnswerValidationState(answer: string): AnswerValidationState 
   if (trimmedAnswer.length === 0) {
     return {
       isInvalid: true,
-      message: 'Please enter your answer before submitting.',
+      message: EMPTY_ANSWER_MESSAGE,
       tone: 'error',
     }
   }
@@ -23,7 +27,7 @@ export function getAnswerValidationState(answer: string): AnswerValidationState 
   if (trimmedAnswer.length > MAX_ANSWER_CHARACTERS) {
     return {
       isInvalid: true,
-      message: `Your answer is too long. Please keep it under ${MAX_ANSWER_CHARACTERS.toLocaleString()} characters.`,
+      message: MAX_ANSWER_MESSAGE,
       tone: 'error',
     }
   }
@@ -31,7 +35,7 @@ export function getAnswerValidationState(answer: string): AnswerValidationState 
   if (trimmedAnswer.length < SHORT_ANSWER_WARNING_CHARACTERS) {
     return {
       isInvalid: false,
-      message: 'This answer is quite short. Adding one more sentence usually improves feedback.',
+      message: SHORT_ANSWER_WARNING_MESSAGE,
       tone: 'warning',
     }
   }
@@ -44,6 +48,7 @@ export function getAnswerValidationState(answer: string): AnswerValidationState 
 }
 
 export type QuestionPrimaryActionInput = {
+  canCompleteInterview: boolean
   currentEvaluation?: AnswerEvaluation
   currentEvaluationError?: string
   isAnswerValid: boolean
@@ -54,11 +59,18 @@ export type QuestionPrimaryActionInput = {
 
 export type QuestionPrimaryActionState = {
   disabled: boolean
-  kind: 'submit' | 'retry' | 'next' | 'finish' | 'evaluating'
+  kind:
+    | 'submit'
+    | 'retry'
+    | 'next'
+    | 'finish'
+    | 'evaluating'
+    | 'report-loading'
   label: string
 }
 
 export function getQuestionPrimaryActionState({
+  canCompleteInterview,
   currentEvaluation,
   currentEvaluationError,
   isAnswerValid,
@@ -70,7 +82,15 @@ export function getQuestionPrimaryActionState({
     return {
       disabled: true,
       kind: 'evaluating',
-      label: 'Evaluating answer…',
+      label: 'Evaluating answer...',
+    }
+  }
+
+  if (isReportLoading) {
+    return {
+      disabled: true,
+      kind: 'report-loading',
+      label: 'Generating final report...',
     }
   }
 
@@ -85,7 +105,7 @@ export function getQuestionPrimaryActionState({
   if (currentEvaluation) {
     if (isLastQuestion) {
       return {
-        disabled: isReportLoading,
+        disabled: !canCompleteInterview,
         kind: 'finish',
         label: 'Finish interview and view report',
       }

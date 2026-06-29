@@ -16,6 +16,7 @@
     "eval": "npm run eval --workspace server",
     "eval:real": "npm run eval:real --workspace server",
     "scan:secrets": "node scripts/scan-secrets.mjs",
+    "smoke:production": "node scripts/production-smoke.mjs",
     "screenshots:update": "node scripts/update-screenshots.mjs",
     "test:e2e": "playwright test",
     "start": "npm run start --workspace server"

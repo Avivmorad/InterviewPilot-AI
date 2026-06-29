@@ -51,6 +51,7 @@ export function InterviewQuestions({
 }: InterviewQuestionsProps) {
   const isMountedRef = useRef(true)
   const answerTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const submissionInFlightRef = useRef(new Set<string>())
   const primaryActionButtonRef = useRef<HTMLButtonElement | null>(null)
   const pendingPrimaryFocusQuestionIdRef = useRef<string | null>(null)
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
@@ -85,6 +86,7 @@ export function InterviewQuestions({
   const answerValidationState = getAnswerValidationState(currentAnswer)
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
   const primaryActionState = getQuestionPrimaryActionState({
+    canCompleteInterview,
     currentEvaluation,
     currentEvaluationError,
     isAnswerValid: !answerValidationState.isInvalid,
@@ -197,12 +199,16 @@ export function InterviewQuestions({
   }
 
   async function submitCurrentAnswer() {
-    if (answerValidationState.isInvalid) {
+    if (
+      answerValidationState.isInvalid ||
+      submissionInFlightRef.current.has(question.id)
+    ) {
       return
     }
 
     const submittedQuestion = question
     const submittedText = trimmedCurrentAnswer
+    submissionInFlightRef.current.add(submittedQuestion.id)
     pendingPrimaryFocusQuestionIdRef.current = submittedQuestion.id
 
     setSubmittedAnswers((answers) => ({
@@ -254,6 +260,8 @@ export function InterviewQuestions({
         [submittedQuestion.id]: message,
       }))
     } finally {
+      submissionInFlightRef.current.delete(submittedQuestion.id)
+
       if (isMountedRef.current) {
         setEvaluatingQuestionIds((questionIds) => ({
           ...questionIds,
@@ -275,7 +283,10 @@ export function InterviewQuestions({
   }
 
   function handlePrimaryAction() {
-    if (primaryActionState.kind === 'evaluating') {
+    if (
+      primaryActionState.kind === 'evaluating' ||
+      primaryActionState.kind === 'report-loading'
+    ) {
       return
     }
 
@@ -558,12 +569,14 @@ export function InterviewQuestions({
             Previous question
           </Button>
           <Button
+            data-testid="question-primary-action"
             ref={primaryActionButtonRef}
             disabled={primaryActionState.disabled}
             onClick={handlePrimaryAction}
             type="button"
           >
-            {primaryActionState.kind === 'evaluating' ? (
+            {primaryActionState.kind === 'evaluating' ||
+            primaryActionState.kind === 'report-loading' ? (
               <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
             ) : primaryActionState.kind === 'finish' ? (
               <CheckCircle2 aria-hidden="true" className="size-4" />

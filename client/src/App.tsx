@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { SupabaseAuthPanel } from '@/components/auth/supabase-auth-panel'
 import { AppLayout } from '@/components/layout/app-layout'
 import { HomePage } from '@/pages/home-page'
+import { getFinalReportPreparationState } from '@/components/interview/report-flow'
 import {
   createInterview,
   getApiHealth,
@@ -22,14 +23,18 @@ import type {
 
 function App() {
   const [savedConfig, setSavedConfig] = useState<InterviewConfig | null>(null)
+  const [setupResetKey, setSetupResetKey] = useState(0)
   const [interview, setInterview] = useState<CreateInterviewResponse | null>(null)
   const [interviewResults, setInterviewResults] = useState<Record<string, InterviewQuestionResult>>({})
+  const interviewResultsRef = useRef(interviewResults)
   const pendingSessionFocusRef = useRef(false)
   const reportLoadingTimerRef = useRef<number | undefined>(undefined)
+  const isReportCompletionPendingRef = useRef(false)
   const sessionRef = useRef<HTMLElement | null>(null)
   const setupRef = useRef<HTMLDivElement | null>(null)
   const [isReportLoading, setIsReportLoading] = useState(false)
   const [isReportVisible, setIsReportVisible] = useState(false)
+  const [reportError, setReportError] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [apiConnectionStatus, setApiConnectionStatus] =
@@ -58,6 +63,10 @@ function App() {
       }
     }
   }, [supabaseEnabled])
+
+  useEffect(() => {
+    interviewResultsRef.current = interviewResults
+  }, [interviewResults])
 
   useEffect(() => {
     let isActive = true
@@ -98,20 +107,53 @@ function App() {
   function clearReportLoadingTimer() {
     window.clearTimeout(reportLoadingTimerRef.current)
     reportLoadingTimerRef.current = undefined
+    isReportCompletionPendingRef.current = false
   }
 
   function handleCompleteInterview() {
-    if (!interview || isReportLoading || isReportVisible) {
+    if (
+      !interview ||
+      isReportLoading ||
+      isReportVisible ||
+      isReportCompletionPendingRef.current
+    ) {
+      return
+    }
+
+    const initialReportState = getFinalReportPreparationState(
+      interview,
+      interviewResultsRef.current,
+    )
+
+    if (!initialReportState.ready) {
+      setIsReportLoading(false)
+      setIsReportVisible(false)
+      setReportError(initialReportState.error)
       return
     }
 
     clearReportLoadingTimer()
+    setReportError('')
     setIsReportVisible(false)
     setIsReportLoading(true)
+    isReportCompletionPendingRef.current = true
 
     reportLoadingTimerRef.current = window.setTimeout(() => {
       reportLoadingTimerRef.current = undefined
+      isReportCompletionPendingRef.current = false
       setIsReportLoading(false)
+
+      const reportState = getFinalReportPreparationState(
+        interview,
+        interviewResultsRef.current,
+      )
+
+      if (!reportState.ready) {
+        setReportError(reportState.error)
+        return
+      }
+
+      setReportError('')
       setIsReportVisible(true)
     }, 500)
   }
@@ -120,9 +162,11 @@ function App() {
     clearReportLoadingTimer()
     setSavedConfig(config)
     setInterview(null)
+    interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
     setIsReportVisible(false)
+    setReportError('')
     setError('')
     setIsLoading(true)
 
@@ -143,11 +187,14 @@ function App() {
 
   function handleStartNewInterview() {
     clearReportLoadingTimer()
+    setSetupResetKey((currentKey) => currentKey + 1)
     setSavedConfig(null)
     setInterview(null)
+    interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
     setIsReportVisible(false)
+    setReportError('')
     setError('')
 
     window.requestAnimationFrame(() => {
@@ -171,18 +218,24 @@ function App() {
         isReportVisible={isReportVisible}
         isLoading={isLoading}
         onCompleteInterview={handleCompleteInterview}
+        onRetryReport={handleCompleteInterview}
         onStartNewInterview={handleStartNewInterview}
         onResultChange={(result) =>
-          setInterviewResults((currentResults) => ({
-            ...currentResults,
-            [result.question.id]: result,
-          }))
+          setInterviewResults((currentResults) => {
+            const nextResults = {
+              ...currentResults,
+              [result.question.id]: result,
+            }
+            interviewResultsRef.current = nextResults
+            return nextResults
+          })
         }
         onResultRemove={(questionId) => {
           clearReportLoadingTimer()
           setInterviewResults((currentResults) => {
             const nextResults = { ...currentResults }
             delete nextResults[questionId]
+            interviewResultsRef.current = nextResults
             return nextResults
           })
           setIsReportLoading(false)
@@ -190,6 +243,8 @@ function App() {
         }}
         onStartInterview={handleStartInterview}
         savedConfig={savedConfig}
+        reportError={reportError}
+        setupResetKey={setupResetKey}
         supabaseAuth={
           <SupabaseAuthPanel
             client={supabaseClient}
