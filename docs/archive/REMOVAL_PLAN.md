@@ -1,4 +1,4 @@
-# InterviewPilot AI — File Removal and Merge Plan
+# InterviewPilot AI - Documentation Removal and Merge Plan
 
 ## Goal
 
@@ -12,12 +12,12 @@ docs/
   TECHNICAL_SPEC.md
   OPERATIONS_GUIDE.md
   TASK_TRACKER.md
-  PHASE2_ROADMAP.md
-  PORTFOLIO_RELEASE.md
-  README_DOCS_INDEX.md
+  roadmaps/PHASE2_ROADMAP.md
+  release/PORTFOLIO_RELEASE.md
+  README.md
 ```
 
-Keep `REMOVAL_PLAN.md` until the cleanup is done, then archive it.
+Keep `docs/archive/REMOVAL_PLAN.md` as the historical cleanup record.
 
 ## Replace / merge map
 
@@ -37,8 +37,8 @@ Keep `REMOVAL_PLAN.md` until the cleanup is done, then archive it.
 | `MASTER_TASKS.md` | Replace | `TASK_TRACKER.md` | Use one cleaner tracker |
 | `Tasks_Phase1.md` | Archive/remove | `TASK_TRACKER.md` | Conflicts with completed Phase 1 state |
 | `Tasks_Phase1_Done.md` | Archive/remove | `TASK_TRACKER.md` | Completed task evidence is condensed into tracker |
-| `PHASE2_SUPABASE.md` | Merge then remove | `PHASE2_ROADMAP.md` | Supabase belongs in future roadmap |
-| `LINKEDIN_RELEASE.md` | Merge then remove | `PORTFOLIO_RELEASE.md` | Portfolio docs should live in one file |
+| `PHASE2_SUPABASE.md` | Merge then remove | `docs/roadmaps/PHASE2_ROADMAP.md` | Supabase belongs in future roadmap |
+| `LINKEDIN_RELEASE.md` | Merge then remove | `docs/release/PORTFOLIO_RELEASE.md` | Portfolio docs should live in one file |
 
 ## Recommended delete/archive commands
 

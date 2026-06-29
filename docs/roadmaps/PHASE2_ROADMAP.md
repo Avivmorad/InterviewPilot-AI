@@ -1,4 +1,4 @@
-# InterviewPilot AI — Phase 2 Roadmap
+# InterviewPilot AI - Phase 2 Roadmap
 
 ## Purpose
 

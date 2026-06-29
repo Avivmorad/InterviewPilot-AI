@@ -1,4 +1,6 @@
-**Findings**
+# Design QA
+
+## Findings
 - No actionable P0/P1/P2 mismatches remain.
 
 **Source Visual Truth**

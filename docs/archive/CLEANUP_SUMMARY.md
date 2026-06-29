@@ -1,16 +1,16 @@
-# Cleanup Summary
+# Documentation Cleanup Summary
 
 ## Active docs set
 
-- `README_DOCS_INDEX.md`
+- `docs/README.md`
 - `PROJECT_OVERVIEW.md`
 - `TECHNICAL_SPEC.md`
 - `OPERATIONS_GUIDE.md`
 - `TASK_TRACKER.md`
-- `PHASE1_PRODUCTION_VERIFICATION.md`
-- `PHASE2_ROADMAP.md`
-- `PORTFOLIO_RELEASE.md`
-- `REMOVAL_PLAN.md`
+- `docs/verification/PHASE1_PRODUCTION_VERIFICATION.md`
+- `docs/roadmaps/PHASE2_ROADMAP.md`
+- `docs/release/PORTFOLIO_RELEASE.md`
+- `docs/archive/REMOVAL_PLAN.md`
 - `verification/`
 
 ## Main decision
@@ -21,7 +21,7 @@ How it works now:
 
 - The active Phase 1 section contains only unfinished work.
 - The completed Phase 1 section contains only verified DONE tasks with evidence.
-- Phase 2 stays separate in `PHASE2_ROADMAP.md` and the tracker Phase 2 section.
+- Phase 2 stays separate in `docs/roadmaps/PHASE2_ROADMAP.md` and the tracker Phase 2 section.
 
 ## Why
 

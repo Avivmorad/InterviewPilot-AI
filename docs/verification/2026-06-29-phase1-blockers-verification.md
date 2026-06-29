@@ -57,7 +57,7 @@ Date: 2026-06-29
 - `server/src/services/interviewService.test.ts`
 - `tests/e2e/core-flow.spec.ts`
 - `scripts/production-smoke.mjs`
-- `docs/PHASE1_PRODUCTION_VERIFICATION.md`
+- `docs/verification/PHASE1_PRODUCTION_VERIFICATION.md`
 
 ## Remaining manual production checks
 
