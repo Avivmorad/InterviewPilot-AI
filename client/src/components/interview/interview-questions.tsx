@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { evaluateAnswer } from '@/services/interview-api'
+import { evaluateAnswer, generateExampleAnswer } from '@/services/interview-api'
 import {
   normalizeFeedbackItems,
   normalizeFeedbackText,
@@ -27,6 +27,7 @@ import {
 } from './question-flow'
 import type {
   AnswerEvaluation,
+  ExampleAnswer,
   CreateInterviewResponse,
   InterviewConfig,
   InterviewQuestionResult,
@@ -65,16 +66,19 @@ export function InterviewQuestions({
   const [evaluations, setEvaluations] = useState<Record<string, AnswerEvaluation>>({})
   const [evaluatingQuestionIds, setEvaluatingQuestionIds] = useState<Record<string, boolean>>({})
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, string>>({})
+  const [skippedQuestionIds, setSkippedQuestionIds] = useState<Record<string, boolean>>({})
+  const [exampleAnswers, setExampleAnswers] = useState<Record<string, ExampleAnswer>>({})
+  const [exampleAnswerErrors, setExampleAnswerErrors] = useState<Record<string, string>>({})
+  const [generatingExampleQuestionId, setGeneratingExampleQuestionId] = useState<string | null>(null)
 
   const question = interview.questions[activeQuestionIndex]
   const questionNumber = activeQuestionIndex + 1
   const totalQuestions = interview.questions.length
   const isLastQuestion = activeQuestionIndex === totalQuestions - 1
-  const evaluatedQuestionCount = interview.questions.filter(
-    (interviewQuestion) => results[interviewQuestion.id],
+  const handledQuestionCount = interview.questions.filter(
+    (interviewQuestion) => results[interviewQuestion.id] || skippedQuestionIds[interviewQuestion.id],
   ).length
-  const canCompleteInterview =
-    totalQuestions > 0 && evaluatedQuestionCount === totalQuestions
+  const canCompleteInterview = totalQuestions > 0 && handledQuestionCount === totalQuestions
   const currentAnswer = question ? (answerDrafts[question.id] ?? '') : ''
   const trimmedCurrentAnswer = currentAnswer.trim()
   const submittedAnswer = question ? submittedAnswers[question.id] : undefined
@@ -203,6 +207,9 @@ export function InterviewQuestions({
       ...drafts,
       [question.id]: answer,
     }))
+    if (answer.trim().length > 0 && skippedQuestionIds[question.id]) {
+      setSkippedQuestionIds((ids) => ({ ...ids, [question.id]: false }))
+    }
   }
 
   async function submitCurrentAnswer() {
@@ -280,6 +287,44 @@ export function InterviewQuestions({
 
   function goToNextQuestion() {
     setActiveQuestionIndex((index) => Math.min(index + 1, totalQuestions - 1))
+  }
+
+  function goToPreviousQuestion() {
+    setActiveQuestionIndex((index) => Math.max(index - 1, 0))
+  }
+
+  function skipCurrentQuestion() {
+    if (isEvaluatingCurrentQuestion) return
+    setSkippedQuestionIds((ids) => ({ ...ids, [question.id]: true }))
+    if (isLastQuestion) {
+      window.requestAnimationFrame(onCompleteInterview)
+    } else {
+      goToNextQuestion()
+    }
+  }
+
+  async function handleGenerateExampleAnswer() {
+    if (generatingExampleQuestionId) return
+    const requestedQuestion = question
+    setGeneratingExampleQuestionId(requestedQuestion.id)
+    setExampleAnswerErrors((errors) => ({ ...errors, [requestedQuestion.id]: '' }))
+
+    try {
+      const example = await generateExampleAnswer(requestedQuestion)
+      if (!isMountedRef.current) return
+      setExampleAnswers((answers) => ({ ...answers, [requestedQuestion.id]: example }))
+    } catch (error) {
+      if (!isMountedRef.current) return
+      setExampleAnswerErrors((errors) => ({
+        ...errors,
+        [requestedQuestion.id]:
+          error instanceof Error
+            ? error.message
+            : 'Unable to generate an example answer right now. Please try again.',
+      }))
+    } finally {
+      if (isMountedRef.current) setGeneratingExampleQuestionId(null)
+    }
   }
 
   function handlePrimaryAction() {
@@ -487,11 +532,11 @@ export function InterviewQuestions({
                   AI Feedback
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Confidence: {currentEvaluation.confidenceLevel}
+                  Specific feedback for your answer to this question
                 </p>
               </div>
               <span className="rounded-2xl border border-primary/35 bg-primary/12 px-4 py-2 text-lg font-extrabold text-white">
-                {currentEvaluation.score}/5
+                {currentEvaluation.score}/100
               </span>
             </div>
 
@@ -523,22 +568,64 @@ export function InterviewQuestions({
                 ))}
               </div>
             </details>
+
+            <div className="mt-5 rounded-[1.2rem] border border-primary/20 bg-primary/[0.06] p-4">
+              <h4 className="text-sm font-semibold text-white">Practical next step</h4>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {normalizeFeedbackText(currentEvaluation.improvementSuggestion)}
+              </p>
+            </div>
           </section>
         ) : null}
 
-        <div className="grid gap-5 border-t border-white/10 pt-5 lg:grid-cols-3">
+        {exampleAnswers[question.id] ? (
+          <section aria-live="polite" className="rounded-[1.55rem] border border-violet-400/20 bg-[#081326]/92 p-6">
+            <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
+              <Sparkles aria-hidden="true" className="size-5 text-violet-300" />
+              Example answer
+            </h3>
+            <p className="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-200">
+              {normalizeFeedbackText(exampleAnswers[question.id].answer)}
+            </p>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {normalizeFeedbackItems(exampleAnswers[question.id].keyPoints).map((point) => (
+                <li className="rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100" key={point}>{point}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {exampleAnswerErrors[question.id] ? (
+          <p className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100" role="alert">
+            {exampleAnswerErrors[question.id]}
+          </p>
+        ) : null}
+
+        <div className="grid gap-5 border-t border-white/10 pt-5 sm:grid-cols-2 lg:grid-cols-4">
           <ActionCard
-            helper="You can come back later"
+            disabled={activeQuestionIndex === 0 || isEvaluatingCurrentQuestion}
+            helper="Review your previous response"
             icon={ArrowRight}
-            label="Skip Question"
-            onClick={goToNextQuestion}
+            iconClassName="rotate-180"
+            label="Previous Question"
+            onClick={goToPreviousQuestion}
             variant="outline"
           />
           <ActionCard
-            disabled
+            disabled={isEvaluatingCurrentQuestion}
+            helper="You can come back later"
+            icon={ArrowRight}
+            label="Skip Question"
+            onClick={skipCurrentQuestion}
+            variant="outline"
+          />
+          <ActionCard
+            disabled={Boolean(generatingExampleQuestionId)}
             helper="Get a reference answer to compare"
-            icon={Sparkles}
-            label="Generate Example Answer"
+            icon={generatingExampleQuestionId === question.id ? LoaderCircle : Sparkles}
+            iconClassName={generatingExampleQuestionId === question.id ? 'animate-spin' : ''}
+            label={generatingExampleQuestionId === question.id ? 'Generating Example...' : exampleAnswers[question.id] ? 'Regenerate Example Answer' : 'Generate Example Answer'}
+            onClick={() => void handleGenerateExampleAnswer()}
             variant="outline"
           />
           <ActionCard

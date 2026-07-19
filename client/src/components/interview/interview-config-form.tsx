@@ -16,6 +16,7 @@ import { OptionGroup } from '@/components/interview/option-group'
 import { Button } from '@/components/ui/button'
 import {
   INTERVIEW_TYPES,
+  QUESTION_COUNTS,
   LEVELS,
   ROLES,
   getLevelLabel,
@@ -24,6 +25,7 @@ import {
   type InterviewType,
   type Level,
   type Role,
+  type QuestionCount,
 } from '@/types/interview'
 
 type InterviewConfigFormProps = {
@@ -106,7 +108,7 @@ export function InterviewConfigForm({
   const [role, setRole] = useState<Role>('frontend-developer')
   const [level, setLevel] = useState<Level>('mid-level')
   const [interviewType, setInterviewType] = useState<InterviewType>('Technical')
-  const questionCount = 3 as const
+  const [questionCount, setQuestionCount] = useState<QuestionCount>(3)
 
   useEffect(() => {
     onConfigChange?.({ role, level, interviewType, questionCount })
@@ -225,6 +227,20 @@ export function InterviewConfigForm({
         size="feature"
         title="3. Select Interview Type"
         value={interviewType}
+      />
+
+      <OptionGroup
+        columnsClassName="grid-cols-5"
+        description="Choose a focused session from 1 to 5 questions."
+        disabled={isLoading}
+        name="questionCount"
+        onChange={setQuestionCount}
+        options={QUESTION_COUNTS}
+        renderDescription={(option) => (option === 1 ? 'question' : 'questions')}
+        renderLabel={(option) => String(option)}
+        size="compact"
+        title="4. Select Number of Questions"
+        value={questionCount}
       />
 
       <Button
