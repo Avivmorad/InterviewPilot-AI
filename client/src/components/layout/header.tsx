@@ -1,4 +1,4 @@
-import { ChevronDown, CircleAlert, CircleCheck, CodeXml, LoaderCircle } from 'lucide-react'
+import { ChevronDown, CircleAlert, CircleCheck, LoaderCircle } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { ApiConnectionStatus } from '@/types/interview'
@@ -45,31 +45,26 @@ export function Header({ apiConnectionStatus }: HeaderProps) {
   } = connectionDetails[apiConnectionStatus]
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#020611]/80 px-4 backdrop-blur-xl sm:px-8">
-      <div className="mx-auto flex h-[5.5rem] max-w-[1488px] items-center justify-between">
-        <a className="flex items-center gap-4 text-base font-extrabold" href="/">
-          <span className="flex size-12 items-center justify-center rounded-lg bg-[linear-gradient(145deg,#2f6bff,#1646f5)] text-primary-foreground shadow-[0_0_30px_rgb(47_107_255_/_0.45)]">
-            <CodeXml aria-hidden="true" className="size-5" />
+    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#020611]/88 px-5 backdrop-blur-xl sm:px-8">
+      <div className="mx-auto flex h-[4.75rem] max-w-[1488px] items-center justify-between gap-4">
+        <a
+          aria-label="InterviewPilot AI home"
+          className="group flex min-w-0 items-center gap-3 text-base font-extrabold tracking-[-0.02em] text-white sm:gap-4"
+          href="/"
+        >
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-[0.65rem] bg-[linear-gradient(145deg,#35b8ff_0%,#2f6bff_48%,#7b35ff_100%)] text-[1.35rem] font-extrabold leading-none text-white shadow-[0_0_32px_rgb(47_107_255_/_0.42)] ring-1 ring-white/15 transition-transform duration-200 group-hover:-translate-y-0.5">
+            IP
           </span>
-          <span className="text-[1rem] text-white sm:text-[1.25rem]">
+          <span className="truncate text-[1.05rem] text-white sm:text-[1.35rem]">
             InterviewPilot <span className="text-white">AI</span>
           </span>
         </a>
 
-        <nav aria-label="Main navigation" className="flex items-center gap-4 text-sm sm:gap-8 sm:text-base">
-          <a className="hidden border-b-2 border-primary px-2 py-6 font-extrabold text-white transition-colors hover:text-white sm:inline" href="#home">
-            Home
-          </a>
-          <a
-            className="hidden px-2 py-6 font-bold text-muted-foreground transition-colors hover:text-white sm:inline"
-            href="#how-it-works"
-          >
-            How it works
-          </a>
+        <div className="flex items-center gap-3 text-sm sm:gap-5 sm:text-base">
           <span
             aria-live="polite"
             className={cn(
-              'flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold sm:text-sm',
+              'flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-extrabold shadow-[inset_0_1px_0_rgb(255_255_255_/_0.05)] sm:text-sm',
               className,
             )}
             title={label}
@@ -93,12 +88,12 @@ export function Header({ apiConnectionStatus }: HeaderProps) {
             type="button"
             aria-label="User menu"
           >
-            <span className="flex size-10 items-center justify-center rounded-full bg-[linear-gradient(145deg,#2f6bff,#8a5cff)] text-sm font-extrabold shadow-[0_0_24px_rgb(138_92_255_/_0.38)]">
+            <span className="flex size-10 items-center justify-center rounded-full bg-[linear-gradient(145deg,#2f6bff,#7b35ff)] text-sm font-extrabold shadow-[0_0_24px_rgb(138_92_255_/_0.38)] ring-1 ring-white/10">
               JD
             </span>
             <ChevronDown aria-hidden="true" className="size-4 text-muted-foreground" />
           </button>
-        </nav>
+        </div>
       </div>
     </header>
   )

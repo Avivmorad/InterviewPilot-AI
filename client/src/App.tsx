@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { SupabaseAuthPanel } from '@/components/auth/supabase-auth-panel'
-import { AppLayout } from '@/components/layout/app-layout'
+import { useEffect, useRef, useState } from 'react'
+import { AppShell } from '@/components/layout/app-shell'
 import { HomePage } from '@/pages/home-page'
 import { getFinalReportPreparationState } from '@/components/interview/report-flow'
 import {
@@ -8,12 +7,6 @@ import {
   getApiHealth,
   InterviewApiError,
 } from '@/services/interview-api'
-import {
-  createSupabaseBrowserClient,
-} from '@/supabase/client'
-import {
-  hasSupabaseClientEnvironment,
-} from '@/supabase/config'
 import type {
   ApiConnectionStatus,
   CreateInterviewResponse,
@@ -39,31 +32,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [apiConnectionStatus, setApiConnectionStatus] =
     useState<ApiConnectionStatus>('checking')
-  const supabaseEnabled = hasSupabaseClientEnvironment()
-  const { client: supabaseClient, error: supabaseError } = useMemo(() => {
-    if (!supabaseEnabled) {
-      return {
-        client: null,
-        error: '',
-      }
-    }
-
-    try {
-      return {
-        client: createSupabaseBrowserClient(),
-        error: '',
-      }
-    } catch (supabaseEnvironmentError) {
-      return {
-        client: null,
-        error:
-          supabaseEnvironmentError instanceof Error
-            ? 'Supabase auth is not available because the browser env is invalid.'
-            : 'Supabase auth is not available right now.',
-      }
-    }
-  }, [supabaseEnabled])
-
   useEffect(() => {
     interviewResultsRef.current = interviewResults
   }, [interviewResults])
@@ -200,16 +168,14 @@ function App() {
     window.requestAnimationFrame(() => {
       setupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       const setupHelpButton =
-        setupRef.current?.querySelector<HTMLButtonElement>(
-          'button[aria-label="Setup help"]',
-        )
+        setupRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')
 
       setupHelpButton?.focus({ preventScroll: true })
     })
   }
 
   return (
-    <AppLayout apiConnectionStatus={apiConnectionStatus}>
+    <AppShell apiConnectionStatus={apiConnectionStatus}>
       <HomePage
         error={error}
         interview={interview}
@@ -245,17 +211,10 @@ function App() {
         savedConfig={savedConfig}
         reportError={reportError}
         setupResetKey={setupResetKey}
-        supabaseAuth={
-          <SupabaseAuthPanel
-            client={supabaseClient}
-            configurationError={supabaseError || null}
-            isConfigured={supabaseEnabled}
-          />
-        }
         sessionRef={sessionRef}
         setupRef={setupRef}
       />
-    </AppLayout>
+    </AppShell>
   )
 }
 

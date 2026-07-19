@@ -1,4 +1,4 @@
-# InterviewPilot AI — Portfolio Release
+# InterviewPilot AI - Portfolio Release
 
 ## Short description
 

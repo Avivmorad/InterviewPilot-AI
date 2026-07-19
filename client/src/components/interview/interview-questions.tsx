@@ -2,14 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import {
   AlertCircle,
-  ArrowLeft,
   ArrowRight,
   BookOpen,
+  Bookmark,
   CheckCircle2,
   Code2,
   LoaderCircle,
-  Pencil,
+  Send,
   Sparkles,
+  UserRound,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -27,10 +28,13 @@ import {
 import type {
   AnswerEvaluation,
   CreateInterviewResponse,
+  InterviewConfig,
   InterviewQuestionResult,
 } from '@/types/interview'
+import { getLevelLabel, getRoleLabel } from '@/types/interview'
 
 type InterviewQuestionsProps = {
+  config: InterviewConfig | null
   interview: CreateInterviewResponse
   isReportLoading: boolean
   onCompleteInterview: () => void
@@ -41,6 +45,7 @@ type InterviewQuestionsProps = {
 }
 
 export function InterviewQuestions({
+  config,
   interview,
   isReportLoading,
   onCompleteInterview,
@@ -59,13 +64,11 @@ export function InterviewQuestions({
   const [evaluationErrors, setEvaluationErrors] = useState<Record<string, string>>({})
   const [evaluations, setEvaluations] = useState<Record<string, AnswerEvaluation>>({})
   const [evaluatingQuestionIds, setEvaluatingQuestionIds] = useState<Record<string, boolean>>({})
-  const [visibleHintQuestionIds, setVisibleHintQuestionIds] = useState<Record<string, boolean>>({})
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, string>>({})
 
   const question = interview.questions[activeQuestionIndex]
   const questionNumber = activeQuestionIndex + 1
   const totalQuestions = interview.questions.length
-  const isFirstQuestion = activeQuestionIndex === 0
   const isLastQuestion = activeQuestionIndex === totalQuestions - 1
   const evaluatedQuestionCount = interview.questions.filter(
     (interviewQuestion) => results[interviewQuestion.id],
@@ -82,7 +85,6 @@ export function InterviewQuestions({
     : false
   const isSavedAnswerCurrent =
     typeof submittedAnswer === 'string' && submittedAnswer === trimmedCurrentAnswer
-  const areHintsVisible = question ? Boolean(visibleHintQuestionIds[question.id]) : false
   const answerValidationState = getAnswerValidationState(currentAnswer)
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100)
   const primaryActionState = getQuestionPrimaryActionState({
@@ -94,6 +96,10 @@ export function InterviewQuestions({
     isLastQuestion,
     isReportLoading,
   })
+  const answerCharacterCount = currentAnswer.trim().length
+  const roleLabel = config ? getRoleLabel(config.role) : 'Interview role'
+  const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
+  const interviewTypeLabel = config?.interviewType ?? 'Mixed'
 
   useEffect(() => {
     isMountedRef.current = true
@@ -144,10 +150,11 @@ export function InterviewQuestions({
     window.requestAnimationFrame(() => {
       answerTextareaRef.current?.focus({ preventScroll: true })
     })
-  }, [question.id])
+  }, [question?.id])
 
   useEffect(() => {
     if (
+      !question ||
       pendingPrimaryFocusQuestionIdRef.current !== question.id ||
       isEvaluatingCurrentQuestion ||
       (!currentEvaluation && !currentEvaluationError)
@@ -163,7 +170,7 @@ export function InterviewQuestions({
     currentEvaluation,
     currentEvaluationError,
     isEvaluatingCurrentQuestion,
-    question.id,
+    question,
   ])
 
   if (!question) {
@@ -275,13 +282,6 @@ export function InterviewQuestions({
     setActiveQuestionIndex((index) => Math.min(index + 1, totalQuestions - 1))
   }
 
-  function toggleCurrentHints() {
-    setVisibleHintQuestionIds((questionIds) => ({
-      ...questionIds,
-      [question.id]: !questionIds[question.id],
-    }))
-  }
-
   function handlePrimaryAction() {
     if (
       primaryActionState.kind === 'evaluating' ||
@@ -308,318 +308,350 @@ export function InterviewQuestions({
   return (
     <section
       aria-labelledby="questions-title"
-      className="mx-auto max-w-[1488px] px-5 pb-12 pt-8 sm:px-8 lg:pb-20"
+      className="mx-auto max-w-[1520px] px-5 pb-12 pt-6 sm:px-8 lg:pb-16"
       ref={sessionRef}
       tabIndex={-1}
     >
       <div className="space-y-6">
-        <div className="soft-panel rounded-lg p-6 sm:p-8">
-          <div className="grid gap-5 md:grid-cols-[10rem_minmax(0,1fr)_10rem] md:items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Question</p>
-              <p className="mt-1 text-4xl font-extrabold text-white">
-                {questionNumber}
-                <span className="ml-2 text-base font-semibold text-muted-foreground">
-                  of {totalQuestions}
-                </span>
-              </p>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,#8a5cff,#2f6bff,#39b8ff)] shadow-[0_0_18px_rgb(47_107_255_/_0.8)] transition-all"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="text-sm font-bold text-muted-foreground md:text-right">
-              {progressPercent}% complete
-            </p>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px]">
-          <article className="glass-panel rounded-lg p-5 sm:p-7">
-            <h2 className="sr-only" id="questions-title">
-              Interview session
+        <div className="grid gap-5 border-b border-white/10 pb-6 lg:grid-cols-[minmax(0,30rem)_auto] lg:items-center lg:justify-between">
+          <div className="mx-auto flex w-full max-w-[30rem] flex-col items-center gap-3">
+            <h2
+              className="text-center text-2xl font-extrabold tracking-[-0.03em] text-white"
+              id="questions-title"
+            >
+              Question {questionNumber} of {totalQuestions}
             </h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
-              <span className="inline-flex items-center gap-2 rounded-full text-primary">
-                <Code2 aria-hidden="true" className="size-5" />
-                Question {questionNumber}
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-secondary-foreground">
-                {question.topic}
-              </span>
-              <span className="capitalize text-muted-foreground">
-                {question.difficulty}
-              </span>
-            </div>
-
-            <p className="mt-7 max-w-3xl text-3xl font-extrabold leading-tight text-white">
-              {normalizeFeedbackText(question.question)}
-            </p>
-
-            <div className="mt-8 border-t border-white/10 pt-6">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h3 className="flex items-center gap-2 text-lg font-extrabold text-white">
-                    <BookOpen aria-hidden="true" className="size-5 text-primary" />
-                    Expected concepts
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Use hints only when you want study guidance.
-                  </p>
-                </div>
-                <Button
-                  aria-controls={`hints-${question.id}`}
-                  aria-expanded={areHintsVisible}
-                  onClick={toggleCurrentHints}
-                  type="button"
-                  variant="outline"
-                >
-                  {areHintsVisible ? 'Hide hints' : `Show hints for question ${questionNumber}`}
-                </Button>
-              </div>
-              {areHintsVisible ? (
-                <ul className="mt-4 flex flex-wrap gap-3" id={`hints-${question.id}`}>
-                  {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
-                    <li
-                      className="flex items-center gap-2 rounded-full bg-white/[0.04] px-3 py-1.5 text-sm text-muted-foreground"
-                      key={concept}
-                    >
-                      <CheckCircle2
-                        aria-hidden="true"
-                        className="size-4 shrink-0 text-primary"
-                      />
-                      <span>{concept}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-
-            <div className="mt-8 border-t border-white/10 pt-6">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <label
-                  className="flex items-center gap-2 text-lg font-extrabold text-white"
-                  htmlFor={`answer-${question.id}`}
-                >
-                  <Pencil aria-hidden="true" className="size-5 text-primary" />
-                  Your answer
-                </label>
-                {isSavedAnswerCurrent ? (
-                  <span className="text-xs font-medium text-primary">Answer saved</span>
-                ) : null}
-              </div>
-              <textarea
-                aria-describedby={`answer-help-${question.id} answer-count-${question.id} answer-validation-${question.id}`}
-                aria-invalid={answerValidationState.isInvalid}
-                className="mt-4 min-h-56 w-full resize-y rounded-lg border border-primary/40 bg-[#091225] px-4 py-4 text-base leading-7 text-white outline-none shadow-[inset_0_0_28px_rgb(47_107_255_/_0.08),0_0_24px_rgb(47_107_255_/_0.12)] transition-colors placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-primary/60"
-                id={`answer-${question.id}`}
-                maxLength={MAX_ANSWER_CHARACTERS}
-                onChange={(event) => updateCurrentAnswer(event.target.value)}
-                placeholder="Type your answer here..."
-                ref={answerTextareaRef}
-                value={currentAnswer}
-                disabled={isEvaluatingCurrentQuestion}
-              />
-              <div className="mt-3 space-y-2">
-                <p className="text-xs text-muted-foreground" id={`answer-help-${question.id}`}>
-                  Keep answers under {MAX_ANSWER_CHARACTERS.toLocaleString()} characters.
-                </p>
-                <p
-                  className={`text-sm leading-6 ${
-                    answerValidationState.tone === 'error'
-                      ? 'text-red-200'
-                      : answerValidationState.tone === 'warning'
-                        ? 'text-amber-200'
-                        : 'text-muted-foreground'
-                  }`}
-                  id={`answer-validation-${question.id}`}
-                  aria-live="polite"
-                >
-                  {answerValidationState.message || 'Answer looks ready to review.'}
-                </p>
-                <p className="text-xs text-muted-foreground" id={`answer-count-${question.id}`}>
-                  {currentAnswer.trim().length.toLocaleString()} characters entered
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <aside className="space-y-4">
-            {isEvaluatingCurrentQuestion ? (
-              <section
-                aria-live="polite"
-                className="glass-panel flex items-start gap-3 rounded-lg p-5"
-              >
-                <LoaderCircle
-                  aria-hidden="true"
-                  className="mt-0.5 size-4 animate-spin text-primary"
+            <div className="flex w-full items-center gap-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-[linear-gradient(90deg,#2f6bff,#7346ff)] transition-all"
+                  style={{ width: `${progressPercent}%` }}
                 />
-                <div>
-                  <h3 className="text-sm font-semibold">Evaluating answer</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    The AI is reviewing your answer and preparing feedback.
-                  </p>
-                </div>
-              </section>
-            ) : null}
-
-            {currentEvaluationError ? (
-              <section
-                className="flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 p-5 text-red-100"
-                role="alert"
-              >
-                <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                <div>
-                  <h3 className="text-sm font-semibold">Could not evaluate answer</h3>
-                  <p className="mt-1 text-sm leading-6">{currentEvaluationError}</p>
-                </div>
-              </section>
-            ) : null}
-
-            {currentEvaluation && isSavedAnswerCurrent ? (
-              <section className="glass-panel rounded-lg p-5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
-                      <Sparkles aria-hidden="true" className="size-5 text-primary" />
-                      AI feedback
-                    </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Confidence: {currentEvaluation.confidenceLevel}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-primary/40 bg-primary/15 px-4 py-2 text-sm font-extrabold text-white">
-                    {currentEvaluation.score}/5
-                  </span>
-                </div>
-
-                <div className="mt-6 grid gap-5">
-                  <FeedbackList
-                    items={normalizeFeedbackItems(currentEvaluation.strengths)}
-                    title="Strengths"
-                  />
-                  <FeedbackList
-                    items={normalizeFeedbackItems(currentEvaluation.weaknesses)}
-                    title="Areas to improve"
-                  />
-                </div>
-
-                <FeedbackList
-                  className="mt-4"
-                  emptyText="No major key concepts were identified."
-                  items={normalizeFeedbackItems(currentEvaluation.missingConcepts)}
-                  title="Key concepts"
-                />
-
-                <details
-                  className="mt-5 rounded-2xl border border-white/10 bg-white/[0.025] p-4"
-                  open
-                >
-                  <summary className="cursor-pointer list-none text-sm font-semibold text-white">
-                    Suggested answer
-                  </summary>
-                  <div className="mt-3 space-y-3">
-                    {splitFeedbackParagraphs(currentEvaluation.improvedAnswer).map(
-                      (paragraph) => (
-                        <p
-                          className="max-w-3xl text-sm leading-6 text-muted-foreground"
-                          key={paragraph}
-                        >
-                          {paragraph}
-                        </p>
-                      ),
-                    )}
-                  </div>
-                </details>
-
-                <div className="mt-5 border-t border-white/10 pt-5">
-                  <p className="text-sm text-muted-foreground">
-                    {canCompleteInterview
-                      ? 'All questions have been reviewed. You can now finish the interview.'
-                      : 'Feedback is ready. Continue when you are ready.'}
-                  </p>
-                </div>
-              </section>
-            ) : null}
-
-            {!isEvaluatingCurrentQuestion && !currentEvaluationError && !currentEvaluation ? (
-              <section className="glass-panel rounded-lg p-5">
-                <h3 className="flex items-center gap-2 text-xl font-extrabold text-white">
-                  <Sparkles aria-hidden="true" className="size-5 text-primary" />
-                  AI feedback
-                </h3>
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                  Submit your answer to unlock a score, strengths, improvements, and a stronger sample answer.
-                </p>
-              </section>
-            ) : null}
-          </aside>
-        </div>
-
-        <div className="sticky bottom-4 z-20 mt-5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-4">
-          <Button
-            disabled={isFirstQuestion}
-            onClick={() => setActiveQuestionIndex((index) => Math.max(index - 1, 0))}
-            type="button"
-            variant="outline"
-          >
-            <ArrowLeft aria-hidden="true" className="size-4" />
-            Previous question
-          </Button>
-          <Button
-            data-testid="question-primary-action"
-            ref={primaryActionButtonRef}
-            disabled={primaryActionState.disabled}
-            onClick={handlePrimaryAction}
-            type="button"
-          >
-            {primaryActionState.kind === 'evaluating' ||
-            primaryActionState.kind === 'report-loading' ? (
-              <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-            ) : primaryActionState.kind === 'finish' ? (
-              <CheckCircle2 aria-hidden="true" className="size-4" />
-            ) : (
-              <ArrowRight aria-hidden="true" className="size-4" />
-            )}
-            {primaryActionState.label}
-          </Button>
-        </div>
-
-        <section className="soft-panel mt-6 rounded-lg p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-white">Interview progress</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {evaluatedQuestionCount} of {totalQuestions} answers have feedback.
-              </p>
+              </div>
+              <span className="min-w-12 text-right text-xl font-semibold text-white/85">
+                {progressPercent}%
+              </span>
             </div>
           </div>
-        </section>
+
+          <div className="flex justify-start lg:justify-end">
+            <Button
+              className="h-12 rounded-2xl border-red-400/50 bg-transparent px-5 text-red-300 shadow-none hover:bg-red-500/10 hover:text-red-200"
+              onClick={onCompleteInterview}
+              type="button"
+              variant="outline"
+            >
+              <ArrowRight aria-hidden="true" className="size-4 rotate-45" />
+              End Interview
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <MetaPill icon={Code2} label={roleLabel} tone="blue" />
+          <MetaPill icon={UserRound} label={levelLabel} tone="green" />
+          <MetaPill icon={Sparkles} label={interviewTypeLabel} tone="violet" />
+        </div>
+
+        <article className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary">
+                Question
+              </p>
+              <h3 className="mt-5 max-w-6xl text-[2.2rem] font-extrabold leading-[1.24] tracking-[-0.04em] text-white sm:text-[2.6rem]">
+                {normalizeFeedbackText(question.question)}
+              </h3>
+              <p className="mt-5 max-w-5xl text-lg leading-9 text-slate-300">
+                Give a detailed explanation of what the concept means, how it works in practice,
+                and why it improves performance or code quality.
+              </p>
+            </div>
+            <button
+              aria-label="Bookmark question"
+              className="grid size-12 shrink-0 place-items-center rounded-2xl border border-white/12 bg-white/[0.03] text-slate-300 transition hover:border-primary/45 hover:text-white"
+              type="button"
+            >
+              <Bookmark aria-hidden="true" className="size-5" />
+            </button>
+          </div>
+
+          <div className="mt-8 border-t border-white/10 pt-6">
+            <div className="flex items-center gap-2 text-lg font-extrabold text-primary">
+              <BookOpen aria-hidden="true" className="size-5" />
+              Hints <span className="font-medium text-slate-400">(optional)</span>
+            </div>
+            <ul className="mt-4 space-y-3 text-lg leading-8 text-slate-300" id={`hints-${question.id}`}>
+              {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
+                <li className="flex items-start gap-3" key={concept}>
+                  <span className="mt-3 size-1.5 rounded-full bg-slate-300" />
+                  <span>{concept}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+
+        <article className="rounded-[1.55rem] border border-white/10 bg-[#081326]/90 px-6 py-7 shadow-[0_28px_90px_rgba(0,0,0,0.2)] sm:px-8">
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+            <label
+              className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary"
+              htmlFor={`answer-${question.id}`}
+            >
+              Your Answer
+            </label>
+            <div className="flex flex-wrap items-center gap-4 text-base text-slate-300">
+              {isSavedAnswerCurrent ? (
+                <span className="inline-flex items-center gap-2 text-emerald-300">
+                  <CheckCircle2 aria-hidden="true" className="size-4" />
+                  Auto-saved
+                </span>
+              ) : null}
+              <span>
+                {answerCharacterCount.toLocaleString()} / {MAX_ANSWER_CHARACTERS.toLocaleString()} characters
+              </span>
+            </div>
+          </div>
+
+          <textarea
+            aria-describedby={`answer-help-${question.id} answer-validation-${question.id}`}
+            aria-invalid={answerValidationState.isInvalid}
+            className="mt-5 min-h-[16rem] w-full resize-y rounded-[1.1rem] border border-primary/55 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-5 py-5 text-xl leading-9 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70"
+            disabled={isEvaluatingCurrentQuestion}
+            id={`answer-${question.id}`}
+            maxLength={MAX_ANSWER_CHARACTERS}
+            onChange={(event) => updateCurrentAnswer(event.target.value)}
+            placeholder="Write your answer here..."
+            ref={answerTextareaRef}
+            value={currentAnswer}
+          />
+
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-muted-foreground" id={`answer-help-${question.id}`}>
+              Keep answers structured and concise. Adding examples usually improves feedback quality.
+            </p>
+            <p
+              aria-live="polite"
+              className={`text-sm leading-6 ${
+                answerValidationState.tone === 'error'
+                  ? 'text-red-200'
+                  : answerValidationState.tone === 'warning'
+                    ? 'text-amber-200'
+                    : 'text-muted-foreground'
+              }`}
+              id={`answer-validation-${question.id}`}
+            >
+              {answerValidationState.message || 'Answer looks ready to review.'}
+            </p>
+          </div>
+        </article>
+
+        {isEvaluatingCurrentQuestion ? (
+          <section
+            aria-live="polite"
+            className="rounded-[1.45rem] border border-white/10 bg-[#081326]/90 p-5"
+          >
+            <div className="flex items-start gap-3">
+              <LoaderCircle aria-hidden="true" className="mt-1 size-5 animate-spin text-primary" />
+              <div>
+                <h3 className="text-lg font-semibold text-white">Evaluating answer</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  The AI is reviewing your answer and preparing feedback.
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {currentEvaluationError ? (
+          <section
+            className="rounded-[1.45rem] border border-red-400/30 bg-red-500/10 p-5 text-red-100"
+            role="alert"
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle aria-hidden="true" className="mt-1 size-5 shrink-0" />
+              <div>
+                <h3 className="text-lg font-semibold">Could not evaluate answer</h3>
+                <p className="mt-1 text-sm leading-6">{currentEvaluationError}</p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {currentEvaluation && isSavedAnswerCurrent ? (
+          <section className="rounded-[1.55rem] border border-white/10 bg-[#081326]/92 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.2)]">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h3 className="flex items-center gap-2 text-2xl font-extrabold text-white">
+                  <Sparkles aria-hidden="true" className="size-5 text-primary" />
+                  AI Feedback
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Confidence: {currentEvaluation.confidenceLevel}
+                </p>
+              </div>
+              <span className="rounded-2xl border border-primary/35 bg-primary/12 px-4 py-2 text-lg font-extrabold text-white">
+                {currentEvaluation.score}/5
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-5 lg:grid-cols-3">
+              <FeedbackList
+                items={normalizeFeedbackItems(currentEvaluation.strengths)}
+                title="Strong areas"
+              />
+              <FeedbackList
+                items={normalizeFeedbackItems(currentEvaluation.weaknesses)}
+                title="Areas to improve"
+              />
+              <FeedbackList
+                emptyText="No major missing concepts were identified."
+                items={normalizeFeedbackItems(currentEvaluation.missingConcepts)}
+                title="Missing concepts"
+              />
+            </div>
+
+            <details className="mt-5 rounded-[1.2rem] border border-white/10 bg-white/[0.025] p-4" open>
+              <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+                Suggested answer
+              </summary>
+              <div className="mt-3 space-y-3">
+                {splitFeedbackParagraphs(currentEvaluation.improvedAnswer).map((paragraph) => (
+                  <p className="max-w-5xl text-sm leading-6 text-muted-foreground" key={paragraph}>
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </details>
+          </section>
+        ) : null}
+
+        <div className="grid gap-5 border-t border-white/10 pt-5 lg:grid-cols-3">
+          <ActionCard
+            helper="You can come back later"
+            icon={ArrowRight}
+            label="Skip Question"
+            onClick={goToNextQuestion}
+            variant="outline"
+          />
+          <ActionCard
+            disabled
+            helper="Get a reference answer to compare"
+            icon={Sparkles}
+            label="Generate Example Answer"
+            variant="outline"
+          />
+          <ActionCard
+            buttonRef={primaryActionButtonRef}
+            dataTestId="question-primary-action"
+            disabled={primaryActionState.disabled}
+            helper="Submit your answer for AI evaluation"
+            icon={
+              primaryActionState.kind === 'evaluating' ||
+              primaryActionState.kind === 'report-loading'
+                ? LoaderCircle
+                : primaryActionState.kind === 'finish'
+                  ? CheckCircle2
+                  : Send
+            }
+            iconClassName={
+              primaryActionState.kind === 'evaluating' ||
+              primaryActionState.kind === 'report-loading'
+                ? 'animate-spin'
+                : ''
+            }
+            label={primaryActionState.label}
+            onClick={handlePrimaryAction}
+          />
+        </div>
       </div>
     </section>
   )
 }
 
+function MetaPill({
+  icon: Icon,
+  label,
+  tone,
+}: {
+  icon: typeof Code2
+  label: string
+  tone: 'blue' | 'green' | 'violet'
+}) {
+  return (
+    <span
+      className={`inline-flex items-center gap-3 rounded-xl border px-5 py-3 text-lg ${
+        tone === 'green'
+          ? 'border-emerald-500/25 bg-emerald-500/8 text-emerald-300'
+          : tone === 'violet'
+            ? 'border-violet-500/25 bg-violet-500/8 text-violet-300'
+            : 'border-primary/25 bg-primary/8 text-blue-300'
+      }`}
+    >
+      <Icon aria-hidden="true" className="size-5" />
+      {label}
+    </span>
+  )
+}
+
+function ActionCard({
+  buttonRef,
+  dataTestId,
+  disabled = false,
+  helper,
+  icon: Icon,
+  iconClassName,
+  label,
+  onClick,
+  variant = 'default',
+}: {
+  buttonRef?: RefObject<HTMLButtonElement | null>
+  dataTestId?: string
+  disabled?: boolean
+  helper: string
+  icon: typeof ArrowRight
+  iconClassName?: string
+  label: string
+  onClick?: () => void
+  variant?: 'default' | 'outline'
+}) {
+  return (
+    <div className="space-y-3">
+      <Button
+        className={`h-14 w-full rounded-[1.15rem] text-lg font-extrabold ${
+          variant === 'default' ? 'text-white' : ''
+        }`}
+        data-testid={dataTestId}
+        disabled={disabled}
+        onClick={onClick}
+        ref={buttonRef}
+        type="button"
+        variant={variant}
+      >
+        <Icon aria-hidden="true" className={`size-5 ${iconClassName ?? ''}`.trim()} />
+        {label}
+      </Button>
+      <p className="text-center text-sm leading-6 text-muted-foreground">{helper}</p>
+    </div>
+  )
+}
+
 type FeedbackListProps = {
-  className?: string
   emptyText?: string
   items: string[]
   title: string
 }
 
 function FeedbackList({
-  className = '',
   emptyText = 'No items returned.',
   items,
   title,
 }: FeedbackListProps) {
   return (
-    <div className={className}>
-      <h4 className="text-sm font-semibold">{title}</h4>
+    <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.025] p-4">
+      <h4 className="text-base font-semibold text-white">{title}</h4>
       {items.length > 0 ? (
-        <ul className="mt-2 space-y-2">
+        <ul className="mt-3 space-y-2">
           {items.map((item) => (
             <li className="max-w-3xl text-sm leading-6 text-muted-foreground" key={item}>
               {item}
@@ -627,7 +659,7 @@ function FeedbackList({
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{emptyText}</p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">{emptyText}</p>
       )}
     </div>
   )

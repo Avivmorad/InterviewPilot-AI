@@ -203,7 +203,7 @@ Use the deployed Vercel URL and confirm:
 - Browser Network, JavaScript bundles, and Storage do not expose AI keys.
 - Error messages do not expose raw provider stack traces.
 
-See [docs/PHASE1_PRODUCTION_VERIFICATION.md](./PHASE1_PRODUCTION_VERIFICATION.md) for the exact Phase 1 checklist and commands.
+See [docs/verification/PHASE1_PRODUCTION_VERIFICATION.md](./verification/PHASE1_PRODUCTION_VERIFICATION.md) for the exact Phase 1 checklist and commands.
 
 ## Git workflow
 
