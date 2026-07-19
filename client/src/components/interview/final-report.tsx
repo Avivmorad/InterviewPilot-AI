@@ -54,16 +54,10 @@ export function FinalReport({
   const orderedResults = interview.questions
     .map((question) => results[question.id])
     .filter((result): result is InterviewQuestionResult => Boolean(result))
-  const averageScoreOutOfFive =
+  const averageScore =
     orderedResults.reduce((total, result) => total + result.evaluation.score, 0) /
     orderedResults.length
-  const reportScore = Number.isFinite(averageScoreOutOfFive)
-    ? averageScoreOutOfFive.toFixed(1)
-    : '0.0'
-  const averageScoreOutOfTen = Number.isFinite(averageScoreOutOfFive)
-    ? averageScoreOutOfFive * 2
-    : 0
-  const roundedScore = averageScoreOutOfTen.toFixed(1)
+  const roundedScore = Number.isFinite(averageScore) ? averageScore.toFixed(0) : '0'
   const strengths = uniqueItems(
     orderedResults.flatMap((result) => result.evaluation.strengths),
   ).slice(0, 4)
@@ -85,9 +79,9 @@ export function FinalReport({
     orderedResults,
     recommendedTopics,
     roadmap,
-    roundedScore: reportScore,
+    roundedScore,
   })
-  const scorePercent = Math.round((averageScoreOutOfTen / 10) * 100)
+  const scorePercent = Math.round(averageScore)
   const displayScore = Number.isFinite(scorePercent) ? scorePercent : 0
   const roleLabel = config ? getRoleLabel(config.role) : 'Interview practice'
   const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
@@ -115,36 +109,15 @@ export function FinalReport({
     },
     { icon: Clock3, label: 'Completed At', value: completedAt, tone: 'blue' },
   ] as const
-  const breakdownCards = [
-    {
-      icon: Code2,
-      label: 'Technical Knowledge',
-      score: scoreForIndex(orderedResults, 0, 4.25),
-      tone: 'blue',
-      status: 'Excellent',
-    },
-    {
-      icon: Lightbulb,
-      label: 'Problem Solving',
-      score: scoreForIndex(orderedResults, 1, 4),
-      tone: 'green',
-      status: 'Strong',
-    },
-    {
-      icon: Bot,
-      label: 'Communication',
-      score: scoreForIndex(orderedResults, 2, 3.9),
-      tone: 'violet',
-      status: 'Good',
-    },
-    {
-      icon: Award,
-      label: 'Code Quality',
-      score: scoreForIndex(orderedResults, 3, 4.2),
-      tone: 'amber',
-      status: 'Very Good',
-    },
-  ] as const
+  const breakdownIcons = [Code2, Lightbulb, Bot, Award] as const
+  const breakdownTones = ['blue', 'green', 'violet', 'amber'] as const
+  const breakdownCards = orderedResults.slice(0, 4).map((result, index) => ({
+    icon: breakdownIcons[index] ?? Code2,
+    label: result.question.topic,
+    score: result.evaluation.score,
+    tone: breakdownTones[index] ?? 'blue',
+    status: getScoreStatus(result.evaluation.score),
+  }))
 
   async function copyReport() {
     try {
@@ -205,7 +178,7 @@ export function FinalReport({
                     <span className="text-7xl font-extrabold tracking-[-0.08em] text-white">
                       {roundedScore}
                     </span>
-                    <span className="pb-2 text-3xl font-semibold text-slate-400">/10</span>
+                    <span className="pb-2 text-3xl font-semibold text-slate-400">/100</span>
                   </div>
                   <p className="mt-4 flex items-center gap-2 text-2xl font-extrabold text-emerald-300">
                     <Sparkles aria-hidden="true" className="size-6" />
@@ -381,8 +354,8 @@ function BreakdownCard({
   status: string
   tone: 'amber' | 'blue' | 'green' | 'violet'
 }) {
-  const progress = Math.min(Math.max((score / 5) * 100, 0), 100)
-  const display = (score * 2).toFixed(1)
+  const progress = Math.min(Math.max(score, 0), 100)
+  const display = Math.round(score)
 
   return (
     <article className="rounded-[1.35rem] border border-white/10 bg-[#081326]/92 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
@@ -404,7 +377,7 @@ function BreakdownCard({
           <p className="text-sm font-medium text-slate-300">{label}</p>
           <p className="mt-2 text-5xl font-extrabold tracking-[-0.06em] text-white">
             {display}
-            <span className="ml-2 text-2xl text-slate-400">/10</span>
+            <span className="ml-2 text-2xl text-slate-400">/100</span>
           </p>
         </div>
       </div>
@@ -602,14 +575,14 @@ function buildReportText({
   const questionBreakdown = orderedResults
     .map(
       (result, index) => `${index + 1}. ${normalizeFeedbackText(result.question.question)}
-Score: ${result.evaluation.score}/5
+Score: ${result.evaluation.score}/100
 Suggested answer: ${normalizeFeedbackText(result.evaluation.improvedAnswer)}`,
     )
     .join('\n\n')
 
   return `InterviewPilot AI Final Report
 ${title}
-Overall score: ${roundedScore}/5
+Overall score: ${roundedScore}/100
 
 Recommended topics:
 ${formatReportList(recommendedTopics)}
@@ -673,16 +646,9 @@ function buildRoadmap(topics: string[], weaknesses: string[]): string[] {
   ]
 }
 
-function scoreForIndex(
-  results: InterviewQuestionResult[],
-  index: number,
-  fallback: number,
-): number {
-  const selected = results[index]?.evaluation.score
-
-  if (typeof selected === 'number' && Number.isFinite(selected)) {
-    return selected
-  }
-
-  return fallback
+function getScoreStatus(score: number): string {
+  if (score >= 90) return 'Excellent'
+  if (score >= 75) return 'Strong'
+  if (score >= 60) return 'Developing'
+  return 'Needs practice'
 }

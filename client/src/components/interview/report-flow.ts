@@ -9,7 +9,7 @@ export type FinalReportPreparationState =
   | { ready: false; error: string }
 
 const FINAL_REPORT_INCOMPLETE_ERROR =
-  'Could not generate the final report. Please review all answers and retry.'
+  'Could not prepare the final report. Please retry.'
 
 export function isValidInterviewQuestionResult(
   questionId: string,
@@ -25,7 +25,11 @@ export function isValidInterviewQuestionResult(
 
   const { evaluation } = result
 
-  if (!isRecord(evaluation) || typeof evaluation.improvedAnswer !== 'string') {
+  if (
+    !isRecord(evaluation) ||
+    typeof evaluation.improvedAnswer !== 'string' ||
+    typeof evaluation.improvementSuggestion !== 'string'
+  ) {
     return false
   }
 
@@ -34,12 +38,13 @@ export function isValidInterviewQuestionResult(
   return (
     typeof score === 'number' &&
     Number.isInteger(score) &&
-    score >= 1 &&
-    score <= 5 &&
+    score >= 0 &&
+    score <= 100 &&
     isStringList(evaluation.strengths) &&
     isStringList(evaluation.weaknesses) &&
     isStringList(evaluation.missingConcepts) &&
     evaluation.improvedAnswer.trim().length > 0 &&
+    evaluation.improvementSuggestion.trim().length > 0 &&
     isConfidenceLevel(evaluation.confidenceLevel)
   )
 }
@@ -48,8 +53,9 @@ export function getFinalReportPreparationState(
   interview: CreateInterviewResponse,
   results: Record<string, InterviewQuestionResult>,
 ): FinalReportPreparationState {
-  const hasCompleteResults = interview.questions.every((question) =>
-    isValidInterviewQuestionResult(question.id, results[question.id]),
+  const hasCompleteResults = Object.entries(results).every(([questionId, result]) =>
+    interview.questions.some((question) => question.id === questionId) &&
+    isValidInterviewQuestionResult(questionId, result),
   )
 
   if (!hasCompleteResults) {

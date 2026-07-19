@@ -50,19 +50,17 @@ test('responsive layout stays usable across the required viewport matrix', async
   for (const { name, size } of viewportMatrix) {
     await page.setViewportSize(size)
     await page.goto('/')
+    await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
 
-    await expect(page.getByRole('heading', { name: 'Set up your interview' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Setup help' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start interview', exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start interview help' })).toBeVisible()
-    await expect(page.getByText('Quick start tip')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Create Your Interview' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Generate Interview', exact: true })).toBeVisible()
     await expectNoHorizontalOverflow(page)
 
     if (name === 'mobile') {
-      await page.getByText('Backend Developer', { exact: true }).click()
-      await page.getByText('Senior', { exact: true }).click()
-      await page.getByText('Mixed', { exact: true }).click()
-      await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+      await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+      await page.locator('form').getByText('Senior', { exact: true }).click()
+      await page.locator('form').getByText('Mixed', { exact: true }).click()
+      await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
       await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
       await expect(page.getByLabel('Your answer')).toBeVisible()
@@ -74,12 +72,13 @@ test('responsive layout stays usable across the required viewport matrix', async
 test('the main interview flow works with keyboard only', async ({ page }) => {
   await installMockApi(page)
   await page.goto('/')
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
 
   await selectWithKeyboard(page, 'Backend Developer')
   await selectWithKeyboard(page, 'Senior')
   await selectWithKeyboard(page, 'Mixed')
 
-  const startButton = page.getByRole('button', { name: 'Start interview', exact: true })
+  const startButton = page.getByRole('button', { name: 'Generate Interview', exact: true })
   await startButton.focus()
   await expect(startButton).toBeFocused()
   await page.keyboard.press('Enter')
@@ -111,13 +110,14 @@ test('the main interview flow works with keyboard only', async ({ page }) => {
   await expect(finishButton).toBeFocused()
   await page.keyboard.press('Enter')
 
-  await expect(page.getByRole('heading', { name: 'Your interview report' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Practice again' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Interview Complete/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Start New Interview' })).toBeVisible()
 })
 
 test('setup and interview states pass basic axe checks', async ({ page }) => {
   await installMockApi(page)
   await page.goto('/')
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
 
   const setupResults = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa'])
@@ -125,10 +125,10 @@ test('setup and interview states pass basic axe checks', async ({ page }) => {
 
   expect(setupResults.violations).toEqual([])
 
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
   const interviewResults = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa'])

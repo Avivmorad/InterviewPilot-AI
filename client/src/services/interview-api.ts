@@ -4,6 +4,7 @@ import type {
   Difficulty,
   InterviewConfig,
   InterviewQuestion,
+  ExampleAnswer,
 } from '@/types/interview'
 
 export type ApiHealth = {
@@ -174,12 +175,13 @@ function parseAnswerEvaluation(value: unknown): AnswerEvaluation {
     !isRecord(value) ||
     typeof value.score !== 'number' ||
     !Number.isInteger(value.score) ||
-    value.score < 1 ||
-    value.score > 5 ||
+    value.score < 0 ||
+    value.score > 100 ||
     !isStringList(value.strengths) ||
     !isStringList(value.weaknesses) ||
     !isStringList(value.missingConcepts) ||
     typeof value.improvedAnswer !== 'string' ||
+    typeof value.improvementSuggestion !== 'string' ||
     !isConfidenceLevel(value.confidenceLevel)
   ) {
     throw new InterviewApiError(
@@ -195,8 +197,55 @@ function parseAnswerEvaluation(value: unknown): AnswerEvaluation {
     weaknesses: value.weaknesses,
     missingConcepts: value.missingConcepts,
     improvedAnswer: value.improvedAnswer,
+    improvementSuggestion: value.improvementSuggestion,
     confidenceLevel: value.confidenceLevel,
   }
+}
+
+function parseExampleAnswer(value: unknown): ExampleAnswer {
+  if (
+    !isRecord(value) ||
+    typeof value.answer !== 'string' ||
+    value.answer.trim().length === 0 ||
+    !isStringList(value.keyPoints) ||
+    value.keyPoints.length < 2
+  ) {
+    throw new InterviewApiError(
+      'The example answer could not be prepared. Please try again.',
+      'INVALID_RESPONSE',
+      502,
+    )
+  }
+  return { answer: value.answer, keyPoints: value.keyPoints }
+}
+
+export async function generateExampleAnswer(
+  question: InterviewQuestion,
+): Promise<ExampleAnswer> {
+  let response: Response
+  try {
+    response = await fetch(`${apiUrl}/api/interview/example-answer`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ question }),
+    })
+  } catch {
+    throw new InterviewApiError(
+      'Unable to generate an example answer right now. Please try again.',
+      'NETWORK_ERROR',
+      0,
+    )
+  }
+
+  const data: unknown = await response.json().catch(() => null)
+  if (!response.ok) {
+    throw new InterviewApiError(
+      'Unable to generate an example answer right now. Please try again.',
+      isRecord(data) && typeof data.code === 'string' ? data.code : 'REQUEST_FAILED',
+      response.status,
+    )
+  }
+  return parseExampleAnswer(data)
 }
 
 export async function evaluateAnswer(

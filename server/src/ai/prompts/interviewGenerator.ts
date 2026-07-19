@@ -36,7 +36,10 @@ Requirements:
 - ${interviewTypeGuidance}
 - Level guidance: ${levelGuidance}
 - Role guidance: ${roleGuidance}
-- Keep each question clear, specific, and answerable in an interview.
+- Keep each question clear, specific, concise, and answerable in an interview.
+- Keep every question under 240 characters and avoid multi-part laundry lists.
+- Do not repeat or paraphrase the same question, topic, or core skill.
+- Make every question meaningfully distinct from all other questions.
 - Write all question content and expected concepts in English.
 - List 2 to 5 concise expected concepts for each question.
 - Use the difficulty value "${difficulty}" for every question.

@@ -32,6 +32,7 @@ const result: InterviewQuestionResult = {
     weaknesses: ['Could mention integration tests'],
     missingConcepts: ['Integration tests'],
     improvedAnswer: 'I would combine unit and integration coverage.',
+    improvementSuggestion: 'Name one concrete integration boundary.',
     confidenceLevel: 'high',
   },
 }
@@ -43,11 +44,10 @@ test('allows final-report preparation when every question has feedback', () => {
   })
 })
 
-test('returns a clear retryable error when feedback is incomplete', () => {
+test('allows a report when questions were skipped', () => {
   assert.deepEqual(getFinalReportPreparationState(interview, {}), {
-    ready: false,
-    error:
-      'Could not generate the final report. Please review all answers and retry.',
+    ready: true,
+    error: '',
   })
 })
 
@@ -64,8 +64,7 @@ test('rejects incomplete report data even when a result object exists', () => {
     }),
     {
       ready: false,
-      error:
-        'Could not generate the final report. Please review all answers and retry.',
+      error: 'Could not prepare the final report. Please retry.',
     },
   )
 })

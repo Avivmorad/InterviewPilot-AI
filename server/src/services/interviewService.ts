@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { generateText } from '../ai/aiService.js'
 import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
 import { buildInterviewGeneratorPrompt } from '../ai/prompts/interviewGenerator.js'
+import { buildExampleAnswerPrompt } from '../ai/prompts/exampleAnswer.js'
 import { logStructuredEvent } from '../observability/structuredLog.js'
 import {
   INTERVIEW_LEVELS,
@@ -15,6 +16,8 @@ import {
   type CreateInterviewResponse,
   type Difficulty,
   type EvaluateAnswerRequest,
+  type ExampleAnswer,
+  type GenerateExampleAnswerRequest,
   type InterviewQuestion,
   type InterviewType,
   type Level,
@@ -58,7 +61,7 @@ const interviewTypeSchema = z.enum(interviewTypeValues, {
   message: 'Select a valid interview type.',
 })
 const questionCountSchema = z.custom<QuestionCount>(isQuestionCount, {
-  message: 'Question count must be 3 for the MVP.',
+  message: 'Question count must be between 1 and 5.',
 })
 
 const createInterviewRequestSchema = z.object({
@@ -85,7 +88,7 @@ const answerEvaluationSchema = z.object({
   score: z.preprocess(
     (value) =>
       typeof value === 'string' && value.trim().length > 0 ? Number(value) : value,
-    z.number().finite().min(1).max(5),
+    z.number().finite().int().min(0).max(100),
   ),
   strengths: z
     .array(z.string().trim().min(1, 'List items must not be empty.'))
@@ -95,6 +98,10 @@ const answerEvaluationSchema = z.object({
     .min(1),
   missingConcepts: z.array(z.string().trim().min(1, 'List items must not be empty.')),
   improvedAnswer: z.string().trim().min(1, 'Improved answer is required.'),
+  improvementSuggestion: z
+    .string()
+    .trim()
+    .min(1, 'Improvement suggestion is required.'),
   confidenceLevel: z.preprocess(
     (value) =>
       typeof value === 'string' ? value.trim().toLowerCase() : value,
@@ -102,6 +109,11 @@ const answerEvaluationSchema = z.object({
       message: 'Select a valid confidence level.',
     }),
   ),
+})
+
+const exampleAnswerSchema = z.object({
+  answer: z.string().trim().min(40).max(4_000),
+  keyPoints: z.array(z.string().trim().min(1)).min(2).max(6),
 })
 
 function isRole(value: unknown): value is Role {
@@ -186,6 +198,14 @@ function validateEvaluateAnswerRequest(input: unknown): EvaluateAnswerRequest {
     question,
     answer: answerResult.data,
   }
+}
+
+function validateExampleAnswerRequest(input: unknown): GenerateExampleAnswerRequest {
+  if (!isRecord(input) || !isRecord(input.question)) {
+    throw new InterviewValidationError('Question must be a valid interview question.')
+  }
+
+  return { question: parseInterviewQuestion(input.question) }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -347,9 +367,24 @@ export function parseGeneratedInterview(
 
   const expectedDifficulty = request.level
 
-  return generatedQuestions.map((question, index) =>
+  const questions = generatedQuestions.map((question, index) =>
     parseGeneratedQuestion(question, index, expectedDifficulty),
   )
+
+  const normalizedQuestions = questions.map(({ question }) =>
+    question.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim(),
+  )
+  const normalizedTopics = questions.map(({ topic }) => topic.toLowerCase().trim())
+
+  if (
+    new Set(normalizedQuestions).size !== questions.length ||
+    new Set(normalizedTopics).size !== questions.length ||
+    questions.some(({ question }) => question.length > 240)
+  ) {
+    throw new InterviewGenerationError('Questions must be concise and distinct.')
+  }
+
+  return questions
 }
 
 export function parseAnswerEvaluation(text: string): AnswerEvaluation {
@@ -369,6 +404,7 @@ export function parseAnswerEvaluation(text: string): AnswerEvaluation {
     weaknesses: evaluation.weaknesses.slice(0, 4),
     missingConcepts: evaluation.missingConcepts.slice(0, 5),
     improvedAnswer: evaluation.improvedAnswer,
+    improvementSuggestion: evaluation.improvementSuggestion,
     confidenceLevel: evaluation.confidenceLevel,
   }
 }
@@ -377,15 +413,37 @@ function createFallbackEvaluation(request: EvaluateAnswerRequest): AnswerEvaluat
   const missingConcepts = request.question.expectedConcepts.slice(0, 5)
 
   return {
-    score: 1,
-    strengths: ['Your answer was saved and included enough detail to review.'],
-    weaknesses: [
-      'AI feedback fallback was used because the provider response could not be validated.',
-      'Revise the answer to explicitly cover the expected concepts.',
-    ],
+    score: 0,
+    strengths: ['Your answer addresses the same topic as the interview question.'],
+    weaknesses: ['The answer needs a clearer explanation of the core concepts requested by the question.'],
     missingConcepts,
     improvedAnswer: `A stronger answer should directly address: ${missingConcepts.join(', ')}.`,
-    confidenceLevel: 'low',
+    improvementSuggestion: `Rewrite the answer as a short explanation followed by one practical example covering ${missingConcepts[0] ?? 'the main concept'}.`,
+    confidenceLevel: 'medium',
+  }
+}
+
+export function parseExampleAnswer(text: string): ExampleAnswer {
+  const parsed = exampleAnswerSchema.safeParse(parseJsonObjectText(text))
+  if (!parsed.success) {
+    throw new InterviewGenerationError()
+  }
+  return parsed.data
+}
+
+export async function generateExampleAnswer(
+  input: unknown,
+  textGenerator: TextGenerator = generateText,
+): Promise<ExampleAnswer> {
+  const request = validateExampleAnswerRequest(input)
+  const prompt = buildExampleAnswerPrompt(request)
+
+  try {
+    return parseExampleAnswer(await textGenerator(prompt))
+  } catch (error) {
+    if (!(error instanceof InterviewGenerationError)) throw error
+    const retryPrompt = `${prompt}\n\nYour previous response was invalid. Return only valid JSON matching the exact requested shape.`
+    return parseExampleAnswer(await textGenerator(retryPrompt))
   }
 }
 

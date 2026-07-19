@@ -41,21 +41,20 @@ test('rapid repeated submit actions send only one evaluation request', async ({ 
   })
 
   await page.goto('/')
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
   await page.getByLabel('Your answer').fill(
     'I would version the contract carefully, preserve compatibility, and test consumers.',
   )
 
   const submitButton = page.getByTestId('question-primary-action')
-  await submitButton.evaluate((button) => {
-    button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-  })
+  await submitButton.click()
+  await submitButton.dispatchEvent('click')
 
-  await expect(page.getByRole('heading', { name: 'AI feedback' })).toBeVisible()
+  await expect.poll(() => evaluationRequestCount).toBe(1)
   expect(evaluationRequestCount).toBe(1)
 })
 
@@ -90,10 +89,11 @@ test('interview exposes one clear forward action in each state', async ({ page }
   })
 
   await page.goto('/')
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
   await expectSinglePrimaryAction(page, 'Submit answer')
   await page.getByLabel('Your answer').fill(
@@ -130,8 +130,7 @@ test('interview exposes one clear forward action in each state', async ({ page }
   await expectSinglePrimaryAction(page, 'Finish interview and view report')
 
   await primaryActionButton.click()
-  await expectSinglePrimaryAction(page, 'Generating final report...')
-  await expect(page.getByRole('heading', { name: 'Your interview report' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Interview Complete/ })).toBeVisible()
 })
 
 test('submit controls stay disabled while evaluation is running', async ({ page }) => {
@@ -143,10 +142,11 @@ test('submit controls stay disabled while evaluation is running', async ({ page 
   })
 
   await page.goto('/')
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
   await page.getByLabel('Your answer').fill(
     'I would version the contract carefully, preserve compatibility, and test consumers.',
   )
@@ -154,7 +154,7 @@ test('submit controls stay disabled while evaluation is running', async ({ page 
   const submitButton = page.getByTestId('question-primary-action')
   const answerBox = page.getByLabel('Your answer')
 
-  await submitButton.click()
+  await submitButton.dispatchEvent('click')
 
   await expect(page.getByRole('heading', { name: 'Evaluating answer' })).toBeVisible()
   await expect(answerBox).toBeDisabled()
@@ -174,10 +174,11 @@ test('rapid repeated Enter presses send only one evaluation request', async ({ p
   })
 
   await page.goto('/')
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
   await page.getByLabel('Your answer').fill(
     'I would version the contract carefully, preserve compatibility, and test consumers.',
   )
@@ -187,14 +188,22 @@ test('rapid repeated Enter presses send only one evaluation request', async ({ p
   await page.keyboard.press('Enter')
   await page.keyboard.press('Enter')
 
-  await expect(page.getByText('Strengths')).toBeVisible()
+  await expect(page.getByText('Strong areas')).toBeVisible()
   expect(evaluationRequestCount).toBe(1)
 })
 
 test('setup supports every option and submits the selected configuration', async ({ page }) => {
   await installMockApi(page)
+  const roleValueByLabel: Record<string, string> = {
+    'Frontend Developer': 'frontend-developer',
+    'Full Stack Developer': 'full-stack-developer',
+    'AI Engineer': 'ai-engineer',
+    'Generative AI Engineer': 'generative-ai-engineer',
+    'Backend Developer': 'backend-developer',
+  }
 
   await page.goto('/')
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
 
   for (const role of [
     'Frontend Developer',
@@ -203,20 +212,20 @@ test('setup supports every option and submits the selected configuration', async
     'Generative AI Engineer',
     'Backend Developer',
   ]) {
-    const option = page.getByRole('radio', { name: role, exact: true })
-    await page.getByText(role, { exact: true }).click()
+    const option = page.locator(`input[name="role"][value="${roleValueByLabel[role]}"]`)
+    await page.locator('form').getByText(role, { exact: true }).click()
     await expect(option).toBeChecked()
   }
 
   for (const level of ['Intern', 'Junior', 'Mid-Level', 'Senior']) {
-    const option = page.getByRole('radio', { name: level, exact: true })
-    await page.getByText(level, { exact: true }).click()
+    const option = page.getByRole('radio', { name: level })
+    await page.locator('form').getByText(level, { exact: true }).click()
     await expect(option).toBeChecked()
   }
 
   for (const interviewType of ['Technical', 'Behavioral', 'Mixed']) {
-    const option = page.getByRole('radio', { name: interviewType, exact: true })
-    await page.getByText(interviewType, { exact: true }).click()
+    const option = page.locator(`input[name="interviewType"][value="${interviewType}"]`)
+    await page.locator('form').getByText(interviewType, { exact: true }).click()
     await expect(option).toBeChecked()
   }
 
@@ -225,31 +234,34 @@ test('setup supports every option and submits the selected configuration', async
   })
   await expect(questionCount).toBeChecked()
 
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
   await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
-  const savedSetup = page
-    .getByRole('heading', { name: 'Current interview setup' })
-    .locator('..')
-  await expect(savedSetup.getByText('Backend Developer', { exact: true })).toBeVisible()
-  await expect(savedSetup.getByText('Senior', { exact: true })).toBeVisible()
-  await expect(savedSetup.getByText('Mixed', { exact: true })).toBeVisible()
+  const questionStage = page.getByLabel(/Question 1 of/)
+  await expect(questionStage.getByText('Backend Developer', { exact: true })).toBeVisible()
+  await expect(questionStage.getByText('Senior', { exact: true })).toBeVisible()
+  await expect(questionStage.getByText('Mixed', { exact: true })).toBeVisible()
 })
 
 test('core interview flow completes from setup through final report', async ({ page }) => {
   await installMockApi(page)
 
   await page.goto('/')
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
 
-  await expect(page.getByRole('heading', { name: 'Set up your interview' })).toBeVisible()
-  await page.getByText('Backend Developer', { exact: true }).click()
-  await page.getByText('Senior', { exact: true }).click()
-  await page.getByText('Mixed', { exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Create Your Interview' })).toBeVisible()
+  await page.locator('form').getByText('Backend Developer', { exact: true }).click()
+  await page.locator('form').getByText('Senior', { exact: true }).click()
+  await page.locator('form').getByText('Mixed', { exact: true }).click()
 
-  await page.getByRole('button', { name: 'Start interview', exact: true }).click()
+  await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
   await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Show hints for question 1' })).toBeVisible()
+  await expect(page.getByText('Hints', { exact: false })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Generate Example Answer' }).click()
+  await expect(page.getByRole('heading', { name: 'Example answer' })).toBeVisible()
+  await expect(page.getByText('Stable contracts')).toBeVisible()
 
   await answerCurrentQuestion(
     page,
@@ -277,9 +289,9 @@ test('core interview flow completes from setup through final report', async ({ p
     button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
   })
 
-  await expect(page.getByRole('heading', { name: 'Your interview report' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Interview Complete/ })).toBeVisible()
   await expect(page.getByText('Overall score')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Practice again' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Start New Interview' })).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Finish interview and view report', exact: true }),
   ).toHaveCount(0)
@@ -291,12 +303,13 @@ test('core interview flow completes from setup through final report', async ({ p
     'interviewpilot-report-backend-developer-senior-mixed.txt',
   )
 
-  await page.getByRole('button', { name: 'Practice again' }).click()
-  await expect(page.getByRole('heading', { name: 'Set up your interview' })).toBeVisible()
+  await page.getByRole('button', { name: 'Start New Interview' }).click()
+  await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Create Your Interview' })).toBeVisible()
   await expect(page.getByRole('radio', { name: 'Frontend Developer' })).toBeChecked()
   await expect(page.getByRole('radio', { name: 'Mid-Level' })).toBeChecked()
-  await expect(page.getByRole('radio', { name: 'Technical' })).toBeChecked()
+  await expect(page.locator('input[name="interviewType"][value="Technical"]')).toBeChecked()
   await expect(page.getByRole('radio', { name: '3' })).toBeChecked()
   await expect(page.getByText(interviewQuestions[0].question)).not.toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Your interview report' })).not.toBeVisible()
+  await expect(page.getByRole('heading', { name: /Interview Complete/ })).not.toBeVisible()
 })
