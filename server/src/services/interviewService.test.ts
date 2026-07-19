@@ -5,12 +5,14 @@ import {
   createInterview,
   EMPTY_ANSWER_MESSAGE,
   evaluateAnswer,
+  generateExampleAnswer,
   InterviewGenerationError,
   InterviewValidationError,
   MAX_ANSWER_MESSAGE,
   MAX_ANSWER_CHARACTERS,
   parseAnswerEvaluation,
   parseGeneratedInterview,
+  parseExampleAnswer,
 } from './interviewService.js'
 import type { CreateInterviewRequest } from '../types/interviewTypes.js'
 
@@ -45,12 +47,13 @@ const validGeneratedText = JSON.stringify({
 })
 
 const validEvaluationText = JSON.stringify({
-  score: 4,
+  score: 80,
   strengths: ['Explains state clearly.'],
   weaknesses: ['Could mention rendering tradeoffs.'],
   missingConcepts: ['Batching'],
   improvedAnswer:
     'React state stores component data that can change over time and trigger rendering when updated.',
+  improvementSuggestion: 'Add a brief example of a state update triggering a render.',
   confidenceLevel: 'medium',
 })
 
@@ -187,7 +190,7 @@ test('evaluates an answer from valid generated JSON', async () => {
     },
   )
 
-  assert.equal(result.score, 4)
+  assert.equal(result.score, 80)
   assert.deepEqual(result.strengths, ['Explains state clearly.'])
   assert.deepEqual(result.weaknesses, ['Could mention rendering tradeoffs.'])
   assert.deepEqual(result.missingConcepts, ['Batching'])
@@ -203,13 +206,13 @@ test('evaluates an answer from valid generated JSON', async () => {
 test('normalizes common numeric and list-length evaluation drift', () => {
   const result = parseAnswerEvaluation(JSON.stringify({
     ...JSON.parse(validEvaluationText),
-    score: '3.5',
+    score: '75',
     strengths: ['Clear', 'Specific', 'Relevant', 'Practical', 'Concise'],
     weaknesses: ['Missing tradeoffs', 'Could add examples', 'Needs depth', 'No risks', 'No testing'],
     missingConcepts: ['Tradeoffs', 'Testing', 'Risks', 'Edge cases', 'Metrics', 'Monitoring'],
   }))
 
-  assert.equal(result.score, 3.5)
+  assert.equal(result.score, 75)
   assert.deepEqual(result.strengths, ['Clear', 'Specific', 'Relevant', 'Practical'])
   assert.deepEqual(result.weaknesses, ['Missing tradeoffs', 'Could add examples', 'Needs depth', 'No risks'])
   assert.deepEqual(result.missingConcepts, ['Tradeoffs', 'Testing', 'Risks', 'Edge cases', 'Metrics'])
@@ -357,7 +360,7 @@ test('parses an answer evaluation from markdown-wrapped JSON', () => {
 ${validEvaluationText}
 \`\`\``)
 
-  assert.equal(result.score, 4)
+  assert.equal(result.score, 80)
   assert.equal(result.confidenceLevel, 'medium')
 })
 
@@ -365,12 +368,12 @@ test('parses an answer evaluation with common AI shape drift', () => {
   const result = parseAnswerEvaluation(JSON.stringify({
     evaluation: {
       ...JSON.parse(validEvaluationText),
-      score: '4',
+      score: '80',
       confidenceLevel: 'Medium',
     },
   }))
 
-  assert.equal(result.score, 4)
+  assert.equal(result.score, 80)
   assert.equal(result.confidenceLevel, 'medium')
 })
 
@@ -388,12 +391,12 @@ test('retries answer evaluation once after invalid AI output', async () => {
     },
   )
 
-  assert.equal(result.score, 4)
+  assert.equal(result.score, 80)
   assert.equal(prompts.length, 2)
   assert.match(prompts[1] ?? '', /previous response was invalid/)
 })
 
-test('returns transparent fallback feedback after retry output is still invalid', async () => {
+test('returns safe useful fallback feedback after retry output is still invalid', async () => {
   let calls = 0
 
   const result = await evaluateAnswer(
@@ -408,9 +411,9 @@ test('returns transparent fallback feedback after retry output is still invalid'
   )
 
   assert.equal(calls, 2)
-  assert.equal(result.score, 1)
-  assert.equal(result.confidenceLevel, 'low')
-  assert.match(result.weaknesses.join(' '), /fallback/)
+  assert.equal(result.score, 0)
+  assert.equal(result.confidenceLevel, 'medium')
+  assert.doesNotMatch(result.weaknesses.join(' '), /fallback|provider|validation/i)
   assert.deepEqual(result.missingConcepts, ['State', 'Rendering'])
 })
 
@@ -491,7 +494,7 @@ test('validates the request before calling AI', async () => {
 
   await assert.rejects(
     createInterview(
-      { ...request, questionCount: 4 as 3 },
+      { ...request, questionCount: 6 },
       async () => {
         calls += 1
         return validGeneratedText
@@ -501,4 +504,41 @@ test('validates the request before calling AI', async () => {
   )
 
   assert.equal(calls, 0)
+})
+
+test('rejects repeated generated questions and topics', () => {
+  const sourceQuestions = JSON.parse(validGeneratedText).questions
+  const repeated = JSON.stringify({
+    questions: [sourceQuestions[0], { ...sourceQuestions[0] }, sourceQuestions[2]],
+  })
+
+  assert.throws(
+    () => parseGeneratedInterview(repeated, request),
+    InterviewGenerationError,
+  )
+})
+
+test('generates and validates an example answer with one repair retry', async () => {
+  const prompts: string[] = []
+  const result = await generateExampleAnswer(
+    { question: JSON.parse(validGeneratedText).questions[0] },
+    async (prompt) => {
+      prompts.push(prompt)
+      return prompts.length === 1
+        ? '{"answer":""}'
+        : JSON.stringify({
+            answer:
+              'React state stores changing component data and triggers a render when it is updated. For example, a counter keeps its current value in state and renders the new value after a click.',
+            keyPoints: ['Changing component data', 'Rendering updates'],
+          })
+    },
+  )
+
+  assert.equal(prompts.length, 2)
+  assert.match(result.answer, /React state/)
+  assert.deepEqual(result.keyPoints, ['Changing component data', 'Rendering updates'])
+  assert.throws(
+    () => parseExampleAnswer('{"answer":"unrelated","keyPoints":[]}'),
+    InterviewGenerationError,
+  )
 })

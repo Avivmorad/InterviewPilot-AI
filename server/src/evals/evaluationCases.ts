@@ -36,7 +36,7 @@ export const evaluationCases: readonly EvaluationCase[] = [
         'JSON is easier for the app to read, and we can check that the fields are there before showing it.',
     },
     mockedProviderResponse: JSON.stringify({
-      score: 4,
+      score: 85,
       strengths: [
         'Explains that structured JSON is easier for the app to consume.',
         'Mentions checking required fields before display.',
@@ -45,9 +45,10 @@ export const evaluationCases: readonly EvaluationCase[] = [
       missingConcepts: ['JSON schema validation'],
       improvedAnswer:
         'An app may ask an LLM for JSON so the response can be parsed, validated against required fields, and rendered predictably in the UI.',
+      improvementSuggestion: 'Name schema validation and show one required-field check.',
       confidenceLevel: 'high',
     }),
-    expectedScoreRange: [3, 5],
+    expectedScoreRange: [75, 95],
     expectedMissingConcepts: ['JSON schema validation'],
     expectedPromptIncludes: [
       'realistic Intern expectations',
@@ -74,15 +75,16 @@ export const evaluationCases: readonly EvaluationCase[] = [
         'It gives the model some data before answering so the answer can be more useful.',
     },
     mockedProviderResponse: JSON.stringify({
-      score: 3,
+      score: 62,
       strengths: ['Recognizes that extra context can improve the response.'],
       weaknesses: ['Does not clearly explain grounding or hallucination reduction.'],
       missingConcepts: ['Grounding', 'Reduced hallucination'],
       improvedAnswer:
         'RAG retrieves relevant source material and includes it in the prompt so the model can ground its answer in context and reduce unsupported claims.',
+      improvementSuggestion: 'Explain how retrieval grounds the answer in source material.',
       confidenceLevel: 'medium',
     }),
-    expectedScoreRange: [2, 4],
+    expectedScoreRange: [50, 75],
     expectedMissingConcepts: ['Grounding', 'Reduced hallucination'],
     expectedPromptIncludes: ['grounding', 'evaluation', 'retries'],
     notes:
@@ -105,7 +107,7 @@ export const evaluationCases: readonly EvaluationCase[] = [
         'I would check if the click function is connected and look in the browser console for errors.',
     },
     mockedProviderResponse: JSON.stringify({
-      score: 4,
+      score: 88,
       strengths: [
         'Checks whether the event handler is connected.',
         'Uses the browser console to look for errors.',
@@ -114,9 +116,10 @@ export const evaluationCases: readonly EvaluationCase[] = [
       missingConcepts: ['Small reproduction'],
       improvedAnswer:
         'I would confirm the event handler is wired to the button, check the browser console for errors, reproduce the issue with the smallest possible example, and verify whether disabled state or CSS is blocking interaction.',
+      improvementSuggestion: 'Add a small reproduction step after checking the console.',
       confidenceLevel: 'high',
     }),
-    expectedScoreRange: [3, 5],
+    expectedScoreRange: [75, 95],
     expectedMissingConcepts: ['Small reproduction'],
     expectedPromptIncludes: ['realistic Intern expectations'],
     notes:
@@ -138,7 +141,7 @@ export const evaluationCases: readonly EvaluationCase[] = [
       answer: 'I would use a very large database because AI needs lots of data.',
     },
     mockedProviderResponse: JSON.stringify({
-      score: 1,
+      score: 8,
       strengths: ['Shows awareness that data can matter for AI systems.'],
       weaknesses: [
         'Does not answer why a deployed model should be monitored.',
@@ -147,9 +150,10 @@ export const evaluationCases: readonly EvaluationCase[] = [
       missingConcepts: ['Performance drift', 'Errors', 'User impact'],
       improvedAnswer:
         'A deployed AI model should be monitored to catch performance drift, errors, and user-impacting behavior before it causes bad product outcomes.',
+      improvementSuggestion: 'Answer the monitoring question directly and name one drift metric.',
       confidenceLevel: 'high',
     }),
-    expectedScoreRange: [1, 2],
+    expectedScoreRange: [0, 20],
     expectedMissingConcepts: ['Performance drift', 'Errors', 'User impact'],
     expectedPromptIncludes: ['realistic Intern expectations'],
     notes:

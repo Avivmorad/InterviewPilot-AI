@@ -252,6 +252,7 @@ test('evaluate route returns the required feedback response shape', async (conte
     weaknesses: ['Needs more detail on tradeoffs.'],
     missingConcepts: ['Testing'],
     improvedAnswer: 'A stronger answer would cover state, rendering, and testing.',
+    improvementSuggestion: 'Add one concrete example.',
     confidenceLevel: 'high',
   }))
   const testApp = createApp(createInterviewRoutes(createController, evaluateController))
@@ -285,6 +286,7 @@ test('evaluate route returns the required feedback response shape', async (conte
     weaknesses: ['Needs more detail on tradeoffs.'],
     missingConcepts: ['Testing'],
     improvedAnswer: 'A stronger answer would cover state, rendering, and testing.',
+    improvementSuggestion: 'Add one concrete example.',
     confidenceLevel: 'high',
   })
 })

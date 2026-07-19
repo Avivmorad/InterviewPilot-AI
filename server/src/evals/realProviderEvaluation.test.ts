@@ -32,21 +32,23 @@ class FakeRealProvider implements RealProviderEvaluationProvider {
 test('produces provider summaries and comparisons for real-provider runs', async () => {
   const gemini = new FakeRealProvider('gemini', 'gemini-test-model', [
     JSON.stringify({
-      score: 4,
+      score: 80,
       strengths: ['Clear explanation.'],
       weaknesses: ['Could mention validation.'],
       missingConcepts: ['Validation'],
       improvedAnswer: 'A stronger answer would mention validation.',
+      improvementSuggestion: 'Add one validation example.',
       confidenceLevel: 'high',
     }),
   ])
   const groq = new FakeRealProvider('groq', 'groq-test-model', [
     JSON.stringify({
-      score: 3,
+      score: 65,
       strengths: ['Good basics.'],
       weaknesses: ['Could be more specific.'],
       missingConcepts: ['Validation'],
       improvedAnswer: 'A stronger answer would mention validation.',
+      improvementSuggestion: 'Add one validation example.',
       confidenceLevel: 'medium',
     }),
   ])
@@ -70,7 +72,7 @@ test('produces provider summaries and comparisons for real-provider runs', async
           answer: 'So the app can parse it.',
         },
         mockedProviderResponse: '{}',
-        expectedScoreRange: [3, 5],
+        expectedScoreRange: [60, 90],
         expectedMissingConcepts: ['Validation'],
         expectedPromptIncludes: ['structured JSON'],
         notes: 'Test case',
@@ -85,8 +87,8 @@ test('produces provider summaries and comparisons for real-provider runs', async
   assert.equal(report.summaries.groq.passedCaseCount, 1)
   assert.equal(report.comparison.comparedCaseCount, 1)
   assert.equal(report.comparison.geminiHigherScoreCount, 1)
-  assert.equal(report.results[0]?.providers.gemini.score, 4)
-  assert.equal(report.results[0]?.providers.groq.score, 3)
+  assert.equal(report.results[0]?.providers.gemini.score, 80)
+  assert.equal(report.results[0]?.providers.groq.score, 65)
   assert.equal(report.results[0]?.comparison.winner, 'gemini')
 })
 
@@ -95,11 +97,12 @@ test('writes a real-provider evaluation report to disk when an output path is pr
   const outputPath = join(tempDir, 'report.json')
   const provider = new FakeRealProvider('gemini', 'gemini-test-model', [
     JSON.stringify({
-      score: 4,
+      score: 80,
       strengths: ['Clear explanation.'],
       weaknesses: ['Could mention validation.'],
       missingConcepts: ['Validation'],
       improvedAnswer: 'A stronger answer would mention validation.',
+      improvementSuggestion: 'Add one validation example.',
       confidenceLevel: 'high',
     }),
   ])
@@ -123,7 +126,7 @@ test('writes a real-provider evaluation report to disk when an output path is pr
           answer: 'So the app can parse it.',
         },
         mockedProviderResponse: '{}',
-        expectedScoreRange: [3, 5],
+        expectedScoreRange: [60, 90],
         expectedMissingConcepts: ['Validation'],
         expectedPromptIncludes: ['structured JSON'],
         notes: 'Test case',

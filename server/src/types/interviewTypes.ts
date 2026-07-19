@@ -13,7 +13,7 @@ export const INTERVIEW_LEVELS = [
   { value: 'senior', label: 'Senior' },
 ] as const
 export const INTERVIEW_TYPES = ['Technical', 'Behavioral', 'Mixed'] as const
-export const QUESTION_COUNTS = [3] as const
+export const QUESTION_COUNTS = [1, 2, 3, 4, 5] as const
 
 export type Role = (typeof INTERVIEW_ROLES)[number]['value']
 export type Level = (typeof INTERVIEW_LEVELS)[number]['value']
@@ -48,13 +48,23 @@ export type EvaluateAnswerRequest = {
   answer: string
 }
 
+export type GenerateExampleAnswerRequest = {
+  question: InterviewQuestion
+}
+
 export type AnswerEvaluation = {
   score: number
   strengths: string[]
   weaknesses: string[]
   missingConcepts: string[]
   improvedAnswer: string
+  improvementSuggestion: string
   confidenceLevel: EvaluationConfidenceLevel
+}
+
+export type ExampleAnswer = {
+  answer: string
+  keyPoints: string[]
 }
 
 export function getRoleLabel(roleValue: Role): string {
