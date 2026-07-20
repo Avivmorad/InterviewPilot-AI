@@ -304,6 +304,8 @@ test('core interview flow completes from setup through final report', async ({ p
   )
 
   await page.getByRole('button', { name: 'Start New Interview' }).click()
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
+  await expect(page.getByRole('heading', { name: /Ace Your Next/ })).toBeVisible()
   await page.getByRole('button', { name: 'Start Interview', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Create Your Interview' })).toBeVisible()
   await expect(page.getByRole('radio', { name: 'Frontend Developer' })).toBeChecked()

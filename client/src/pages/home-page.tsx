@@ -494,6 +494,7 @@ function StageFrame({
       className={isActive ? 'reveal-in block w-full' : 'hidden'}
       data-testid={isActive ? 'active-stage' : undefined}
       inert={!isActive}
+      tabIndex={isActive ? -1 : undefined}
     >
       {children}
     </div>
@@ -574,7 +575,25 @@ export function HomePage({
 
   useEffect(() => {
     if (!hasInterview) {
-      return
+      let focusFrameId: number | undefined
+      const frameId = window.requestAnimationFrame(() => {
+        setManualStage((currentStage) =>
+          currentStage === 'interview' || currentStage === 'report' ? null : currentStage,
+        )
+        window.scrollTo({ top: 0, behavior: 'auto' })
+        focusFrameId = window.requestAnimationFrame(() => {
+          document
+            .querySelector<HTMLElement>('[data-testid="active-stage"]')
+            ?.focus({ preventScroll: true })
+        })
+      })
+
+      return () => {
+        window.cancelAnimationFrame(frameId)
+        if (focusFrameId !== undefined) {
+          window.cancelAnimationFrame(focusFrameId)
+        }
+      }
     }
 
     let focusFrameId: number | undefined
