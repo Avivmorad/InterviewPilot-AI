@@ -50,5 +50,5 @@ npm run screenshots:update
 - Responsive, keyboard, and axe suite: passed locally.
 - Client lint, type checking, and unit tests: passed locally.
 - Server type checking and unit tests: passed locally.
-- Full release and production smoke results are recorded separately after
-  deployment.
+- Final production verification passed; see
+  `docs/verification/2026-07-20-production-verification.md`.

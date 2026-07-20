@@ -214,6 +214,9 @@ report. Authentication and persistence are not included yet.
 - Production browser verification was completed in this audit; ongoing release management still depends on the Vercel and Render accounts.
 - Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
 
+The final Phase 1 production evidence is recorded in
+[docs/verification/2026-07-20-production-verification.md](docs/verification/2026-07-20-production-verification.md).
+
 ## Screenshots
 
 These deterministic UI screenshots were refreshed on July 20, 2026. The
