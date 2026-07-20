@@ -102,6 +102,7 @@ test('every main stage stays inside the required viewport matrix', async ({
     await page.locator('form').getByText('Mixed', { exact: true }).click()
     await page.getByRole('button', { name: 'Generate Interview', exact: true }).click()
 
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
     await expect(page.getByText(interviewQuestions[0].question)).toBeVisible()
     await expect(page.getByLabel('Your answer')).toBeVisible()
     await expectActiveStageFitsViewport(page)
@@ -118,6 +119,7 @@ test('every main stage stays inside the required viewport matrix', async ({
     }
 
     await expect(page.getByRole('heading', { name: /Interview Complete/ })).toBeVisible()
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
     await expectActiveStageFitsViewport(page)
   }
 })

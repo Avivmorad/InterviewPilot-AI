@@ -577,16 +577,26 @@ export function HomePage({
       return
     }
 
+    let focusFrameId: number | undefined
     const frameId = window.requestAnimationFrame(() => {
       setManualStage((currentStage) =>
         currentStage === null || currentStage === 'landing' || currentStage === 'setup'
           ? 'interview'
           : currentStage,
       )
+      window.scrollTo({ top: 0, behavior: 'auto' })
+      focusFrameId = window.requestAnimationFrame(() => {
+        sessionRef.current?.focus({ preventScroll: true })
+      })
     })
 
-    return () => window.cancelAnimationFrame(frameId)
-  }, [hasInterview])
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      if (focusFrameId !== undefined) {
+        window.cancelAnimationFrame(focusFrameId)
+      }
+    }
+  }, [hasInterview, sessionRef])
 
   useEffect(() => {
     if (!hasReportStage) {
@@ -597,33 +607,24 @@ export function HomePage({
       setManualStage((currentStage) =>
         currentStage === null || currentStage === 'interview' ? 'report' : currentStage,
       )
+      window.scrollTo({ top: 0, behavior: 'auto' })
     })
 
     return () => window.cancelAnimationFrame(frameId)
   }, [hasReportStage])
 
-  function focusSetupSubmit() {
-    window.requestAnimationFrame(() => {
-      const setupSubmitButton =
-        setupRef.current?.querySelector<HTMLButtonElement>('button[type="submit"]')
-      setupSubmitButton?.focus({ preventScroll: true })
-    })
-  }
-
   function goToStage(nextStage: StageId) {
     setManualStage(nextStage)
-
-    if (nextStage === 'setup') {
-      focusSetupSubmit()
-    }
-
-    if (nextStage === 'interview') {
-      window.requestAnimationFrame(() => {
-        const firstQuestionControl =
-          sessionRef.current?.querySelector<HTMLTextAreaElement>('textarea')
-        firstQuestionControl?.focus({ preventScroll: true })
-      })
-    }
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    window.requestAnimationFrame(() => {
+      const stageContainer =
+        nextStage === 'setup'
+          ? setupRef.current
+          : nextStage === 'interview'
+            ? sessionRef.current
+            : null
+      stageContainer?.focus({ preventScroll: true })
+    })
   }
 
   const stageLabel = {
