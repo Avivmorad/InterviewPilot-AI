@@ -17,13 +17,14 @@
     "eval:real": "npm run eval:real --workspace server",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "smoke:production": "node scripts/production-smoke.mjs",
-    "screenshots:update": "node scripts/update-screenshots.mjs",
+    "screenshots:update": "tsx scripts/update-screenshots.ts",
     "test:e2e": "playwright test",
     "start": "npm run start --workspace server"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
-    "concurrently": "^10.0.3"
+    "concurrently": "^10.0.3",
+    "tsx": "^4.20.6"
   }
 }

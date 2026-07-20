@@ -10,6 +10,7 @@ import {
   Gauge,
   Lightbulb,
   Lock,
+  PartyPopper,
   PlayCircle,
   RotateCcw,
   ShieldCheck,
@@ -25,6 +26,7 @@ import type { ComponentType } from 'react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import {
   normalizeFeedbackItems,
   normalizeFeedbackText,
@@ -37,17 +39,21 @@ import type {
 import { getLevelLabel, getRoleLabel } from '@/types/interview'
 
 type FinalReportProps = {
+  completedAt: number | null
   config: InterviewConfig | null
   interview: CreateInterviewResponse
   onStartNewInterview: () => void
   results: Record<string, InterviewQuestionResult>
+  startedAt: number | null
 }
 
 export function FinalReport({
+  completedAt,
   config,
   interview,
   onStartNewInterview,
   results,
+  startedAt,
 }: FinalReportProps) {
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'failed'>('idle')
@@ -83,13 +89,18 @@ export function FinalReport({
   })
   const scorePercent = Math.round(averageScore)
   const displayScore = Number.isFinite(scorePercent) ? scorePercent : 0
+  const performance = getReportPerformance(displayScore, orderedResults.length > 0)
   const roleLabel = config ? getRoleLabel(config.role) : 'Interview practice'
   const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
   const skippedQuestionCount = Math.max(interview.questions.length - orderedResults.length, 0)
-  const completedAt = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date())
+  const completedAtLabel =
+    completedAt === null
+      ? 'Not recorded'
+      : new Intl.DateTimeFormat('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(new Date(completedAt))
+  const durationLabel = getDurationLabel(startedAt, completedAt)
   const summaryRows = [
     { icon: Code2, label: 'Role', value: roleLabel, tone: 'blue' },
     { icon: UserRound, label: 'Experience Level', value: levelLabel, tone: 'green' },
@@ -104,14 +115,14 @@ export function FinalReport({
     {
       icon: TimerReset,
       label: 'Total Duration',
-      value: `${interview.questions.length * 6}m 00s`,
+      value: durationLabel,
       tone: 'blue',
     },
-    { icon: Clock3, label: 'Completed At', value: completedAt, tone: 'blue' },
+    { icon: Clock3, label: 'Completed At', value: completedAtLabel, tone: 'blue' },
   ] as const
   const breakdownIcons = [Code2, Lightbulb, Bot, Award] as const
   const breakdownTones = ['blue', 'green', 'violet', 'amber'] as const
-  const breakdownCards = orderedResults.slice(0, 4).map((result, index) => ({
+  const breakdownCards = orderedResults.map((result, index) => ({
     icon: breakdownIcons[index] ?? Code2,
     label: result.question.topic,
     score: result.evaluation.score,
@@ -150,16 +161,16 @@ export function FinalReport({
   return (
     <section
       aria-labelledby="final-report-title"
-      className="mx-auto max-w-[1520px] px-5 pb-12 pt-8 sm:px-8 lg:pb-16"
+      className="mx-auto w-full max-w-[1520px] px-4 pb-12 pt-6 sm:px-8 sm:pt-8 lg:pb-16"
     >
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1.32fr)_22rem]">
         <div className="space-y-6">
           <div>
             <h2
-              className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.15rem]"
+              className="flex items-center gap-3 text-3xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.15rem]"
               id="final-report-title"
             >
-              Interview Complete! <span aria-hidden="true">🎉</span>
+              Interview Complete! <PartyPopper aria-hidden="true" className="size-8 text-amber-300 sm:size-10" />
             </h2>
             <p className="mt-2 text-lg text-slate-300">
               Here&apos;s your complete performance report.
@@ -168,36 +179,36 @@ export function FinalReport({
 
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_19rem]">
             <section className="rounded-[1.7rem] border border-primary/55 bg-[linear-gradient(145deg,rgba(8,18,38,0.95),rgba(6,13,28,0.92))] p-7 shadow-[0_28px_90px_rgba(0,0,0,0.25)]">
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_16rem] lg:items-center">
+              <div className="grid gap-6 md:grid-cols-[minmax(0,0.95fr)_13rem] md:items-center lg:grid-cols-[minmax(0,0.95fr)_16rem]">
                 <div>
                   <div className="inline-flex items-center gap-2 text-base font-semibold text-white">
                     <Gauge aria-hidden="true" className="size-5 text-primary" />
                     Overall Score
                   </div>
                   <div className="mt-5 flex items-end gap-3">
-                    <span className="text-7xl font-extrabold tracking-[-0.08em] text-white">
+                    <span className="text-6xl font-extrabold tracking-[-0.08em] text-white sm:text-7xl">
                       {roundedScore}
                     </span>
                     <span className="pb-2 text-3xl font-semibold text-slate-400">/100</span>
                   </div>
-                  <p className="mt-4 flex items-center gap-2 text-2xl font-extrabold text-emerald-300">
+                  <p className="mt-4 flex items-center gap-2 text-xl font-extrabold text-emerald-300 sm:text-2xl">
                     <Sparkles aria-hidden="true" className="size-6" />
-                    Top Performer
+                    {performance.label}
                   </p>
-                  <p className="mt-3 max-w-md text-lg leading-8 text-slate-200">
-                    Great job! You performed better than <span className="text-emerald-300">82%</span> of developers in your level.
+                  <p className="mt-3 max-w-md text-base leading-7 text-slate-200 sm:text-lg sm:leading-8">
+                    {performance.summary}
                   </p>
                 </div>
 
                 <div className="grid place-items-center">
                   <div
-                    className="grid size-52 place-items-center rounded-full p-4"
+                    className="grid size-40 place-items-center rounded-full p-4 sm:size-52"
                     style={{
                       background: `conic-gradient(from 10deg, #2f6bff 0 ${displayScore * 0.5}%, #6e49ff ${displayScore}%, rgba(255,255,255,0.06) ${displayScore}% 100%)`,
                     }}
                   >
                     <div className="grid size-full place-items-center rounded-full bg-[#081326] shadow-[inset_0_0_40px_rgba(47,107,255,0.12)]">
-                      <Trophy aria-hidden="true" className="size-20 text-primary" />
+                      <Trophy aria-hidden="true" className="size-16 text-primary sm:size-20" />
                     </div>
                   </div>
                 </div>
@@ -210,9 +221,9 @@ export function FinalReport({
                   <Star aria-hidden="true" className="size-5" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-extrabold text-white">Amazing Work!</h3>
+                  <h3 className="text-2xl font-extrabold text-white">{performance.title}</h3>
                   <p className="mt-4 text-lg leading-8 text-slate-300">
-                    You demonstrated strong technical skills and solid problem solving abilities. Keep practicing to achieve perfection.
+                    {performance.detail}
                   </p>
                 </div>
               </div>
@@ -221,7 +232,7 @@ export function FinalReport({
 
           <section>
             <h3 className="text-3xl font-extrabold tracking-[-0.03em] text-white">Score Breakdown</h3>
-            <div className="mt-5 grid gap-4 xl:grid-cols-4">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
               {breakdownCards.map(({ icon, label, score, status, tone }) => (
                 <BreakdownCard
                   icon={icon}
@@ -275,7 +286,7 @@ export function FinalReport({
                   description={item}
                   key={item}
                   step={index + 1}
-                  title={roadmapTitles[index] ?? `Practice Step ${index + 1}`}
+                  title={getRoadmapTitle(recommendedTopics[index], index)}
                 />
               ))}
             </div>
@@ -292,8 +303,8 @@ export function FinalReport({
 
           <SummaryPanel
             rows={[
-              { icon: Sparkles, label: 'Primary Provider', value: 'Gemini Flash', tone: 'blue' },
-              { icon: Bot, label: 'Fallback Provider', value: 'Groq', tone: 'green' },
+              { icon: Sparkles, label: 'Preferred Provider', value: 'Gemini Flash', tone: 'blue' },
+              { icon: Bot, label: 'Configured Fallback', value: 'Groq', tone: 'green' },
               { icon: ShieldCheck, label: 'Structured Output', value: 'Validated', tone: 'green' },
             ]}
             title="AI & Evaluation Details"
@@ -335,12 +346,6 @@ export function FinalReport({
   )
 }
 
-const roadmapTitles = [
-  'Master React Performance',
-  'Deep Dive: React Hooks',
-  'Practice More Edge Cases',
-]
-
 function BreakdownCard({
   icon: Icon,
   label,
@@ -374,7 +379,7 @@ function BreakdownCard({
           <Icon aria-hidden="true" className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-slate-300">{label}</p>
+          <p className="break-words text-sm font-medium text-slate-300">{label}</p>
           <p className="mt-2 text-5xl font-extrabold tracking-[-0.06em] text-white">
             {display}
             <span className="ml-2 text-2xl text-slate-400">/100</span>
@@ -447,12 +452,17 @@ function InsightCard({
           }`}
         />
         <h3 className="text-2xl font-extrabold text-white">{title}</h3>
+        <InfoTooltip content={getInsightHelp(title)} label={title} />
       </div>
-      {usePills ? (
+      {items.length === 0 ? (
+        <p className="mt-5 text-base leading-7 text-slate-300">
+          No evaluated answers were available for this section.
+        </p>
+      ) : usePills ? (
         <div className="mt-5 flex flex-wrap gap-3">
           {items.map((item) => (
             <span
-              className="rounded-full border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-lg text-violet-200"
+              className="max-w-full break-words rounded-full border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-lg text-violet-200"
               key={item}
             >
               {item}
@@ -462,7 +472,7 @@ function InsightCard({
       ) : (
         <ul className="mt-5 space-y-3">
           {items.map((item) => (
-            <li className="flex items-start gap-3 text-lg leading-8 text-slate-200" key={item}>
+            <li className="flex items-start gap-3 break-words text-lg leading-8 text-slate-200" key={item}>
               <span
                 className={`mt-3 size-2 rounded-full ${
                   tone === 'green'
@@ -504,8 +514,8 @@ function RoadmapStep({
         {step}
       </span>
       <div>
-        <h4 className="text-2xl font-bold text-white">{title}</h4>
-        <p className="mt-2 text-lg leading-8 text-slate-300">{description}</p>
+        <h4 className="break-words text-2xl font-bold text-white">{title}</h4>
+        <p className="mt-2 break-words text-lg leading-8 text-slate-300">{description}</p>
         <p className="mt-4 text-sm font-semibold text-muted-foreground">{3 + step}-{4 + step} hours</p>
       </div>
     </div>
@@ -534,10 +544,10 @@ function SummaryPanel({
               <span className="grid size-9 place-items-center rounded-full border border-white/10 bg-white/[0.03] text-slate-300">
                 <Icon aria-hidden="true" className="size-4" />
               </span>
-              <span className="text-sm text-white">{label}</span>
+              <span className="min-w-0 text-sm text-white">{label}</span>
             </div>
             <span
-              className={`text-right text-sm font-semibold ${
+              className={`min-w-0 break-words text-right text-sm font-semibold ${
                 tone === 'green'
                   ? 'text-emerald-300'
                   : tone === 'violet'
@@ -624,6 +634,84 @@ function uniqueItems(items: string[]): string[] {
   return Array.from(
     new Set(items.map((item) => item.trim()).filter((item) => item.length > 0)),
   )
+}
+
+function getDurationLabel(startedAt: number | null, completedAt: number | null): string {
+  if (startedAt === null || completedAt === null || completedAt < startedAt) {
+    return 'Not recorded'
+  }
+
+  const totalSeconds = Math.max(Math.round((completedAt - startedAt) / 1_000), 0)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${minutes}m ${seconds.toString().padStart(2, '0')}s`
+}
+
+function getReportPerformance(score: number, hasScoredAnswers: boolean) {
+  if (!hasScoredAnswers) {
+    return {
+      detail: 'No answers were submitted for AI evaluation, so this report contains session details without a performance score.',
+      label: 'No scored answers',
+      summary: 'Complete at least one evaluated answer next time to receive strengths, gaps, and a personalized score.',
+      title: 'Session completed',
+    }
+  }
+
+  if (score >= 85) {
+    return {
+      detail: 'Your evaluated answers were accurate, focused, and well supported. Keep sharpening examples and tradeoff discussions.',
+      label: 'Top performance',
+      summary: 'Your answers showed strong command of the evaluated topics and clear interview-ready reasoning.',
+      title: 'Excellent work',
+    }
+  }
+
+  if (score >= 70) {
+    return {
+      detail: 'You showed solid understanding across the evaluated answers. Use the learning plan to close the remaining gaps.',
+      label: 'Strong performance',
+      summary: 'You have a strong foundation; the feedback below identifies the clearest opportunities to improve.',
+      title: 'Strong result',
+    }
+  }
+
+  if (score >= 50) {
+    return {
+      detail: 'You demonstrated useful fundamentals, but several answers need more precise concepts, examples, or tradeoffs.',
+      label: 'Building momentum',
+      summary: 'Review the missing concepts and suggested answers, then repeat a focused practice session.',
+      title: 'Good progress',
+    }
+  }
+
+  return {
+    detail: 'The evaluated answers need more complete explanations and stronger coverage of the expected concepts.',
+    label: 'Keep practicing',
+    summary: 'Start with the highest-priority gaps below and practice one topic at a time before repeating the interview.',
+    title: 'A useful baseline',
+  }
+}
+
+function getRoadmapTitle(topic: string | undefined, index: number): string {
+  if (topic) {
+    return index === 0 ? `Review ${topic}` : index === 1 ? `Apply ${topic}` : `Practice ${topic}`
+  }
+
+  return ['Review Core Concepts', 'Improve Answer Structure', 'Practice Out Loud'][index] ??
+    `Practice Step ${index + 1}`
+}
+
+function getInsightHelp(title: string): string {
+  if (title === 'Strong Areas') {
+    return 'Repeated strengths identified across your evaluated answers.'
+  }
+
+  if (title === 'Areas To Improve') {
+    return 'The most useful changes to make your future answers clearer and more complete.'
+  }
+
+  return 'Important concepts that were missing from one or more evaluated answers.'
 }
 
 function buildRoadmap(topics: string[], weaknesses: string[]): string[] {

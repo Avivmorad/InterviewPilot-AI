@@ -66,4 +66,4 @@ Observed results:
 ## Linked Tasks
 
 - `docs/MASTER_TASKS.md` - IP-P1-001, IP-P1-007, IP-P1-008, IP-P1-010
-- `docs/manual-testing.md` - browser notes and viewport expectations
+- `docs/OPERATIONS_GUIDE.md` - browser notes and viewport expectations

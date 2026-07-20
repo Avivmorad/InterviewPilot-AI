@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { extname } from 'node:path'
 
 const patterns = [
@@ -39,15 +39,19 @@ function isTextFile(filePath) {
   return textExtensions.has(extension) || !extension
 }
 
-const trackedFiles = execFileSync('git', ['ls-files', '-z'], { encoding: 'buffer' })
+const sourceFiles = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+  { encoding: 'buffer' },
+)
   .toString('utf8')
   .split('\0')
   .filter(Boolean)
 
 const findings = []
 
-for (const filePath of trackedFiles) {
-  if (!isTextFile(filePath)) {
+for (const filePath of sourceFiles) {
+  if (!existsSync(filePath) || !isTextFile(filePath)) {
     continue
   }
 
@@ -64,7 +68,6 @@ for (const filePath of trackedFiles) {
       findings.push({
         filePath,
         name,
-        value: match[0],
       })
     }
   }
@@ -73,7 +76,7 @@ for (const filePath of trackedFiles) {
 if (findings.length > 0) {
   console.error('Potential secrets found:')
   for (const finding of findings) {
-    console.error(`- ${finding.name} in ${finding.filePath}: ${finding.value}`)
+    console.error(`- ${finding.name} in ${finding.filePath}`)
   }
   process.exit(1)
 }

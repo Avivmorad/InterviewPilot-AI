@@ -1,4 +1,4 @@
-import { ChevronDown, CircleAlert, CircleCheck, LoaderCircle } from 'lucide-react'
+import { CircleAlert, CircleCheck, LoaderCircle } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { ApiConnectionStatus } from '@/types/interview'
@@ -45,7 +45,7 @@ export function Header({ apiConnectionStatus }: HeaderProps) {
   } = connectionDetails[apiConnectionStatus]
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#020611]/88 px-5 backdrop-blur-xl sm:px-8">
+    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#020611]/88 px-4 backdrop-blur-xl sm:px-8">
       <div className="mx-auto flex h-[4.75rem] max-w-[1488px] items-center justify-between gap-4">
         <a
           aria-label="InterviewPilot AI home"
@@ -55,13 +55,14 @@ export function Header({ apiConnectionStatus }: HeaderProps) {
           <span className="flex size-12 shrink-0 items-center justify-center rounded-[0.65rem] bg-[linear-gradient(145deg,#35b8ff_0%,#2f6bff_48%,#7b35ff_100%)] text-[1.35rem] font-extrabold leading-none text-white shadow-[0_0_32px_rgb(47_107_255_/_0.42)] ring-1 ring-white/15 transition-transform duration-200 group-hover:-translate-y-0.5">
             IP
           </span>
-          <span className="truncate text-[1.05rem] text-white sm:text-[1.35rem]">
+          <span className="hidden truncate text-[1.05rem] text-white min-[360px]:inline sm:text-[1.35rem]">
             InterviewPilot <span className="text-white">AI</span>
           </span>
         </a>
 
         <div className="flex items-center gap-3 text-sm sm:gap-5 sm:text-base">
           <span
+            aria-label={label}
             aria-live="polite"
             className={cn(
               'flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-extrabold shadow-[inset_0_1px_0_rgb(255_255_255_/_0.05)] sm:text-sm',
@@ -80,19 +81,10 @@ export function Header({ apiConnectionStatus }: HeaderProps) {
                 iconClassName,
               )}
             />
-            <span>{apiConnectionStatus === 'connected' ? 'API connected' : label}</span>
-          </span>
-          <span className="hidden h-6 w-px bg-white/10 md:block" aria-hidden="true" />
-          <button
-            className="hidden items-center gap-2 rounded-full text-white md:flex"
-            type="button"
-            aria-label="User menu"
-          >
-            <span className="flex size-10 items-center justify-center rounded-full bg-[linear-gradient(145deg,#2f6bff,#7b35ff)] text-sm font-extrabold shadow-[0_0_24px_rgb(138_92_255_/_0.38)] ring-1 ring-white/10">
-              JD
+            <span className="hidden min-[380px]:inline">
+              {apiConnectionStatus === 'connected' ? 'API connected' : label}
             </span>
-            <ChevronDown aria-hidden="true" className="size-4 text-muted-foreground" />
-          </button>
+          </span>
         </div>
       </div>
     </header>

@@ -6,6 +6,8 @@ import {
   type Role,
 } from '../../types/interviewTypes.js'
 
+export const INTERVIEW_GENERATOR_PROMPT_VERSION = 'interview-generator-v2'
+
 export function buildInterviewGeneratorPrompt({
   role,
   level,
