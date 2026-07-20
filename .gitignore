@@ -8,5 +8,8 @@ dist/
 coverage/
 .vscode/
 .playwright-mcp/
+output/
+test-results/
+baseline-*.png
 
 .vercel

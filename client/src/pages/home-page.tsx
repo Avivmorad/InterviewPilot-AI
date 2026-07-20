@@ -34,7 +34,9 @@ import { getLevelLabel, getRoleLabel } from '@/types/interview'
 type HomePageProps = {
   error: string
   interview: CreateInterviewResponse | null
+  interviewCompletedAt: number | null
   interviewResults: Record<string, InterviewQuestionResult>
+  interviewStartedAt: number | null
   isReportLoading: boolean
   isReportVisible: boolean
   isLoading: boolean
@@ -124,7 +126,7 @@ function LandingScorePreview() {
         className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-primary/20 blur-3xl"
       />
       <div className="relative z-10 grid gap-4">
-        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.8fr]">
+        <div className="grid gap-4 sm:grid-cols-[0.9fr_1.8fr]">
           <div className="rounded-2xl border border-white/8 bg-[#071225]/80 p-4">
             <h2 className="text-base font-extrabold text-white">Overall Score</h2>
             <div className="mx-auto mt-3 grid size-32 place-items-center rounded-full bg-[conic-gradient(from_8deg,#7b35ff_0_34%,#2f6bff_34%_82%,#15223c_82%_100%)] p-3 shadow-[0_0_38px_rgb(47_107_255_/_0.2)]">
@@ -197,7 +199,7 @@ function LandingScorePreview() {
 
 function LandingStage({ onNext }: { onNext: () => void }) {
   return (
-    <section className="relative mx-auto flex min-h-[calc(100svh-9rem)] max-w-[1348px] flex-col justify-between gap-7 px-5 py-9 sm:px-8 lg:px-0 lg:py-10">
+    <section className="relative mx-auto flex w-full min-h-[calc(100svh-9rem)] max-w-[1348px] flex-col justify-between gap-7 px-4 py-6 sm:px-8 sm:py-9 lg:px-0 lg:py-10">
       <div className="grid items-start gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
         <div className="relative z-10 max-w-[650px]">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255_/_0.06)]">
@@ -205,29 +207,29 @@ function LandingStage({ onNext }: { onNext: () => void }) {
             AI-Powered Interview Preparation
           </div>
 
-          <h1 className="font-display mt-5 text-5xl font-extrabold leading-[1.08] tracking-[-0.055em] text-white sm:text-6xl lg:text-[3.95rem] xl:text-[4.05rem]">
+          <h1 className="font-display mt-5 text-[2.65rem] font-extrabold leading-[1.08] tracking-[-0.055em] text-white sm:text-6xl lg:text-[3.95rem] xl:text-[4.05rem]">
             Ace Your Next
             <br />
-            <span className="whitespace-nowrap bg-[linear-gradient(110deg,#2f6bff_0%,#4b7cff_52%,#8a5cff_100%)] bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(110deg,#2f6bff_0%,#4b7cff_52%,#8a5cff_100%)] bg-clip-text text-transparent sm:whitespace-nowrap">
               Technical Interview
             </span>
             <br />
             with AI
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-lg sm:leading-8">
             Practice realistic technical interviews, receive detailed AI feedback,
             identify weak areas, and improve with personalized recommendations.
           </p>
 
           <button
-            className="mt-8 inline-flex w-full max-w-[620px] items-center justify-center gap-6 rounded-2xl border border-white/18 bg-[linear-gradient(105deg,#2f6bff_0%,#4b68ff_48%,#7b35ff_100%)] px-8 py-6 text-3xl font-extrabold tracking-[-0.03em] text-white shadow-[0_0_40px_rgb(47_107_255_/_0.48)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_60px_rgb(47_107_255_/_0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80"
+            className="mt-7 inline-flex w-full max-w-[620px] items-center justify-center gap-3 rounded-2xl border border-white/18 bg-[linear-gradient(105deg,#2f6bff_0%,#4b68ff_48%,#7b35ff_100%)] px-4 py-4 text-xl font-extrabold tracking-[-0.03em] text-white shadow-[0_0_40px_rgb(47_107_255_/_0.48)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_60px_rgb(47_107_255_/_0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 sm:mt-8 sm:gap-6 sm:px-8 sm:py-6 sm:text-3xl"
             onClick={onNext}
             type="button"
           >
-            <Sparkles aria-hidden="true" className="size-9 text-blue-100" />
+            <Sparkles aria-hidden="true" className="size-6 text-blue-100 sm:size-9" />
             Start Interview
-            <ArrowRight aria-hidden="true" className="size-10" />
+            <ArrowRight aria-hidden="true" className="size-7 sm:size-10" />
           </button>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -237,8 +239,8 @@ function LandingStage({ onNext }: { onNext: () => void }) {
                   <Icon aria-hidden="true" className="size-7 stroke-[2.2]" />
                 </span>
                 <div>
-                  <p className="whitespace-nowrap text-sm font-extrabold text-white">{title}</p>
-                  <p className="whitespace-nowrap text-sm text-muted-foreground">{description}</p>
+                  <p className="text-sm font-extrabold text-white">{title}</p>
+                  <p className="text-sm text-muted-foreground">{description}</p>
                 </div>
               </div>
             ))}
@@ -248,7 +250,7 @@ function LandingStage({ onNext }: { onNext: () => void }) {
         <LandingScorePreview />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {benefits.map(({ accent, description, icon: Icon, tags, title }) => (
           <article
             className="rounded-2xl border border-white/10 bg-[#071225]/78 p-4 shadow-[0_22px_70px_rgb(0_0_0_/_0.25)] backdrop-blur-xl"
@@ -321,7 +323,7 @@ function SetupStage({
   setSetupPreviewConfig: (config: InterviewConfig) => void
 }) {
   return (
-    <section className="relative mx-auto grid min-h-[calc(100svh-9rem)] max-w-[1488px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start lg:gap-10 lg:px-8 lg:py-10 xl:px-12 2xl:px-0">
+    <section className="relative mx-auto grid w-full min-h-[calc(100svh-9rem)] max-w-[1488px] gap-8 px-4 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start lg:gap-10 lg:px-8 lg:py-10 xl:px-12 2xl:px-0">
       <div className="flex flex-col gap-5" ref={setupRef} tabIndex={-1}>
         <InterviewConfigForm
           isLoading={isLoading}
@@ -489,7 +491,8 @@ function StageFrame({
   return (
     <div
       aria-hidden={!isActive}
-      className="min-w-full shrink-0 transition-opacity duration-300"
+      className={isActive ? 'reveal-in block w-full' : 'hidden'}
+      data-testid={isActive ? 'active-stage' : undefined}
       inert={!isActive}
     >
       {children}
@@ -524,7 +527,9 @@ function StageArrow({
 export function HomePage({
   error,
   interview,
+  interviewCompletedAt,
   interviewResults,
+  interviewStartedAt,
   isReportLoading,
   isReportVisible,
   isLoading,
@@ -621,17 +626,30 @@ export function HomePage({
     }
   }
 
+  const stageLabel = {
+    landing: 'Welcome',
+    setup: 'Interview setup',
+    interview: 'Practice interview',
+    report: 'Performance report',
+  }[activeStage]
+
   return (
-    <div className="relative overflow-hidden pb-10">
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-8 sm:px-8 lg:px-10">
-        <div className="pointer-events-auto">
+    <div className="relative pb-10">
+      <nav
+        aria-label="Interview flow navigation"
+        className="mx-auto flex w-full max-w-[1520px] items-center justify-between gap-4 px-4 pt-4 sm:px-8"
+      >
+        <div>
           <StageArrow
             direction="left"
             disabled={activeIndex === 0}
             onClick={() => goToStage(stageOrder[Math.max(activeIndex - 1, 0)])}
           />
         </div>
-        <div className="pointer-events-auto">
+        <p className="text-center text-sm font-semibold text-slate-300">
+          {stageLabel} <span className="text-muted-foreground">{activeIndex + 1} of {stageOrder.length}</span>
+        </p>
+        <div>
           <StageArrow
             direction="right"
             disabled={activeIndex === stageOrder.length - 1}
@@ -640,66 +658,62 @@ export function HomePage({
             }
           />
         </div>
+      </nav>
+
+      <div className="w-full">
+        {stageOrder.map((stage) => (
+          <StageFrame isActive={stage === activeStage} key={stage}>
+            {stage === 'landing' ? (
+              <LandingStage onNext={() => goToStage('setup')} />
+            ) : null}
+
+            {stage === 'setup' ? (
+              <SetupStage
+                error={error}
+                isLoading={isLoading}
+                onStartInterview={onStartInterview}
+                setupPreviewConfig={setupPreviewConfig}
+                setupRef={setupRef}
+                setupResetKey={setupResetKey}
+                setSetupPreviewConfig={setSetupPreviewConfig}
+              />
+            ) : null}
+
+            {stage === 'interview' && interview ? (
+              <InterviewQuestions
+                config={savedConfig}
+                interview={interview}
+                key={interview.interviewId}
+                isReportLoading={isReportLoading}
+                onCompleteInterview={onCompleteInterview}
+                onResultChange={onResultChange}
+                onResultRemove={onResultRemove}
+                results={interviewResults}
+                sessionRef={sessionRef}
+              />
+            ) : null}
+
+            {stage === 'report' && interview ? (
+              <>
+                {isReportLoading ? <ReportLoadingStage /> : null}
+                {!isReportLoading && reportError ? (
+                  <ReportErrorStage onRetryReport={onRetryReport} reportError={reportError} />
+                ) : null}
+                {!isReportLoading && isReportVisible ? (
+                  <FinalReport
+                    completedAt={interviewCompletedAt}
+                    config={savedConfig}
+                    interview={interview}
+                    onStartNewInterview={onStartNewInterview}
+                    results={interviewResults}
+                    startedAt={interviewStartedAt}
+                  />
+                ) : null}
+              </>
+            ) : null}
+          </StageFrame>
+        ))}
       </div>
-
-      <div className="mt-4 overflow-hidden">
-        <div
-          className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-        >
-          {stageOrder.map((stage) => (
-            <StageFrame isActive={stage === activeStage} key={stage}>
-              {stage === 'landing' ? (
-                <LandingStage onNext={() => goToStage('setup')} />
-              ) : null}
-
-              {stage === 'setup' ? (
-                <SetupStage
-                  error={error}
-                  isLoading={isLoading}
-                  onStartInterview={onStartInterview}
-                  setupPreviewConfig={setupPreviewConfig}
-                  setupRef={setupRef}
-                  setupResetKey={setupResetKey}
-                  setSetupPreviewConfig={setSetupPreviewConfig}
-                />
-              ) : null}
-
-              {stage === 'interview' && interview ? (
-                <InterviewQuestions
-                  config={savedConfig}
-                  interview={interview}
-                  key={interview.interviewId}
-                  isReportLoading={isReportLoading}
-                  onCompleteInterview={onCompleteInterview}
-                  onResultChange={onResultChange}
-                  onResultRemove={onResultRemove}
-                  results={interviewResults}
-                  sessionRef={sessionRef}
-                />
-              ) : null}
-
-              {stage === 'report' && interview ? (
-                <>
-                  {isReportLoading ? <ReportLoadingStage /> : null}
-                  {!isReportLoading && reportError ? (
-                    <ReportErrorStage onRetryReport={onRetryReport} reportError={reportError} />
-                  ) : null}
-                  {!isReportLoading && isReportVisible ? (
-                    <FinalReport
-                      config={savedConfig}
-                      interview={interview}
-                      onStartNewInterview={onStartNewInterview}
-                      results={interviewResults}
-                    />
-                  ) : null}
-                </>
-              ) : null}
-            </StageFrame>
-          ))}
-        </div>
-      </div>
-
     </div>
   )
 }

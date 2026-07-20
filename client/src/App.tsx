@@ -18,6 +18,8 @@ function App() {
   const [savedConfig, setSavedConfig] = useState<InterviewConfig | null>(null)
   const [setupResetKey, setSetupResetKey] = useState(0)
   const [interview, setInterview] = useState<CreateInterviewResponse | null>(null)
+  const [interviewStartedAt, setInterviewStartedAt] = useState<number | null>(null)
+  const [interviewCompletedAt, setInterviewCompletedAt] = useState<number | null>(null)
   const [interviewResults, setInterviewResults] = useState<Record<string, InterviewQuestionResult>>({})
   const interviewResultsRef = useRef(interviewResults)
   const pendingSessionFocusRef = useRef(false)
@@ -101,6 +103,7 @@ function App() {
     }
 
     clearReportLoadingTimer()
+    setInterviewCompletedAt((currentValue) => currentValue ?? Date.now())
     setReportError('')
     setIsReportVisible(false)
     setIsReportLoading(true)
@@ -130,6 +133,8 @@ function App() {
     clearReportLoadingTimer()
     setSavedConfig(config)
     setInterview(null)
+    setInterviewStartedAt(null)
+    setInterviewCompletedAt(null)
     interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
@@ -141,6 +146,7 @@ function App() {
     try {
       const nextInterview = await createInterview(config)
       pendingSessionFocusRef.current = true
+      setInterviewStartedAt(Date.now())
       setInterview(nextInterview)
     } catch (requestError) {
       setError(
@@ -158,6 +164,8 @@ function App() {
     setSetupResetKey((currentKey) => currentKey + 1)
     setSavedConfig(null)
     setInterview(null)
+    setInterviewStartedAt(null)
+    setInterviewCompletedAt(null)
     interviewResultsRef.current = {}
     setInterviewResults({})
     setIsReportLoading(false)
@@ -179,7 +187,9 @@ function App() {
       <HomePage
         error={error}
         interview={interview}
+        interviewCompletedAt={interviewCompletedAt}
         interviewResults={interviewResults}
+        interviewStartedAt={interviewStartedAt}
         isReportLoading={isReportLoading}
         isReportVisible={isReportVisible}
         isLoading={isLoading}
@@ -198,6 +208,7 @@ function App() {
         }
         onResultRemove={(questionId) => {
           clearReportLoadingTimer()
+          setInterviewCompletedAt(null)
           setInterviewResults((currentResults) => {
             const nextResults = { ...currentResults }
             delete nextResults[questionId]

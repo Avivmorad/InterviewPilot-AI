@@ -52,7 +52,7 @@ test('rapid repeated submit actions send only one evaluation request', async ({ 
 
   const submitButton = page.getByTestId('question-primary-action')
   await submitButton.click()
-  await submitButton.dispatchEvent('click')
+  await submitButton.click()
 
   await expect.poll(() => evaluationRequestCount).toBe(1)
   expect(evaluationRequestCount).toBe(1)

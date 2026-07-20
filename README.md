@@ -216,8 +216,9 @@ report. Authentication and persistence are not included yet.
 
 ## Screenshots
 
-These screenshots were refreshed from the verified production app on June 26,
-2026.
+These deterministic UI screenshots were refreshed on July 20, 2026. The
+interview API is mocked only while capturing screenshots so the images remain
+stable; the production API is verified separately by the release smoke check.
 
 ### Interview Setup
 
@@ -231,6 +232,14 @@ These screenshots were refreshed from the verified production app on June 26,
 
 ![Final report screen](docs/screenshots/03-final-report.png)
 
+### Mobile Layouts
+
+<p>
+  <img alt="Mobile interview screen" src="docs/screenshots/04-interview-mobile.png" width="240" />
+  <img alt="Mobile final report screen" src="docs/screenshots/05-final-report-mobile.png" width="240" />
+  <img alt="Mobile setup screen" src="docs/screenshots/07-setup-mobile.png" width="240" />
+</p>
+
 ## Root Development Scripts
 
 ```powershell
@@ -242,6 +251,10 @@ npm run build
 npm run check
 npm run eval
 npm run eval:real
+npm run test:e2e
+npm run screenshots:update
+npm run scan:secrets
+npm run smoke:production
 ```
 
 - `npm run typecheck` checks frontend and backend TypeScript without building.
@@ -252,6 +265,13 @@ npm run eval:real
   prompt and schema behavior.
 - `npm run eval:real` compares Gemini and Groq when both server-side API keys
   are configured and can write a JSON report to disk.
+- `npm run test:e2e` verifies the main flow, responsive layouts, keyboard use,
+  and automated accessibility rules.
+- `npm run screenshots:update` refreshes deterministic desktop and mobile UI
+  evidence with a mocked interview API.
+- `npm run scan:secrets` scans tracked source for likely secrets.
+- `npm run smoke:production` checks the deployed frontend, backend health, and
+  production CORS behavior.
 
 To run scripts from an individual workspace:
 
@@ -277,12 +297,12 @@ Deployment config is included:
 
 - `vercel.json` builds the `client` workspace for Vercel.
 - `render.yaml` builds and starts the `server` service on Render.
-- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) lists the required production
-  environment variables and verification checklist.
+- [docs/OPERATIONS_GUIDE.md](docs/OPERATIONS_GUIDE.md) lists the required
+  production environment variables and verification checklist.
 
 Production deploy still requires your Vercel and Render accounts, a GitHub repo,
 and server AI provider keys configured as provider secrets. Never put Gemini or
 Groq keys in client environment variables.
 
-See [docs/manual-testing.md](docs/manual-testing.md) for browser and PowerShell
-testing steps.
+See [docs/OPERATIONS_GUIDE.md](docs/OPERATIONS_GUIDE.md) for browser and
+PowerShell testing steps.

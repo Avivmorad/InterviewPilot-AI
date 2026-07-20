@@ -1,34 +1,54 @@
-# Design QA
+# Responsive Design QA — 2026-07-20
 
-## Findings
-- No actionable P0/P1/P2 mismatches remain.
+## Result
 
-**Source Visual Truth**
-- Source: user-provided inline desktop screenshot in the current chat.
-- Target state: desktop first viewport, API connected, default interview setup selections visible.
+The landing, setup, interview, feedback, and final-report screens now match the
+visual direction in `docs/NewUIPic/` and pass the automated responsive,
+keyboard, and accessibility checks. No actionable layout clipping, overlap, or
+horizontal overflow remains in the tested states.
 
-**Implementation Evidence**
-- Desktop screenshot: `output/playwright/homepage-redesign-desktop-final.png`
-- Mobile screenshot: `output/playwright/homepage-redesign-mobile-fixed-full.png`
-- Snapshot: `output/playwright/homepage-connected-snapshot.md`
-- Viewport: desktop reference-sized browser capture plus 390px mobile responsive check.
-- State: homepage/setup screen, API connected, default form selections.
+## Main fixes
 
-**Fidelity Surfaces**
-- Fonts and typography: large bold hero, compact nav, form headings, and option labels now match the reference hierarchy closely.
-- Spacing and layout rhythm: desktop content aligns in a left hero/right setup-card composition; mobile stacks without overlap.
-- Colors and visual tokens: white header/card, soft blue background, blue selected states, and green API pill match the reference direction.
-- Image and asset fidelity: the screen uses existing lucide icons, which match the simple line-icon style in the reference; there are no bitmap assets in the source mock.
-- Copy and content: hero copy, benefit copy, setup labels, and CTA remain aligned with the existing MVP product text.
+- Replaced the multi-slide flex track that gave mobile stages a desktop-sized
+  intrinsic width with one active, full-width stage.
+- Added phone-specific type, spacing, card-grid, textarea, and action layouts.
+- Kept desktop information density while allowing long labels and AI-generated
+  content to wrap safely.
+- Added focusable hover/focus help for setup choices and report feedback terms.
+- Removed the nonfunctional header account control and implemented bookmark
+  state instead of leaving a decorative action.
+- Replaced hardcoded report claims and timestamps with result-driven labels and
+  recorded session timing.
+- Added useful report empty states when no answers were evaluated.
 
-**Patches Made Since Previous QA Pass**
-- Moved desktop content to the reference-width container.
-- Tightened setup-card spacing to fit the first viewport.
-- Removed desktop vertical overflow.
-- Switched narrow mobile three-option groups to stacked controls.
-- Verified the connected API status state by running the local backend.
+## Viewports and states covered
 
-**Follow-up Polish**
-- P3: the exact typeface in the reference may differ slightly from the system Inter stack.
+Automated browser coverage runs at `320x740`, `390x844`, `768x1024`,
+`1440x900`, and `1920x1080`. Each size covers landing, setup, interview, and
+report stages. The suite also covers keyboard navigation, tooltip focus,
+bookmark state, skipped-answer reporting, and axe accessibility rules.
 
-final result: passed
+## Current visual evidence
+
+- Desktop: `docs/screenshots/01-interview-setup.png`,
+  `docs/screenshots/02-answer-feedback.png`, and
+  `docs/screenshots/03-final-report.png`
+- Mobile: `docs/screenshots/04-interview-mobile.png`,
+  `docs/screenshots/05-final-report-mobile.png`,
+  `docs/screenshots/06-landing-mobile.png`, and
+  `docs/screenshots/07-setup-mobile.png`
+
+The screenshot command uses a deterministic mocked interview API by default so
+portfolio images do not depend on provider availability:
+
+```powershell
+npm run screenshots:update
+```
+
+## Verification
+
+- Responsive, keyboard, and axe suite: passed locally.
+- Client lint, type checking, and unit tests: passed locally.
+- Server type checking and unit tests: passed locally.
+- Full release and production smoke results are recorded separately after
+  deployment.

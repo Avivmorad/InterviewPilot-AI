@@ -126,19 +126,20 @@ export function InterviewConfigForm({
           <Sparkles aria-hidden="true" className="size-7" />
         </span>
         <div>
-          <h2 className="font-display text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.1rem]">
+          <h2 className="font-display text-3xl font-extrabold tracking-[-0.04em] text-white sm:text-[3.1rem]">
             Create Your Interview
           </h2>
-          <p className="mt-1 text-lg text-muted-foreground">
+          <p className="mt-1 text-base text-muted-foreground sm:text-lg">
             Configure your interview session.
           </p>
         </div>
       </div>
 
       <OptionGroup
-        columnsClassName="grid-cols-1 md:grid-cols-2 xl:grid-cols-5"
+        columnsClassName="grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
         description="Choose the role you want to practice for."
         disabled={isLoading}
+        helpText="The role controls the subjects, tools, and problem-solving expectations used to generate your questions."
         name="role"
         onChange={setRole}
         options={ROLES}
@@ -168,9 +169,10 @@ export function InterviewConfigForm({
       />
 
       <OptionGroup
-        columnsClassName="grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
+        columnsClassName="grid-cols-2 xl:grid-cols-4"
         description="Choose your current experience level."
         disabled={isLoading}
+        helpText="The level changes question depth and scoring expectations, from fundamentals at Intern to architecture and leadership at Senior."
         name="level"
         onChange={setLevel}
         options={LEVELS}
@@ -200,9 +202,10 @@ export function InterviewConfigForm({
       />
 
       <OptionGroup
-        columnsClassName="grid-cols-1 lg:grid-cols-3"
+        columnsClassName="grid-cols-1 min-[480px]:grid-cols-3"
         description="Choose the style of questions for this interview."
         disabled={isLoading}
+        helpText="Technical tests role knowledge, Behavioral focuses on real work examples, and Mixed combines both styles."
         name="interviewType"
         onChange={setInterviewType}
         options={INTERVIEW_TYPES}
@@ -233,6 +236,7 @@ export function InterviewConfigForm({
         columnsClassName="grid-cols-5"
         description="Choose a focused session from 1 to 5 questions."
         disabled={isLoading}
+        helpText="Use 1–2 questions for a quick drill or 3–5 for a broader practice session."
         name="questionCount"
         onChange={setQuestionCount}
         options={QUESTION_COUNTS}

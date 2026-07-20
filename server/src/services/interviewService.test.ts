@@ -198,7 +198,7 @@ test('evaluates an answer from valid generated JSON', async () => {
   assert.match(result.improvedAnswer, /React state/)
   assert.match(receivedPrompt, /professional technical interviewer/)
   assert.match(receivedPrompt, /What problem does React state solve/)
-  assert.match(receivedPrompt, /Candidate answer/)
+  assert.match(receivedPrompt, /"candidateAnswer"/)
   assert.match(receivedPrompt, /schema validation/)
   assert.match(receivedPrompt, /strict JSON only/)
 })

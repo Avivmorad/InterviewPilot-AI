@@ -1,6 +1,6 @@
 import type { AnswerEvaluation } from '@/types/interview'
 
-export const MAX_ANSWER_CHARACTERS = 75_000
+export const MAX_ANSWER_CHARACTERS = 3_000
 export const SHORT_ANSWER_WARNING_CHARACTERS = 80
 export const EMPTY_ANSWER_MESSAGE = 'Please enter your answer before submitting.'
 export const SHORT_ANSWER_WARNING_MESSAGE =

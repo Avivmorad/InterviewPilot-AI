@@ -34,7 +34,7 @@ export class InterviewGenerationError extends Error {
   }
 }
 
-export const MAX_ANSWER_CHARACTERS = 75_000
+export const MAX_ANSWER_CHARACTERS = 3_000
 export const EMPTY_ANSWER_MESSAGE = 'Please enter your answer before submitting.'
 export const MAX_ANSWER_MESSAGE = `Your answer is too long. Please keep it under ${MAX_ANSWER_CHARACTERS.toLocaleString()} characters.`
 

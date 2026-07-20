@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { InfoTooltip } from '@/components/ui/info-tooltip'
 import { evaluateAnswer, generateExampleAnswer } from '@/services/interview-api'
 import {
   normalizeFeedbackItems,
@@ -70,6 +71,7 @@ export function InterviewQuestions({
   const [exampleAnswers, setExampleAnswers] = useState<Record<string, ExampleAnswer>>({})
   const [exampleAnswerErrors, setExampleAnswerErrors] = useState<Record<string, string>>({})
   const [generatingExampleQuestionId, setGeneratingExampleQuestionId] = useState<string | null>(null)
+  const [bookmarkedQuestionIds, setBookmarkedQuestionIds] = useState<Record<string, boolean>>({})
 
   const question = interview.questions[activeQuestionIndex]
   const questionNumber = activeQuestionIndex + 1
@@ -104,6 +106,8 @@ export function InterviewQuestions({
   const roleLabel = config ? getRoleLabel(config.role) : 'Interview role'
   const levelLabel = config ? getLevelLabel(config.level) : 'Custom'
   const interviewTypeLabel = config?.interviewType ?? 'Mixed'
+  const isCurrentQuestionBookmarked = Boolean(bookmarkedQuestionIds[question?.id ?? ''])
+  const questionGuidance = getQuestionGuidance(config?.interviewType)
 
   useEffect(() => {
     isMountedRef.current = true
@@ -353,7 +357,7 @@ export function InterviewQuestions({
   return (
     <section
       aria-labelledby="questions-title"
-      className="mx-auto max-w-[1520px] px-5 pb-12 pt-6 sm:px-8 lg:pb-16"
+      className="mx-auto w-full max-w-[1520px] px-4 pb-12 pt-5 sm:px-8 sm:pt-6 lg:pb-16"
       ref={sessionRef}
       tabIndex={-1}
     >
@@ -404,20 +408,33 @@ export function InterviewQuestions({
               <p className="text-lg font-extrabold uppercase tracking-[0.14em] text-primary">
                 Question
               </p>
-              <h3 className="mt-5 max-w-6xl text-[2.2rem] font-extrabold leading-[1.24] tracking-[-0.04em] text-white sm:text-[2.6rem]">
+              <h3 className="mt-4 max-w-6xl break-words text-2xl font-extrabold leading-[1.3] tracking-[-0.04em] text-white sm:mt-5 sm:text-3xl lg:text-[2.6rem]">
                 {normalizeFeedbackText(question.question)}
               </h3>
-              <p className="mt-5 max-w-5xl text-lg leading-9 text-slate-300">
-                Give a detailed explanation of what the concept means, how it works in practice,
-                and why it improves performance or code quality.
+              <p className="mt-4 max-w-5xl text-base leading-7 text-slate-300 sm:mt-5 sm:text-lg sm:leading-9">
+                {questionGuidance}
               </p>
             </div>
             <button
-              aria-label="Bookmark question"
-              className="grid size-12 shrink-0 place-items-center rounded-2xl border border-white/12 bg-white/[0.03] text-slate-300 transition hover:border-primary/45 hover:text-white"
+              aria-label={isCurrentQuestionBookmarked ? 'Remove question bookmark' : 'Bookmark question'}
+              aria-pressed={isCurrentQuestionBookmarked}
+              className={`grid size-12 shrink-0 place-items-center rounded-2xl border transition hover:border-primary/45 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 ${
+                isCurrentQuestionBookmarked
+                  ? 'border-primary/60 bg-primary/15 text-blue-200'
+                  : 'border-white/12 bg-white/[0.03] text-slate-300'
+              }`}
+              onClick={() =>
+                setBookmarkedQuestionIds((currentIds) => ({
+                  ...currentIds,
+                  [question.id]: !currentIds[question.id],
+                }))
+              }
               type="button"
             >
-              <Bookmark aria-hidden="true" className="size-5" />
+              <Bookmark
+                aria-hidden="true"
+                className={`size-5 ${isCurrentQuestionBookmarked ? 'fill-current' : ''}`}
+              />
             </button>
           </div>
 
@@ -428,7 +445,7 @@ export function InterviewQuestions({
             </div>
             <ul className="mt-4 space-y-3 text-lg leading-8 text-slate-300" id={`hints-${question.id}`}>
               {normalizeFeedbackItems(question.expectedConcepts).map((concept) => (
-                <li className="flex items-start gap-3" key={concept}>
+                <li className="flex items-start gap-3 break-words" key={concept}>
                   <span className="mt-3 size-1.5 rounded-full bg-slate-300" />
                   <span>{concept}</span>
                 </li>
@@ -449,7 +466,7 @@ export function InterviewQuestions({
               {isSavedAnswerCurrent ? (
                 <span className="inline-flex items-center gap-2 text-emerald-300">
                   <CheckCircle2 aria-hidden="true" className="size-4" />
-                  Auto-saved
+                  Saved in this session
                 </span>
               ) : null}
               <span>
@@ -461,7 +478,7 @@ export function InterviewQuestions({
           <textarea
             aria-describedby={`answer-help-${question.id} answer-validation-${question.id}`}
             aria-invalid={answerValidationState.isInvalid}
-            className="mt-5 min-h-[16rem] w-full resize-y rounded-[1.1rem] border border-primary/55 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-5 py-5 text-xl leading-9 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70"
+            className="mt-5 min-h-[12rem] w-full resize-y rounded-[1.1rem] border border-primary/55 bg-[linear-gradient(180deg,rgba(15,24,44,0.96),rgba(18,28,48,0.94))] px-4 py-4 text-base leading-7 text-white outline-none shadow-[inset_0_0_40px_rgba(47,107,255,0.08)] transition-colors placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-primary/70 sm:min-h-[16rem] sm:px-5 sm:py-5 sm:text-xl sm:leading-9"
             disabled={isEvaluatingCurrentQuestion}
             id={`answer-${question.id}`}
             maxLength={MAX_ANSWER_CHARACTERS}
@@ -542,15 +559,18 @@ export function InterviewQuestions({
 
             <div className="mt-6 grid gap-5 lg:grid-cols-3">
               <FeedbackList
+                helpText="Correct ideas or communication choices that made your answer effective."
                 items={normalizeFeedbackItems(currentEvaluation.strengths)}
                 title="Strong areas"
               />
               <FeedbackList
+                helpText="Specific parts of your answer that need clearer reasoning, detail, or accuracy."
                 items={normalizeFeedbackItems(currentEvaluation.weaknesses)}
                 title="Areas to improve"
               />
               <FeedbackList
                 emptyText="No major missing concepts were identified."
+                helpText="Important ideas expected for this question that were absent from your answer."
                 items={normalizeFeedbackItems(currentEvaluation.missingConcepts)}
                 title="Missing concepts"
               />
@@ -571,7 +591,7 @@ export function InterviewQuestions({
 
             <div className="mt-5 rounded-[1.2rem] border border-primary/20 bg-primary/[0.06] p-4">
               <h4 className="text-sm font-semibold text-white">Practical next step</h4>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
+              <p className="mt-2 break-words text-sm leading-6 text-slate-300">
                 {normalizeFeedbackText(currentEvaluation.improvementSuggestion)}
               </p>
             </div>
@@ -584,12 +604,12 @@ export function InterviewQuestions({
               <Sparkles aria-hidden="true" className="size-5 text-violet-300" />
               Example answer
             </h3>
-            <p className="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-200">
+            <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7 text-slate-200">
               {normalizeFeedbackText(exampleAnswers[question.id].answer)}
             </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {normalizeFeedbackItems(exampleAnswers[question.id].keyPoints).map((point) => (
-                <li className="rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100" key={point}>{point}</li>
+                <li className="max-w-full break-words rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100" key={point}>{point}</li>
               ))}
             </ul>
           </section>
@@ -601,7 +621,7 @@ export function InterviewQuestions({
           </p>
         ) : null}
 
-        <div className="grid gap-5 border-t border-white/10 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 border-t border-white/10 pt-5 sm:grid-cols-2 xl:grid-cols-4">
           <ActionCard
             disabled={activeQuestionIndex === 0 || isEvaluatingCurrentQuestion}
             helper="Review your previous response"
@@ -703,7 +723,7 @@ function ActionCard({
   variant?: 'default' | 'outline'
 }) {
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${dataTestId ? 'order-first sm:order-none' : ''}`.trim()}>
       <Button
         className={`h-14 w-full rounded-[1.15rem] text-lg font-extrabold ${
           variant === 'default' ? 'text-white' : ''
@@ -725,22 +745,27 @@ function ActionCard({
 
 type FeedbackListProps = {
   emptyText?: string
+  helpText: string
   items: string[]
   title: string
 }
 
 function FeedbackList({
   emptyText = 'No items returned.',
+  helpText,
   items,
   title,
 }: FeedbackListProps) {
   return (
     <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.025] p-4">
-      <h4 className="text-base font-semibold text-white">{title}</h4>
+      <div className="flex items-center gap-1">
+        <h4 className="text-base font-semibold text-white">{title}</h4>
+        <InfoTooltip content={helpText} label={title} />
+      </div>
       {items.length > 0 ? (
         <ul className="mt-3 space-y-2">
           {items.map((item) => (
-            <li className="max-w-3xl text-sm leading-6 text-muted-foreground" key={item}>
+            <li className="max-w-3xl break-words text-sm leading-6 text-muted-foreground" key={item}>
               {item}
             </li>
           ))}
@@ -750,4 +775,16 @@ function FeedbackList({
       )}
     </div>
   )
+}
+
+function getQuestionGuidance(interviewType?: InterviewConfig['interviewType']): string {
+  if (interviewType === 'Behavioral') {
+    return 'Use one specific situation, explain the action you took, and finish with the result and what you learned.'
+  }
+
+  if (interviewType === 'Mixed') {
+    return 'Answer directly, explain your reasoning, and use a practical example or real experience where it adds clarity.'
+  }
+
+  return 'Explain the core idea, how it works in practice, and the most important tradeoff or example for this role.'
 }
