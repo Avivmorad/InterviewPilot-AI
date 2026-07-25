@@ -10,10 +10,15 @@ export type AIServiceErrorCode =
   | 'AI_NOT_CONFIGURED'
   | 'AI_GENERATION_FAILED'
 
+export type GenerateTextOptions = {
+  providerOrder?: 'primary-first' | 'fallback-first'
+  responseJsonSchema?: unknown
+}
+
 export interface AIProvider {
   readonly name: AIProviderName
   readonly modelName?: string
-  generateText(prompt: string): Promise<string>
+  generateText(prompt: string, options?: GenerateTextOptions): Promise<string>
 }
 
 export class AIProviderError extends Error {

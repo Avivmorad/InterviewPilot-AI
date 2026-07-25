@@ -6,7 +6,7 @@ import {
   type Role,
 } from '../../types/interviewTypes.js'
 
-export const INTERVIEW_GENERATOR_PROMPT_VERSION = 'interview-generator-v2'
+export const INTERVIEW_GENERATOR_PROMPT_VERSION = 'interview-generator-v3'
 
 export function buildInterviewGeneratorPrompt({
   role,
@@ -23,7 +23,9 @@ export function buildInterviewGeneratorPrompt({
     Behavioral:
       'Generate only behavioral interview questions focused on communication, ownership, collaboration, conflict handling, learning, and decision making in engineering work.',
     Mixed:
-      'Generate a balanced mix of technical and behavioral questions. Include at least one behavioral question and at least one technical question.',
+      questionCount === 1
+        ? 'Generate one question that combines a practical technical decision with a behavioral explanation of how the candidate handled or would handle it.'
+        : 'Generate a balanced mix of technical and behavioral questions. Include at least one behavioral question and at least one technical question.',
   }[interviewType]
   const roleGuidance = getRoleGuidance(role, level)
   const levelGuidance = getLevelGuidance(level)

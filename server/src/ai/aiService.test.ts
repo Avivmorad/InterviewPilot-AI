@@ -7,18 +7,24 @@ import {
   AIServiceError,
   type AIProvider,
   type AIProviderName,
+  type GenerateTextOptions,
 } from './types.js'
 
 class FakeProvider implements AIProvider {
   calls = 0
+  lastOptions: GenerateTextOptions | undefined
 
   constructor(
     readonly name: AIProviderName,
     private readonly result: string | Error | Promise<string>,
   ) {}
 
-  async generateText(): Promise<string> {
+  async generateText(
+    _prompt: string,
+    options?: GenerateTextOptions,
+  ): Promise<string> {
     this.calls += 1
+    this.lastOptions = options
 
     if (this.result instanceof Error) {
       throw this.result
@@ -49,6 +55,24 @@ test('uses Groq when Gemini fails', async () => {
   assert.equal(await service.generateText('Prompt'), 'Groq response')
   assert.equal(gemini.calls, 1)
   assert.equal(groq.calls, 1)
+})
+
+test('can try the fallback provider first for a repair attempt', async () => {
+  const gemini = new FakeProvider('gemini', 'Gemini response')
+  const groq = new FakeProvider('groq', 'Groq response')
+  const service = new AIService(gemini, groq)
+  const responseJsonSchema = { type: 'object' }
+
+  assert.equal(
+    await service.generateText('Repair prompt', {
+      providerOrder: 'fallback-first',
+      responseJsonSchema,
+    }),
+    'Groq response',
+  )
+  assert.equal(groq.calls, 1)
+  assert.equal(gemini.calls, 0)
+  assert.deepEqual(groq.lastOptions?.responseJsonSchema, responseJsonSchema)
 })
 
 test('returns a clear configuration error when both provider keys are missing', async () => {

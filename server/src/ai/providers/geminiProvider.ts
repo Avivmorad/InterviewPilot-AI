@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai'
 import {
   AIProviderError,
   type AIProvider,
+  type GenerateTextOptions,
 } from '../types.js'
 
 type GeminiProviderOptions = {
@@ -23,7 +24,10 @@ export class GeminiProvider implements AIProvider {
     this.modelName = this.model
   }
 
-  async generateText(prompt: string): Promise<string> {
+  async generateText(
+    prompt: string,
+    options: GenerateTextOptions = {},
+  ): Promise<string> {
     if (!this.apiKey) {
       throw new AIProviderError(
         this.name,
@@ -39,6 +43,7 @@ export class GeminiProvider implements AIProvider {
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
+          responseJsonSchema: options.responseJsonSchema,
         },
       })
       const text = response.text?.trim()

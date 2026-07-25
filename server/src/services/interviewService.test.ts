@@ -101,9 +101,11 @@ test('accepts role and level labels in create requests', async () => {
 
 test('retries interview generation once after invalid AI output', async () => {
   const prompts: string[] = []
+  const providerOrders: Array<string | undefined> = []
 
-  const result = await createInterview(request, async (prompt) => {
+  const result = await createInterview(request, async (prompt, options) => {
     prompts.push(prompt)
+    providerOrders.push(options?.providerOrder)
     return prompts.length === 1 ? '{"questions":[]}' : validGeneratedText
   })
 
@@ -111,6 +113,62 @@ test('retries interview generation once after invalid AI output', async () => {
   assert.equal(prompts.length, 2)
   assert.match(prompts[1] ?? '', /previous response was invalid/)
   assert.match(prompts[1] ?? '', /exactly 3 items/)
+  assert.deepEqual(providerOrders, [undefined, 'fallback-first'])
+})
+
+test('requests a strict provider schema for generated questions', async () => {
+  let responseJsonSchema: unknown
+
+  await createInterview(request, async (_prompt, options) => {
+    responseJsonSchema = options?.responseJsonSchema
+    return validGeneratedText
+  })
+
+  assert.deepEqual(responseJsonSchema, {
+    type: 'object',
+    additionalProperties: false,
+    required: ['questions'],
+    properties: {
+      questions: {
+        type: 'array',
+        minItems: 3,
+        maxItems: 3,
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['topic', 'difficulty', 'question', 'expectedConcepts'],
+          properties: {
+            topic: { type: 'string' },
+            difficulty: { type: 'string', enum: ['junior'] },
+            question: { type: 'string' },
+            expectedConcepts: {
+              type: 'array',
+              minItems: 2,
+              maxItems: 5,
+              items: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+  })
+})
+
+test('uses achievable guidance for a one-question mixed interview', async () => {
+  let receivedPrompt = ''
+
+  await createInterview(
+    { ...request, interviewType: 'Mixed', questionCount: 1 },
+    async (prompt) => {
+      receivedPrompt = prompt
+      return JSON.stringify({
+        questions: [JSON.parse(validGeneratedText).questions[0]],
+      })
+    },
+  )
+
+  assert.match(receivedPrompt, /combines a practical technical decision/)
+  assert.doesNotMatch(receivedPrompt, /at least one behavioral.*at least one technical/)
 })
 
 test('rejects malformed generated JSON', () => {

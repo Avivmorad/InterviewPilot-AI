@@ -6,6 +6,7 @@ import { buildAnswerEvaluationPrompt } from '../ai/prompts/answerEvaluation.js'
 import { buildInterviewGeneratorPrompt } from '../ai/prompts/interviewGenerator.js'
 import { buildExampleAnswerPrompt } from '../ai/prompts/exampleAnswer.js'
 import { logStructuredEvent } from '../observability/structuredLog.js'
+import type { GenerateTextOptions } from '../ai/types.js'
 import {
   INTERVIEW_LEVELS,
   INTERVIEW_ROLES,
@@ -38,7 +39,10 @@ export const MAX_ANSWER_CHARACTERS = 3_000
 export const EMPTY_ANSWER_MESSAGE = 'Please enter your answer before submitting.'
 export const MAX_ANSWER_MESSAGE = `Your answer is too long. Please keep it under ${MAX_ANSWER_CHARACTERS.toLocaleString()} characters.`
 
-type TextGenerator = (prompt: string) => Promise<string>
+type TextGenerator = (
+  prompt: string,
+  options?: GenerateTextOptions,
+) => Promise<string>
 
 const roleValues = INTERVIEW_ROLES.map((role) => role.value) as [Role, ...Role[]]
 const levelValues = INTERVIEW_LEVELS.map((level) => level.value) as [Level, ...Level[]]
@@ -110,6 +114,39 @@ const answerEvaluationSchema = z.object({
     }),
   ),
 })
+
+function createInterviewResponseJsonSchema(
+  request: CreateInterviewRequest,
+): Record<string, unknown> {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['questions'],
+    properties: {
+      questions: {
+        type: 'array',
+        minItems: request.questionCount,
+        maxItems: request.questionCount,
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['topic', 'difficulty', 'question', 'expectedConcepts'],
+          properties: {
+            topic: { type: 'string' },
+            difficulty: { type: 'string', enum: [request.level] },
+            question: { type: 'string' },
+            expectedConcepts: {
+              type: 'array',
+              minItems: 2,
+              maxItems: 5,
+              items: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+  }
+}
 
 const exampleAnswerSchema = z.object({
   answer: z.string().trim().min(40).max(4_000),
@@ -219,8 +256,18 @@ function parseGeneratedQuestion(
 ): InterviewQuestion {
   const parsedQuestion = generatedQuestionSchema.safeParse(value)
 
-  if (!parsedQuestion.success || parsedQuestion.data.difficulty !== expectedDifficulty) {
-    throw new InterviewGenerationError()
+  if (!parsedQuestion.success) {
+    const issue = parsedQuestion.error.issues[0]
+    const field = issue?.path.join('.') || 'question'
+    throw new InterviewGenerationError(
+      `Question ${index + 1} failed validation at ${field}.`,
+    )
+  }
+
+  if (parsedQuestion.data.difficulty !== expectedDifficulty) {
+    throw new InterviewGenerationError(
+      `Question ${index + 1} returned the wrong difficulty.`,
+    )
   }
 
   return {
@@ -453,10 +500,16 @@ export async function createInterview(
 ): Promise<CreateInterviewResponse> {
   const request = validateCreateInterviewRequest(input)
   const prompt = buildInterviewGeneratorPrompt(request)
+  const generationOptions: GenerateTextOptions = {
+    responseJsonSchema: createInterviewResponseJsonSchema(request),
+  }
   let questions: InterviewQuestion[]
 
   try {
-    questions = parseGeneratedInterview(await textGenerator(prompt), request)
+    questions = parseGeneratedInterview(
+      await textGenerator(prompt, generationOptions),
+      request,
+    )
   } catch (error) {
     if (!(error instanceof InterviewGenerationError)) {
       throw error
@@ -478,7 +531,13 @@ export async function createInterview(
 Your previous response was invalid. Return only the JSON object that matches the requested shape. The questions array must contain exactly ${request.questionCount} items. Do not include markdown, code fences, prose, or extra keys.`
 
     try {
-      questions = parseGeneratedInterview(await textGenerator(retryPrompt), request)
+      questions = parseGeneratedInterview(
+        await textGenerator(retryPrompt, {
+          ...generationOptions,
+          providerOrder: 'fallback-first',
+        }),
+        request,
+      )
     } catch (retryError) {
       if (!(retryError instanceof InterviewGenerationError)) {
         throw retryError
