@@ -3,6 +3,7 @@ import Groq from 'groq-sdk'
 import {
   AIProviderError,
   type AIProvider,
+  type GenerateTextOptions,
 } from '../types.js'
 
 type GroqProviderOptions = {
@@ -23,7 +24,10 @@ export class GroqProvider implements AIProvider {
     this.modelName = this.model
   }
 
-  async generateText(prompt: string): Promise<string> {
+  async generateText(
+    prompt: string,
+    _options: GenerateTextOptions = {},
+  ): Promise<string> {
     if (!this.apiKey) {
       throw new AIProviderError(
         this.name,

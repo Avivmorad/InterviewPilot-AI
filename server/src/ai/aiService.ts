@@ -4,6 +4,7 @@ import {
   AIProviderError,
   AIServiceError,
   type AIProvider,
+  type GenerateTextOptions,
 } from './types.js'
 import { logStructuredEvent } from '../observability/structuredLog.js'
 
@@ -14,7 +15,10 @@ export class AIService {
     private readonly timeoutMs = 30_000,
   ) {}
 
-  async generateText(prompt: string): Promise<string> {
+  async generateText(
+    prompt: string,
+    options: GenerateTextOptions = {},
+  ): Promise<string> {
     if (prompt.trim().length === 0) {
       throw new TypeError('Prompt must not be empty.')
     }
@@ -22,11 +26,16 @@ export class AIService {
     const providerErrors: AIProviderError[] = []
     let firstProviderError: AIProviderError | null = null
 
-    for (const provider of [this.primaryProvider, this.fallbackProvider]) {
+    const providers =
+      options.providerOrder === 'fallback-first'
+        ? [this.fallbackProvider, this.primaryProvider]
+        : [this.primaryProvider, this.fallbackProvider]
+
+    for (const [index, provider] of providers.entries()) {
       const startedAt = Date.now()
 
       try {
-        const text = await this.generateTextWithTimeout(provider, prompt)
+        const text = await this.generateTextWithTimeout(provider, prompt, options)
         const durationMs = Date.now() - startedAt
 
         logStructuredEvent({
@@ -37,7 +46,7 @@ export class AIService {
           durationMs,
         })
 
-        if (firstProviderError && provider !== this.primaryProvider) {
+        if (firstProviderError && index > 0) {
           logStructuredEvent({
             event: 'ai_provider_fallback',
             primaryProvider: firstProviderError.provider,
@@ -75,7 +84,7 @@ export class AIService {
           errorMessage: providerError.message,
         })
 
-        if (provider !== this.primaryProvider && firstProviderError) {
+        if (index > 0 && firstProviderError) {
           logStructuredEvent({
             event: 'ai_provider_fallback',
             primaryProvider: firstProviderError.provider,
@@ -97,6 +106,7 @@ export class AIService {
   private async generateTextWithTimeout(
     provider: AIProvider,
     prompt: string,
+    options: GenerateTextOptions,
   ): Promise<string> {
     const timeoutError = new AIProviderError(
       provider.name,
@@ -108,7 +118,7 @@ export class AIService {
 
     try {
       return await Promise.race([
-        provider.generateText(prompt),
+        provider.generateText(prompt, options),
         new Promise<string>((_resolve, reject) => {
           timeoutId = setTimeout(() => reject(timeoutError), this.timeoutMs)
         }),
@@ -123,6 +133,9 @@ export class AIService {
 
 export const aiService = new AIService(geminiProvider, groqProvider)
 
-export function generateText(prompt: string): Promise<string> {
-  return aiService.generateText(prompt)
+export function generateText(
+  prompt: string,
+  options?: GenerateTextOptions,
+): Promise<string> {
+  return aiService.generateText(prompt, options)
 }
