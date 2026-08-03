@@ -120,7 +120,7 @@ These rules apply to every task.
 ## 3.1 Product and scope constraints
 
 - Preserve the existing MVP interview flow.
-- Do not add authentication, Supabase, resume upload, voice interviews, or career coaching during Phase 1.
+- Do not add authentication, persistence, resume upload, voice interviews, or career coaching during Phase 1.
 - Do not add features only because an older planning document mentioned them.
 - The current `docs/NewUIPic/` references and this tracker are authoritative for the redesign.
 - If an old design document conflicts with the current screenshots or current product behavior, follow the current screenshots and current product behavior.
@@ -139,7 +139,7 @@ These rules apply to every task.
 
 ## 3.3 Security constraints
 
-- No Gemini, Groq, Supabase service-role, or other private keys in frontend code.
+- No Gemini, Groq, or other private keys in frontend code.
 - No secrets in source control.
 - No stack traces or sensitive provider errors returned to users.
 - Do not weaken rate limiting, request IDs, input limits, CORS controls, or secret scanning.
@@ -266,10 +266,6 @@ This summary lists parent tasks and their current status (used by the Todo Tree 
 [DONE]: IP-P2-004 — Secret and dependency hygiene commands exist
 [DONE]: IP-P2-005 — Rate limiting and safe provider errors exist
 [DONE]: IP-P2-006 — Schema validation protects trust boundary
-[BLOCKED]: IP-F2-001 — Connect Supabase and Authentication
-[BLOCKED]: IP-F2-002 — Add and verify RLS for user-owned records
-[BLOCKED]: IP-F2-003 — Build interview history and saved reports
-[BLOCKED]: IP-F2-004 — Build analytics dashboard
 [BLOCKED]: IP-F2-005 — Add resume upload and personalize interviews
 [BLOCKED]: IP-F2-006 — Add voice interviews and speech analysis
 [BLOCKED]: IP-F2-007 — Add AI Career Coach
@@ -490,7 +486,7 @@ If the repository's `npm run check` already includes the required client checks,
 - Do not change backend routes.
 - Do not change the request schema.
 - Do not add auth.
-- Do not add Supabase.
+- Do not add authentication or persistence.
 - Do not create a new setup state store.
 - Do not add unsupported roles, levels, or interview types.
 - Do not remove existing validation.
@@ -1999,171 +1995,10 @@ Do not begin Phase 2 because a task below looks easy. Phase 2 changes data owner
 
 ---
 
-# IP-F2-001 — Connect Supabase and Authentication
+## Removed from scope
 
-[BLOCKED]: IP-F2-001 — Connect Supabase and Authentication
-
-**Status:** `BLOCKED`  
-**Blocked by:** Supabase project access and Phase 1 completion
-
-## Objective
-
-Add real user authentication without exposing service secrets or breaking the anonymous interview flow unless the product decision explicitly requires sign-in.
-
-## Required future subtasks
-
-- [ ] Create or select the Supabase project.
-- [ ] Record project URL and public anon key in the correct environments.
-- [ ] Keep service-role key server-only.
-- [ ] Add environment validation.
-- [ ] Add Supabase client initialization.
-- [ ] Decide whether anonymous use remains available.
-- [ ] Add sign-up.
-- [ ] Add sign-in.
-- [ ] Add sign-out.
-- [ ] Add password recovery.
-- [ ] Add session restoration.
-- [ ] Add auth loading state.
-- [ ] Add safe auth errors.
-- [ ] Add route or feature protection only where required.
-- [ ] Add tests.
-- [ ] Document local and production setup.
-
-## Acceptance criteria
-
-- [ ] Sign-up works.
-- [ ] Sign-in works.
-- [ ] Sign-out works.
-- [ ] Password recovery works.
-- [ ] Session restoration works.
-- [ ] Private secrets remain server-only.
-- [ ] Auth errors are safe.
-- [ ] Tests pass.
-
----
-
-# IP-F2-002 — Add and Verify RLS for User-Owned Records
-
-[BLOCKED]: IP-F2-002 — Add and Verify RLS for User-Owned Records
-
-**Status:** `BLOCKED`  
-**Depends on:** `IP-F2-001`
-
-## Objective
-
-Ensure two users cannot read, update, or delete each other's data.
-
-## Required future subtasks
-
-- [ ] Define database tables.
-- [ ] Create versioned SQL migrations.
-- [ ] Add `user_id` ownership fields.
-- [ ] Add foreign keys.
-- [ ] Add indexes.
-- [ ] Enable RLS.
-- [ ] Add select policy.
-- [ ] Add insert policy.
-- [ ] Add update policy.
-- [ ] Add delete policy.
-- [ ] Generate or update database types.
-- [ ] Test with User A.
-- [ ] Test with User B.
-- [ ] Verify User A cannot access User B data.
-- [ ] Verify server-side privileged access is limited and intentional.
-- [ ] Document policies.
-
-## Acceptance criteria
-
-- [ ] Two users can access only their own records.
-- [ ] Anonymous access follows the intended product rule.
-- [ ] RLS is enabled on every user-data table.
-- [ ] Migrations are reproducible.
-- [ ] Types are current.
-- [ ] Permission tests exist.
-
----
-
-# IP-F2-003 — Build Interview History and Saved Reports
-
-[BLOCKED]: IP-F2-003 — Build Interview History and Saved Reports
-
-**Status:** `BLOCKED`  
-**Depends on:** `IP-F2-001`, `IP-F2-002`
-
-## Objective
-
-Persist completed interview sessions and allow signed-in users to view their own history and reports.
-
-## Required future subtasks
-
-- [ ] Define interview-session table.
-- [ ] Define question/answer storage model.
-- [ ] Define evaluation storage model.
-- [ ] Define final-report storage model.
-- [ ] Decide what raw AI output is retained.
-- [ ] Define privacy and deletion behavior.
-- [ ] Save completed interview atomically.
-- [ ] Handle partial failure.
-- [ ] Prevent duplicate saves.
-- [ ] Build history query.
-- [ ] Build history list UI.
-- [ ] Build saved-report detail UI.
-- [ ] Add empty state.
-- [ ] Add loading state.
-- [ ] Add error and retry state.
-- [ ] Add pagination when needed.
-- [ ] Add tests.
-- [ ] Verify RLS with two users.
-
-## Acceptance criteria
-
-- [ ] Signed-in user sees only their own sessions.
-- [ ] Completed report can be reopened.
-- [ ] Duplicate records are prevented.
-- [ ] Error handling is safe.
-- [ ] Data deletion behavior is documented.
-
----
-
-# IP-F2-004 — Build Analytics Dashboard
-
-[BLOCKED]: IP-F2-004 — Build Analytics Dashboard
-
-**Status:** `BLOCKED`  
-**Depends on:** `IP-F2-003`
-
-## Objective
-
-Show persisted performance trends, weak areas, and progress based only on the signed-in user's saved history.
-
-## Required future subtasks
-
-- [ ] Define metrics.
-- [ ] Define minimum data needed before showing trends.
-- [ ] Build aggregate queries.
-- [ ] Add overall score trend.
-- [ ] Add topic breakdown.
-- [ ] Add weak-area frequency.
-- [ ] Add recent interview list.
-- [ ] Add empty state.
-- [ ] Add insufficient-data state.
-- [ ] Add loading state.
-- [ ] Add error state.
-- [ ] Verify calculations.
-- [ ] Verify RLS.
-- [ ] Add tests.
-- [ ] Document metric definitions.
-
-## Acceptance criteria
-
-- [ ] Dashboard uses only user-owned records.
-- [ ] Scores and trends are correct.
-- [ ] Empty and insufficient-data states are clear.
-- [ ] Metric definitions are documented.
-- [ ] Tests cover calculations.
-
----
-
+Authentication, database persistence, saved interview history, and analytics
+were intentionally removed. They are not part of the current product roadmap.
 # IP-F2-005 — Add Resume Upload and Personalized Interviews
 
 [BLOCKED]: IP-F2-005 — Add Resume Upload and Personalized Interviews

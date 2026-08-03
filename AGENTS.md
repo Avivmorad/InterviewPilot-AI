@@ -43,16 +43,15 @@ The primary target roles are:
 - Gemini Flash as the primary provider
 - Groq as the fallback provider
 
-### Data and Authentication
+### Session State
 
-- Supabase
-- Supabase Auth
+- Client-side state for the active interview
+- No authentication or persistent database in the current product scope
 
 ### Deployment
 
 - Vercel for the frontend
 - Render for the backend
-- Supabase for database and authentication
 
 ---
 
@@ -99,13 +98,8 @@ Use this Skill for tasks involving:
 - Services
 - Providers
 - Repositories
-- Supabase integration
-- Authentication
 - Shared types
-- Database access
 - Interview sessions
-- Interview history
-- Analytics features
 
 The Skill should enforce:
 
@@ -129,12 +123,8 @@ Automatically use this Skill for requests such as:
 
 - Add an answer-evaluation endpoint
 - Create interview-session management
-- Connect Supabase
-- Add authentication
 - Refactor the backend
-- Add interview history
 - Add a new AI provider
-- Design the database layer
 
 Do not load it for tiny visual changes unless architecture is affected.
 
@@ -366,11 +356,8 @@ Use the following matrix as guidance:
 | Question generation    |          Yes |               Yes |                  Yes |                  Yes |
 | Follow-up questions    |          Yes |               Yes |                  Yes |                  Yes |
 | Interview summary      |          Yes |               Yes |                  Yes |                  Yes |
-| Authentication         |          Yes |                No |                   No |                  Yes |
-| Supabase integration   |          Yes |                No |                   No |                  Yes |
 | Prompt modification    |    Sometimes |               Yes |                  Yes |                  Yes |
 | New AI provider        |          Yes |               Yes |                  Yes |                  Yes |
-| Database schema change |          Yes |                No |                   No |                  Yes |
 | CSS-only change        |           No |                No |                   No | Relevant checks only |
 | UI interaction change  |    Sometimes |                No |                   No |                  Yes |
 | Deployment preparation |    Sometimes |         Sometimes | Relevant evaluations |                  Yes |
