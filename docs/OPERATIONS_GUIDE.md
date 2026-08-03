@@ -155,15 +155,12 @@ Set these environment variables in Render:
 CLIENT_ORIGIN=https://your-vercel-domain.vercel.app
 GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
 ```
 
 Important:
 
 - Render provides `PORT` automatically.
 - AI keys belong in Render, not Vercel.
-- `SUPABASE_SERVICE_ROLE_KEY` also belongs server-side only.
 
 Verify after deploy:
 
@@ -177,8 +174,6 @@ Set this environment variable in Vercel:
 
 ```dotenv
 VITE_API_URL=https://your-render-service.onrender.com
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
 ```
 
 Do not set these in Vercel:
@@ -186,7 +181,6 @@ Do not set these in Vercel:
 ```dotenv
 GEMINI_API_KEY
 GROQ_API_KEY
-SUPABASE_SERVICE_ROLE_KEY
 ```
 
 ## Production verification

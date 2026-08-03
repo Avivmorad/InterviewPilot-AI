@@ -1,311 +1,132 @@
 # InterviewPilot AI
 
-InterviewPilot AI is a technical interview simulator. The current implementation
-covers the Phase 1 flow through interview setup, AI question generation,
-question-by-question navigation, AI answer evaluation, and a final report.
-Deployment configuration is included for Vercel and Render. Authentication and
-persistence are still pending.
+[![Pull Request CI](https://github.com/Avivmorad/InterviewPilot-AI/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/Avivmorad/InterviewPilot-AI/actions/workflows/pr-ci.yml)
 
-## Live Demo
+Deployed full-stack technical interview simulator that generates role-specific
+questions, evaluates answers, and produces a structured final report. Gemini is
+the primary provider, Groq is the fallback, and every AI response is validated
+before it reaches the UI.
 
-- Frontend: https://interviewpilot-ai-bice.vercel.app
-- Backend health: https://interviewpilot-ai-server.onrender.com/api/health
-- Repository: https://github.com/Avivmorad/InterviewPilot-AI
+**[Open the live app](https://interviewpilot-ai-bice.vercel.app)** ·
+**[Backend health](https://interviewpilot-ai-server.onrender.com/api/health)**
 
-## Architecture At A Glance
+## Product flow
 
-```text
-Browser
-  -> React + Vite client
-  -> Express API
-  -> Gemini (primary)
-  -> Groq (fallback)
-```
-
-## Project Structure
-
-```text
-interviewpilot-ai/
-  client/   React + Vite + TypeScript
-  server/    Node.js + Express + TypeScript
-  docs/       Product and technical notes
-  README.md
-  .gitignore
-```
-
-## How It Works
-
-1. The React frontend sends the selected role, level, interview type, and question count to
-   `POST /api/interview/create`.
-2. The Express route delegates to a thin controller and interview service.
-3. The service validates the request and builds a focused generation prompt.
-4. The AI service tries Gemini first and Groq as a fallback.
-5. The service validates the generated JSON, assigns question IDs, and returns a
-   predictable response to the frontend.
-6. The frontend shows one question at a time and sends each submitted answer to
-   `POST /api/interview/evaluate`.
-7. The backend validates the AI feedback JSON before returning scores,
-   strengths, weaknesses, gaps, and an improved answer.
-8. The frontend stores evaluated answers in local state and builds a final
-   report with an overall score, summaries, recommended topics, and a learning
-   roadmap.
-
-Provider SDKs and API keys remain in the backend. The frontend only knows the
-JSON API contract.
-
-Supported roles are Frontend Developer, Backend Developer, Full Stack
-Developer, AI Engineer, and Generative AI Engineer. The stored API values are
-`frontend-developer`, `backend-developer`, `full-stack-developer`,
-`ai-engineer`, and `generative-ai-engineer`.
-
-Supported experience levels are Intern, Junior, Mid-Level, and Senior. The
-stored API values are `intern`, `junior`, `mid-level`, and `senior`.
-
-AI Engineer remains the broader role for ML systems, data pipelines, model
-training or inference, deployment, feature engineering, and MLOps. Generative AI
-Engineer focuses on LLM application engineering, prompt design, structured
-outputs, RAG, evaluations, provider fallback, safety, cost, latency, and
-production reliability.
-
-## Install Dependencies
-
-From the project root:
-
-```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI
-npm install
-```
-
-## Start The Project
-
-From the project root:
-
-```powershell
-.\runproject
-```
-
-This starts the client and server together.
-
-## Run The Frontend
-
-From the project root:
-
-```powershell
-npm run dev:client
-```
-
-Or from the client folder:
-
-```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
-npm run dev
-```
-
-Open `http://localhost:5173`.
-
-## Run The Backend
-
-Open a second terminal:
-
-From the project root:
-
-```powershell
-npm run dev:server
-```
-
-Or from the server folder:
-
-```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
-npm run dev
-```
-
-The backend runs at `http://localhost:3001`.
-
-To start both development servers from the project root:
-
-```powershell
-npm run dev
-```
-
-## Test The Health Endpoint
-
-With the backend running:
-
-```powershell
-Invoke-RestMethod http://localhost:3001/api/health
-```
-
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "message": "InterviewPilot AI backend is running"
-}
-```
-
-## Create An Interview
-
-Set at least one server API key in `server/.env`, using
-`server/.env.example` as the template. Gemini is attempted first and Groq is
-used as the fallback.
-
-```powershell
-$body = @{
-  role = "generative-ai-engineer"
-  level = "intern"
-  interviewType = "Technical"
-  questionCount = 3
-} | ConvertTo-Json
-
-Invoke-RestMethod `
-  -Method Post `
-  -Uri http://localhost:3001/api/interview/create `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-The response contains a temporary `interviewId` and the generated questions.
-
-## Evaluate An Answer
-
-With the backend running:
-
-```powershell
-$body = @{
-  question = @{
-    id = "question-1"
-    topic = "React"
-    difficulty = "junior"
-    question = "How does React state differ from props?"
-    expectedConcepts = @("Props are passed in", "State is owned by a component")
-  }
-  answer = "Props come from parents. State is managed inside a component and can change."
-} | ConvertTo-Json -Depth 5
-
-Invoke-RestMethod `
-  -Method Post `
-  -Uri http://localhost:3001/api/interview/evaluate `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-The response contains structured feedback used by the interview screen and final
-report. Authentication and persistence are not included yet.
-
-## Engineering Decisions
-
-- Gemini is the primary provider and Groq is the fallback so the app can keep working when the primary provider is unavailable.
-- The backend validates structured AI output before the client sees it, which keeps malformed responses from breaking the UI.
-- The final report is generated in the frontend from already validated evaluations so the release stays deterministic and easy to reason about.
-- The MVP stores the current interview session in memory instead of adding accounts or persistence too early.
-
-## Evaluation Pipeline
-
-- `npm run eval` runs the offline answer-evaluation dataset from the project root.
-- The eval runner checks schema validity, score agreement, missing-concept coverage, and failure cases.
-- `npm run eval:real` compares Gemini and Groq on the same dataset when both server-side API keys are configured.
-- The real-provider runner records provider name, model name, latency, schema success, and score results, and can write a JSON report to disk.
-
-## Known Limitations
-
-- Authentication and persistence are not included in Phase 1.
-- Production browser verification was completed in this audit; ongoing release management still depends on the Vercel and Render accounts.
-- Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
-
-The final Phase 1 production evidence is recorded in
-[docs/verification/2026-07-20-production-verification.md](docs/verification/2026-07-20-production-verification.md).
+1. Choose a role, experience level, interview type, and question count.
+2. Generate an interview through the Express API.
+3. Answer or skip each question and request an example answer when needed.
+4. Receive structured scores, strengths, weaknesses, missing concepts, and an
+   improved answer.
+5. Review a deterministic final report and learning roadmap.
 
 ## Screenshots
 
-These deterministic UI screenshots were refreshed on July 20, 2026. The
-interview API is mocked only while capturing screenshots so the images remain
-stable; the production API is verified separately by the release smoke check.
+| Interview setup | Answer feedback | Final report |
+| --- | --- | --- |
+| ![Interview setup](docs/screenshots/01-interview-setup.png) | ![Answer feedback](docs/screenshots/02-answer-feedback.png) | ![Final report](docs/screenshots/03-final-report.png) |
 
-### Interview Setup
+Mobile and additional UI evidence is available in
+[`docs/screenshots/`](docs/screenshots/).
 
-![Interview setup screen](docs/screenshots/01-interview-setup.png)
+## Architecture
 
-### Answer Feedback
+```text
+React + Vite + TypeScript client
+              |
+              | validated JSON REST API
+              v
+Node.js + Express + TypeScript server
+              |
+              |-- Gemini (primary)
+              `-- Groq (fallback / repair path)
+```
 
-![Answer feedback screen](docs/screenshots/02-answer-feedback.png)
+- Provider SDKs and API keys remain server-side.
+- Request payloads and model outputs are validated at system boundaries.
+- Provider-specific responses are normalized behind one AI service interface.
+- The final report is built from already validated evaluations, avoiding an
+  extra uncontrolled LLM call.
+- The active interview is intentionally held in client state; accounts and
+  persistent history are outside the current product scope.
 
-### Final Report
+## Reliability and evaluation
 
-![Final report screen](docs/screenshots/03-final-report.png)
+- Zod-validated structured outputs with bounded repair and fallback behavior
+- Offline evaluation dataset for schema validity, scoring, missing concepts,
+  and failure cases
+- Optional real-provider comparison for Gemini and Groq, including latency and
+  schema results
+- Client and server unit tests, Playwright E2E flows, Axe accessibility checks,
+  secret scanning, production smoke checks, and pull-request CI
+- Safe provider errors, request IDs, rate limits, CORS checks, and backend-only
+  secrets
 
-### Mobile Layouts
+## API
 
-<p>
-  <img alt="Mobile interview screen" src="docs/screenshots/04-interview-mobile.png" width="240" />
-  <img alt="Mobile final report screen" src="docs/screenshots/05-final-report-mobile.png" width="240" />
-  <img alt="Mobile setup screen" src="docs/screenshots/07-setup-mobile.png" width="240" />
-</p>
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Service health |
+| `POST` | `/api/interview/create` | Generate validated interview questions |
+| `POST` | `/api/interview/evaluate` | Evaluate one answer |
+| `POST` | `/api/interview/example-answer` | Generate a model answer |
 
-## Root Development Scripts
+## Local setup
 
-```powershell
+Requirements: Node.js 22+ and npm.
+
+```sh
+git clone https://github.com/Avivmorad/InterviewPilot-AI.git
+cd InterviewPilot-AI
+npm install
+```
+
+Create local environment files from `client/.env.example` and
+`server/.env.example`. Configure at least one server-side provider key:
+
+```dotenv
+GEMINI_API_KEY=your_key
+GROQ_API_KEY=your_optional_fallback_key
+```
+
+Start both workspaces:
+
+```sh
 npm run dev
-npm run dev:client
-npm run dev:server
-npm run typecheck
-npm run build
+```
+
+Frontend: `http://localhost:5173` · Backend: `http://localhost:3001`
+
+## Verification
+
+```sh
 npm run check
 npm run eval
-npm run eval:real
 npm run test:e2e
-npm run screenshots:update
 npm run scan:secrets
+```
+
+Optional commands:
+
+```sh
+npm run eval:real
 npm run smoke:production
+npm run screenshots:update
 ```
 
-- `npm run typecheck` checks frontend and backend TypeScript without building.
-- `npm run build` creates production builds for frontend and backend.
-- `npm run check` runs frontend linting, all typechecks, existing backend tests,
-  and production builds.
-- `npm run eval` runs the offline mocked evaluation dataset for answer-feedback
-  prompt and schema behavior.
-- `npm run eval:real` compares Gemini and Groq when both server-side API keys
-  are configured and can write a JSON report to disk.
-- `npm run test:e2e` verifies the main flow, responsive layouts, keyboard use,
-  and automated accessibility rules.
-- `npm run screenshots:update` refreshes deterministic desktop and mobile UI
-  evidence with a mocked interview API.
-- `npm run scan:secrets` scans tracked source for likely secrets.
-- `npm run smoke:production` checks the deployed frontend, backend health, and
-  production CORS behavior.
-
-To run scripts from an individual workspace:
-
-```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
-npm run typecheck
-npm run lint
-npm run build
-npm run preview
-
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
-npm run typecheck
-npm run build
-npm run start
-```
-
-Run `npm run build` before `npm run start` in the backend because `start` runs
-the compiled `server/dist/server.js` file.
+`eval:real` requires both provider keys. The production smoke command uses the
+deployed frontend and backend URLs documented in
+[`docs/OPERATIONS_GUIDE.md`](docs/OPERATIONS_GUIDE.md).
 
 ## Deployment
 
-Deployment config is included:
+- Vercel builds the `client` workspace through `vercel.json`.
+- Render builds and starts the Express service through `render.yaml`.
+- GitHub Actions runs separate client and server quality gates on pull requests.
 
-- `vercel.json` builds the `client` workspace for Vercel.
-- `render.yaml` builds and starts the `server` service on Render.
-- [docs/OPERATIONS_GUIDE.md](docs/OPERATIONS_GUIDE.md) lists the required
-  production environment variables and verification checklist.
+The latest documented production sign-off is
+[`docs/verification/2026-07-20-production-verification.md`](docs/verification/2026-07-20-production-verification.md).
+Run a fresh production smoke check after release changes.
 
-Production deploy still requires your Vercel and Render accounts, a GitHub repo,
-and server AI provider keys configured as provider secrets. Never put Gemini or
-Groq keys in client environment variables.
+## License
 
-See [docs/OPERATIONS_GUIDE.md](docs/OPERATIONS_GUIDE.md) for browser and
-PowerShell testing steps.
+Licensed under the [MIT License](LICENSE).
