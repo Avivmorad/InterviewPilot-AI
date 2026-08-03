@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { AppShell } from '@/components/layout/app-shell'
 import { HomePage } from '@/pages/home-page'
 import { getFinalReportPreparationState } from '@/components/interview/report-flow'
@@ -183,49 +184,52 @@ function App() {
   }
 
   return (
-    <AppShell apiConnectionStatus={apiConnectionStatus}>
-      <HomePage
-        error={error}
-        interview={interview}
-        interviewCompletedAt={interviewCompletedAt}
-        interviewResults={interviewResults}
-        interviewStartedAt={interviewStartedAt}
-        isReportLoading={isReportLoading}
-        isReportVisible={isReportVisible}
-        isLoading={isLoading}
-        onCompleteInterview={handleCompleteInterview}
-        onRetryReport={handleCompleteInterview}
-        onStartNewInterview={handleStartNewInterview}
-        onResultChange={(result) =>
-          setInterviewResults((currentResults) => {
-            const nextResults = {
-              ...currentResults,
-              [result.question.id]: result,
-            }
-            interviewResultsRef.current = nextResults
-            return nextResults
-          })
-        }
-        onResultRemove={(questionId) => {
-          clearReportLoadingTimer()
-          setInterviewCompletedAt(null)
-          setInterviewResults((currentResults) => {
-            const nextResults = { ...currentResults }
-            delete nextResults[questionId]
-            interviewResultsRef.current = nextResults
-            return nextResults
-          })
-          setIsReportLoading(false)
-          setIsReportVisible(false)
-        }}
-        onStartInterview={handleStartInterview}
-        savedConfig={savedConfig}
-        reportError={reportError}
-        setupResetKey={setupResetKey}
-        sessionRef={sessionRef}
-        setupRef={setupRef}
-      />
-    </AppShell>
+    <>
+      <AppShell apiConnectionStatus={apiConnectionStatus}>
+        <HomePage
+          error={error}
+          interview={interview}
+          interviewCompletedAt={interviewCompletedAt}
+          interviewResults={interviewResults}
+          interviewStartedAt={interviewStartedAt}
+          isReportLoading={isReportLoading}
+          isReportVisible={isReportVisible}
+          isLoading={isLoading}
+          onCompleteInterview={handleCompleteInterview}
+          onRetryReport={handleCompleteInterview}
+          onStartNewInterview={handleStartNewInterview}
+          onResultChange={(result) =>
+            setInterviewResults((currentResults) => {
+              const nextResults = {
+                ...currentResults,
+                [result.question.id]: result,
+              }
+              interviewResultsRef.current = nextResults
+              return nextResults
+            })
+          }
+          onResultRemove={(questionId) => {
+            clearReportLoadingTimer()
+            setInterviewCompletedAt(null)
+            setInterviewResults((currentResults) => {
+              const nextResults = { ...currentResults }
+              delete nextResults[questionId]
+              interviewResultsRef.current = nextResults
+              return nextResults
+            })
+            setIsReportLoading(false)
+            setIsReportVisible(false)
+          }}
+          onStartInterview={handleStartInterview}
+          savedConfig={savedConfig}
+          reportError={reportError}
+          setupResetKey={setupResetKey}
+          sessionRef={sessionRef}
+          setupRef={setupRef}
+        />
+      </AppShell>
+      <Analytics />
+    </>
   )
 }
 
