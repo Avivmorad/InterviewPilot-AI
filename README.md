@@ -81,7 +81,7 @@ production reliability.
 
 ## Install Dependencies
 
-From the project root:
+From the folder where you want to keep the project:
 
 ```powershell
 git clone https://github.com/Avivmorad/InterviewPilot-AI.git
