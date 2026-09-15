@@ -1,10 +1,22 @@
 # InterviewPilot AI
 
-InterviewPilot AI is a technical interview simulator. The current implementation
-covers the Phase 1 flow through interview setup, AI question generation,
-question-by-question navigation, AI answer evaluation, and a final report.
-Deployment configuration is included for Vercel and Render. Authentication and
-persistence are still pending.
+Practice technical interviews with AI-generated questions, structured answer feedback,
+and a final learning report. Built with React, TypeScript, Express, Gemini and Groq.
+
+The current MVP supports interview setup, question-by-question practice, answer
+evaluation and a final report. Sessions stay in browser memory; accounts and saved
+interview history are not part of the current flow.
+
+## What to review
+
+- **LLM integration:** a shared provider interface, Gemini-to-Groq fallback and request timeouts.
+- **Output validation:** structured AI responses are checked before reaching the UI.
+- **Evaluation:** offline fixtures and optional real-provider comparisons for feedback quality.
+- **User experience:** responsive interview flow, keyboard support and a final learning roadmap.
+
+[Browse the AI service](server/src/ai/aiService.ts) ·
+[Explore the evaluations](server/src/evals/) ·
+[View screenshots](#screenshots)
 
 ## Live Demo
 
@@ -72,8 +84,9 @@ production reliability.
 From the project root:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI
-npm install
+git clone https://github.com/Avivmorad/InterviewPilot-AI.git
+cd InterviewPilot-AI
+npm ci
 ```
 
 ## Start The Project
@@ -97,7 +110,7 @@ npm run dev:client
 Or from the client folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
+cd client
 npm run dev
 ```
 
@@ -116,7 +129,7 @@ npm run dev:server
 Or from the server folder:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
+cd server
 npm run dev
 ```
 
@@ -211,10 +224,10 @@ report. Authentication and persistence are not included yet.
 ## Known Limitations
 
 - Authentication and persistence are not included in Phase 1.
-- Production browser verification was completed in this audit; ongoing release management still depends on the Vercel and Render accounts.
+- Live generation depends on provider availability and server-side API quota.
 - Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
 
-The final Phase 1 production evidence is recorded in
+Historical Phase 1 production verification from July 20, 2026 is recorded in
 [docs/verification/2026-07-20-production-verification.md](docs/verification/2026-07-20-production-verification.md).
 
 ## Screenshots
@@ -279,13 +292,13 @@ npm run smoke:production
 To run scripts from an individual workspace:
 
 ```powershell
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\client
+cd client
 npm run typecheck
 npm run lint
 npm run build
 npm run preview
 
-cd C:\Users\Daniel\Desktop\InterviewPilot-AI\server
+cd ../server
 npm run typecheck
 npm run build
 npm run start
