@@ -35,11 +35,11 @@ The Phase 1 product supports:
 - Role selection
 - Experience level selection
 - Interview type selection
-- Stable 3-question MVP interview length
+- Configurable interview length from 1–5 questions
 - AI-generated interview questions
 - One-question-at-a-time interview session
 - User answer submission
-- Structured AI feedback per answer
+- Structured AI feedback per answer, including an integer score from 0–100 and an `improvementSuggestion`
 - Final report with score, strengths, weaknesses, gaps, recommended topics, and roadmap
 - Restarting a clean new interview
 - Loading, validation, failure, retry, and reset states
@@ -68,12 +68,19 @@ The Phase 1 product supports:
 - Behavioral
 - Mixed
 
+## Current implementation boundaries
+
+- Supabase authentication scaffolding exists, but it is not integrated into the active application flow.
+- Supabase/database scaffolding exists, but active interview sessions and reports are not persisted.
+- The active interview flow uses frontend/in-memory application state.
+- RAG, vector search, an embeddings pipeline, autonomous agents, fine-tuning, model training, and MLOps are not implemented product capabilities.
+
 ## Excluded from Phase 1
 
 Do not add these until the MVP is fully stable and documented:
 
-- Authentication
-- Database persistence
+- Integrating authentication into the active application flow
+- Persisting interview sessions and reports
 - Interview history
 - Analytics dashboard
 - Resume upload
