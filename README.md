@@ -4,8 +4,9 @@ Practice technical interviews with AI-generated questions, structured answer fee
 and a final learning report. Built with React, TypeScript, Express, Gemini and Groq.
 
 The current MVP supports interview setup, question-by-question practice, answer
-evaluation and a final report. Sessions stay in browser memory; accounts and saved
-interview history are not part of the current flow.
+evaluation and a final report. Supabase authentication and database scaffolding
+exist, but they are not integrated into the active application flow. Active
+interview sessions and reports stay in frontend memory and are not persisted.
 
 ## What to review
 
@@ -47,8 +48,8 @@ interviewpilot-ai/
 
 ## How It Works
 
-1. The React frontend sends the selected role, level, interview type, and question count to
-   `POST /api/interview/create`.
+1. The React frontend sends the selected role, level, interview type, and question count
+   (1–5) to `POST /api/interview/create`.
 2. The Express route delegates to a thin controller and interview service.
 3. The service validates the request and builds a focused generation prompt.
 4. The AI service tries Gemini first and Groq as a fallback.
@@ -56,8 +57,9 @@ interviewpilot-ai/
    predictable response to the frontend.
 6. The frontend shows one question at a time and sends each submitted answer to
    `POST /api/interview/evaluate`.
-7. The backend validates the AI feedback JSON before returning scores,
-   strengths, weaknesses, gaps, and an improved answer.
+7. The backend validates the AI feedback JSON before returning an integer score
+   from 0–100, strengths, weaknesses, gaps, an improved answer, and
+   `improvementSuggestion`.
 8. The frontend stores evaluated answers in local state and builds a final
    report with an overall score, summaries, recommended topics, and a learning
    roadmap.
@@ -73,11 +75,11 @@ Developer, AI Engineer, and Generative AI Engineer. The stored API values are
 Supported experience levels are Intern, Junior, Mid-Level, and Senior. The
 stored API values are `intern`, `junior`, `mid-level`, and `senior`.
 
-AI Engineer remains the broader role for ML systems, data pipelines, model
-training or inference, deployment, feature engineering, and MLOps. Generative AI
-Engineer focuses on LLM application engineering, prompt design, structured
-outputs, RAG, evaluations, provider fallback, safety, cost, latency, and
-production reliability.
+AI Engineer and Generative AI Engineer interview questions may cover topics such
+as ML systems, model training, MLOps, RAG, and production reliability. These are
+candidate interview topics, not capabilities implemented by InterviewPilot AI.
+The product does not implement RAG, vector search, an embeddings pipeline,
+autonomous agents, fine-tuning, model training, or MLOps.
 
 ## Install Dependencies
 
@@ -205,14 +207,16 @@ Invoke-RestMethod `
 ```
 
 The response contains structured feedback used by the interview screen and final
-report. Authentication and persistence are not included yet.
+report. Supabase authentication and database scaffolding exist, but neither is
+connected to the active application flow; sessions and reports remain in
+frontend memory.
 
 ## Engineering Decisions
 
 - Gemini is the primary provider and Groq is the fallback so the app can keep working when the primary provider is unavailable.
 - The backend validates structured AI output before the client sees it, which keeps malformed responses from breaking the UI.
 - The final report is generated in the frontend from already validated evaluations so the release stays deterministic and easy to reason about.
-- The MVP stores the current interview session in memory instead of adding accounts or persistence too early.
+- The active MVP stores the current interview session and report in frontend memory. Supabase auth and database scaffolding are present but not wired into this flow.
 
 ## Evaluation Pipeline
 
@@ -223,7 +227,7 @@ report. Authentication and persistence are not included yet.
 
 ## Known Limitations
 
-- Authentication and persistence are not included in Phase 1.
+- Supabase authentication and database scaffolding exist, but authentication is not integrated into the active flow and interview sessions/reports are not persisted.
 - Live generation depends on provider availability and server-side API quota.
 - Real-provider evaluation is optional and still requires server-side Gemini and Groq keys.
 
