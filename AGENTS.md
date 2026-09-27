@@ -45,14 +45,14 @@ The primary target roles are:
 
 ### Data and Authentication
 
-- Supabase
-- Supabase Auth
+- The current shipped MVP has no account authentication or persistent interview history.
+- Interview sessions stay in browser memory.
+- Supabase-related scaffolding may exist in the repository, but it is not part of the mounted production flow and must not be described as a shipped capability.
 
 ### Deployment
 
 - Vercel for the frontend
 - Render for the backend
-- Supabase for database and authentication
 
 ---
 
