@@ -92,11 +92,12 @@ Response:
 
 ```json
 {
-  "score": 4,
+  "score": 78,
   "strengths": ["Clear explanation of the main idea."],
   "weaknesses": ["Missing discussion of tradeoffs."],
   "missingConcepts": ["Error handling"],
   "improvedAnswer": "A stronger answer would explain...",
+  "improvementSuggestion": "Add one concrete example that shows the tradeoff.",
   "confidenceLevel": "medium"
 }
 ```
@@ -135,7 +136,18 @@ Response:
 
 ### Question count
 
-- Phase 1 stable value: `3`
+- Supported values: integers from `1` through `5`
+
+## Current application state
+
+- Supabase authentication scaffolding exists, but authentication is not integrated into the active application flow.
+- Supabase/database scaffolding exists, but active interview sessions and reports are not persisted.
+- The active interview flow uses frontend/in-memory application state.
+
+## Evaluation response contract
+
+- `score` is an integer from `0` through `100`.
+- `improvementSuggestion` is required in the implemented evaluation output.
 
 ## AI provider strategy
 
@@ -173,6 +185,10 @@ The generated questions must include:
 The backend assigns `id` values after validation instead of trusting provider-generated IDs.
 
 ### Role-specific guidance
+
+The subjects below are interview-question guidance only. InterviewPilot AI does
+not implement RAG, vector search, an embeddings pipeline, autonomous agents,
+fine-tuning, model training, or MLOps.
 
 `AI Engineer` is broad and can include:
 
