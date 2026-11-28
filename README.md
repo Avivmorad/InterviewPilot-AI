@@ -34,6 +34,8 @@ The current release is a complete **session-based MVP**. Interview state is held
 
 Supabase scaffolding exists for future work, but it is intentionally not wired into the shipped flow.
 
+RAG, vector search, embeddings, autonomous agents, fine-tuning, model training, and MLOps are interview topics, not implemented product features.
+
 ### Supported configurations
 
 | Category | Options |
